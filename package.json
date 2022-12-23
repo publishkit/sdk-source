@@ -1,0 +1,23 @@
+{
+  "name": "sdk",
+  "version": "0.8.0",
+  "description": "publishkit sdk",
+  "author": "louis",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx concurrently --names 'serve_dev,rollup' --prefix-colors 'yellow,blue' --kill-others 'yarn run serve:dev' 'yarn run rollup'",
+    "serve:dist": "npx serve dist -l 1339",
+    "serve:dev": "npx serve dev -l 1337",
+    "rollup": "rollup -c -w",
+    "build": "NODE_ENV=prod rollup -c",
+    "build:dev": "rollup -c"
+  },
+  "devDependencies": {
+    "dotenv-flow": "^3.2.0",
+    "javascript-obfuscator": "^4.0.0",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-import-css": "^3.1.0",
+    "rollup-plugin-obfuscator": "^0.2.2",
+    "rollup-plugin-replace": "^2.2.0"
+  }
+}
