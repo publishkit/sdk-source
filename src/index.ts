@@ -15,5 +15,4 @@ console.log(Utils.s.banner());
   (document.getElementsByTagName("progress")[0] as any).indeterminate = true; // spin
   await app.init();
   $("#spinner").remove();
-  $("#content").show();
 })();

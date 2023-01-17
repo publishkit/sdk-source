@@ -11,7 +11,8 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
-    return this.app.cache.searchdb.length;
+    const { notes={} } = this.app.cache.pkdb || {} 
+    return Object.keys(notes).length;
   };
 
   ui = async () => {
@@ -73,14 +74,15 @@ export default class Plugin extends BasePlugin {
     };
 
     const idx = new window.MiniSearch({
-      fields: ["title", "content"], // fields to index for full-text search
-      storeFields: ["title", "content", "path"], // fields to return with search results
+      fields: ["title", "text"], // fields to index for full-text search
+      storeFields: ["title", "text", "url"], // fields to return with search results
     });
 
-    const db = cache.searchdb;
+    const db = Object.values(cache.pkdb.notes);
 
     // add id to dataset
-    db.map((item, i) => (db[i].id = i));
+    // @ts-ignore
+    db.map((item, i: Number) => (db[i].id = i));
     // add dataset to index
     idx.addAll(db);
 
@@ -122,13 +124,13 @@ export default class Plugin extends BasePlugin {
         console.log("search", value, searchResults);
         searchResults.map((r: ObjectAny, i: number) => {
           const titleTerms = getsTerms(r.terms, r.match, "title");
-          const contentTerms = getsTerms(r.terms, r.match, "content");
+          const textTerms = getsTerms(r.terms, r.match, "text");
           const title = titleTerms.length
             ? highlight(titleTerms, r.title)
             : r.title;
-          const content = contentTerms.length
+          const text = textTerms.length
             ? this.utils.m.truncateBetweenPattern(
-                highlight(contentTerms, r.content),
+                highlight(textTerms, r.text),
                 "<mark>.+?</mark>",
                 options.padding,
                 " ... "
@@ -136,9 +138,9 @@ export default class Plugin extends BasePlugin {
             : "";
           str += `<li class="${i == 0 ? "selected" : ""}">
                     <div><i class='bx bx-file-blank' ></i> ${title}</div>
-                    <div>${content}</div>
+                    <div>${text}</div>
                 </li>`;
-          results.push(r.path);
+          results.push(r.url);
         });
       }
 

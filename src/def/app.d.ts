@@ -11,8 +11,8 @@ interface App {
 
 interface AppCache {
   pkrc: ObjectAny;
+  pkdb: ObjectAny;
   config: ObjectAny;
   frontmatter: ObjectAny;
-  searchdb: ObjectAny[];
   tags: string[];
 }

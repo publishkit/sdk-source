@@ -25,7 +25,8 @@ export const pageHeight = () => {
 };
 
 export const getData = async (path: string): Promise<string> => {
-  const myRequest = new Request(`${path}`);
+  const url = `${window.pk.base}${path}`
+  const myRequest = new Request(url);
   const res = await fetch(myRequest);
   return res.ok ? res.text() : "";
 };

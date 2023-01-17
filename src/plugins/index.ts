@@ -10,6 +10,7 @@ import toc from './toc'
 import frontmatter from './frontmatter'
 import highlightjs from './highlightjs'
 import social from './social'
+import pdf from './pdf'
 
 const plugins: ObjectAny = {
     global,
@@ -24,6 +25,7 @@ const plugins: ObjectAny = {
     frontmatter,
     highlightjs,
     social,
+    pdf
 }
 
 export default plugins

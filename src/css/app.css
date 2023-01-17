@@ -3,14 +3,28 @@
 iframe::-webkit-scrollbar {
   display: none;
 }
-.pdf-embed {
+.pdf {
   display: block;
   width: 300px;
-  height: 368px;
+  height: 423px;
+  overflow: clip;
 }
-.pdf-embed iframe {
+.pdf.notoolbar {
+  width: 300px;
+  height: 367px;
+}
+.pdf iframe {
   width: inherit;
   height: inherit;
+}
+
+
+/* EMBEDS */
+
+.embed-content.outline {
+  border: 2px solid var(--muted-border-color);
+  padding: 1em;
+  margin-bottom: 1em;
 }
 
 /* FORMS */

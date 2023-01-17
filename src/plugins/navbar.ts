@@ -8,8 +8,8 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
-    const html = await this.utils.w.getData("/navbar");
-    const { nested, items } = this.utils.a.fromUl(html);
+    const data = JSON.parse(await this.utils.w.getData("navbar.json"));
+    const { nested, items } = data
     return items.length ? { nested, items } : false;
   };
 

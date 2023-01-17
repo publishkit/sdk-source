@@ -18,37 +18,32 @@ export default class App {
     this.ui = new UI(this);
   }
 
-  cfg = (key: string, fallback: any) =>
-    this.utils.o.get(this.cache.config, key) || fallback;
+  cfg = (key: string, fallback: any) => {
+    const value = this.utils.o.get(this.cache.config, key);
+    if (typeof value == "undefined") return fallback;
+    else return value;
+  };
 
   init = async () => {
-    const pkrc = (window.pkrc || {});
+    const pkrc = window.pkrc || {};
+    let pkdb: ObjectAny = {};
     let frontmatter = {};
-    let searchdb: ObjectAny[] = [];
-    let tags = [];
+    let tags: string[] = [];
 
     try {
-      searchdb = Object.values(
-        JSON.parse(await this.utils.w.getData("/searchdb.json"))
-      );
+      pkdb = JSON.parse(await this.utils.w.getData("pkdb.json"));
     } catch (e) {}
     try {
-      frontmatter = JSON.parse(
-        unescape($("meta[name=frontmatter]").prop("content"))
-      );
-    } catch (e) {}
-    try {
-      tags = JSON.parse(unescape($("meta[name=tags]").prop("content")));
+      frontmatter = JSON.parse($("template#pkrc").html());
     } catch (e) {}
 
     this.cache = {
-        pkrc,
-        config: this.utils.o.merge(pkrc, frontmatter),
-        frontmatter,
-        searchdb,
-        tags
-    }
-
+      pkrc,
+      config: this.utils.o.merge(pkrc, frontmatter),
+      frontmatter,
+      pkdb,
+      tags,
+    };
 
     const ui = await this.ui.create();
     await this.plugins.init();

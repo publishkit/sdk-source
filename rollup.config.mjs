@@ -67,7 +67,7 @@ if (NODE_ENV == "dev") {
     output: { file: `dev/sdk.js`, format: "iife" },
     plugins: [
       typescript({
-        include: ["src/sdk.ts", "src/**/global.d.ts"],
+        include: ["src/sdk.ts", "src/pk.ts", "src/utils/crypto.ts", "src/**/global.d.ts"],
       }),
       replace({
         "process.env.PK_URL": JSON.stringify(process.env.PK_URL),

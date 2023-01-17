@@ -5,10 +5,12 @@ export default class UI {
   utils;
 
   cache: ObjectAny = {};
+  tpl: ObjectAny;
 
   constructor(app: App) {
     this.app = app;
     this.utils = app.utils;
+    this.tpl = $("template#content")
   }
 
   set = (key: string, value: any) => (this.cache[key] = value);
@@ -48,7 +50,7 @@ export default class UI {
     );
     this.set(
       "poweredby",
-      `<span class="poweredby">powered by</span> <a href="https://www.publishkit.app/" target="_new" class="contrast outline"><i class='bx bx-paper-plane'></i> PublishKit</a>`
+      `<span class="poweredby">powered by</span> <a href="https://publishkit.dev" target="_new" class="contrast outline"><i class='bx bx-paper-plane'></i> PublishKit</a>`
     );
 
     this.push("footer", this.get("copyright"));
@@ -115,8 +117,11 @@ export default class UI {
             ${rx.modals}
         </main>`;
 
-    document.getElementById("content")!.innerHTML = rx.layout;
+    this.renderView(rx.layout)
     return await this.utils.d.waitForEl("main.ready");
   };
 
+  renderView = (view: string) => {
+    this.tpl.replaceWith(view)
+  }
 }

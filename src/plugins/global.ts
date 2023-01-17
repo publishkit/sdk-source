@@ -47,15 +47,6 @@ export default class Plugin extends BasePlugin {
 
     // for (const el of document.querySelectorAll('img')) el.setAttribute('class', 'img-fluid')
 
-    // pdf
-    if (this.app.cfg("doc.pdf_notoolbar"))
-      for (const el of document.querySelectorAll(".pdf-embed iframe")) {
-        // TODO remap this prop
-        const src = el.getAttribute("src") + "#toolbar=0";
-        el.setAttribute("src", "");
-        setTimeout(() => el.setAttribute("src", src), 10);
-      }
-
     // callouts
     $(".callout-title:has(.callout-fold)").on("click", function () {
       $(this).next().toggle();

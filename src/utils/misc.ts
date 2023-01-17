@@ -75,7 +75,7 @@ export const parseValue = (value: string, type: string): ObjectAny => {
     p.url = `https://cdn.jsdelivr.net/gh/publishkit/community@latest${getPath(p.key)}`;
   } else {
     p.key = url;
-    p.url = `${window.pk.folder}${getPath(p.key)}`;
+    p.url = `${window.pk.base}${window.pk.folder}${getPath(p.key)}`;
   }
 
   return p;
