@@ -1,10 +1,8 @@
-import { App } from "src/def/app";
 import BasePlugin from "./basePlugin";
 
 export default class Plugin extends BasePlugin {
-  constructor(app: App, options: ObjectAny) {
-    super(app, options);
-    this.id = "highlightjs";
+  constructor(id: string, options: ObjectAny = {}) {
+    super(id, options);
     this.deps = [
       "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js",
     ];
@@ -16,11 +14,20 @@ export default class Plugin extends BasePlugin {
         : [];
   }
 
-  code = async () => {
+  apply = (el: Element) => {
+    window.hljs.highlightElement(el);
+  };
+
+  bind = async () => {
     // themes - https://github.com/highlightjs/highlight.js/tree/main/src/styles
     // demo - https://highlightjs.org/static/demo/
+
+    window.hljs.configure({
+      ignoreUnescapedHTML: true
+    })
+
     document.querySelectorAll("pre code").forEach((el) => {
-      window.hljs.highlightElement(el);
+      this.apply(el);
     });
   };
 }

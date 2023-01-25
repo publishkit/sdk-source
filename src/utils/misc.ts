@@ -28,55 +28,91 @@ export const truncateBetweenPattern = (
         .join("");
 };
 
+const parseOptions = (s: string, o: ObjectAny = {}) => {
+  if (!s || !o) return {};
+  const vars = s.split(",");
+  vars.forEach((v) => {
+    let [key, ...optionValue] = v.split(":");
+    let value: any = (optionValue||"").join(":");
+    if (isNumeric(value)) value = Number(value);
+    else if (value == "true") value = true;
+    else if (value == "false") value = false;
+    put(o, key, value);
+  });
+  return o;
+};
 
+export const resolveType = (name: string) => {
+  if (typeof name == "boolean") return "core";
+  if (typeof name != "string" || !name) return "";
+  if (name.includes("//")) return "external";
+  else if (name.startsWith("@")) return "community";
+  else return "internal";
+};
 
-
-const parseOptions = (s: string, o: ObjectAny) => {
-  if(!s || !o) return {}
-  const vars = s.split(",")
-  vars.forEach(v => {
-    let kv = v.split(":")
-    let key = kv[0]
-    let value: any = kv[1]
-    if(isNumeric(value)) value = Number(value)
-    else if(value=="true") value = true
-    else if(value=="false") value = false
-    put(o, key, value)
-  })
-  return o
-}
-
-export const parseValue = (value: string, type: string): ObjectAny => {
-  const getPath = (name: string) => (({
-    "css": `/themes/${name}.css`,
-    "js": `/plugins/${name}.js`
-  } as ObjectAny)[type])
-  const p = {
-    key: "",
-    url: "",
+export const parseFlyPlugin = (value: string): PluginObject => {
+  const p: PluginObject = {
+    id: "",
+    value: "",
     options: {},
   };
 
-  if (typeof value != "string" || !(value = value.trim())) return p;
+  try {
+    if (typeof value != "string" || !(value = value.trim())) return p;
 
-  let [url = "", options = ""] = value.split("|");
-  parseOptions(options, p.options);
+    let [name = "", options = ""] = value.split("|");
 
-  if (options === "false") {
-    p.key = url
+    p.value = name;
+    if (options === "false") p.value = false;
+    else p.options = parseOptions(options);
+
+    switch (resolveType(name)) {
+      case "internal":
+        p.id = name;
+        break;
+      case "external":
+        p.id = name.split("/").pop()?.split(".")[0] || "";
+        break;
+      case "community":
+        p.id = name.replace("@", "");
+        break;
+    }
+  } catch (e) {
     // @ts-ignore
-    p.url = false
-  } else if (url.includes("//")) {
-    // @ts-ignore
-    p.key = url.split("/").pop()?.split(".")[0];
-    p.url = url;
-  } else if (value.startsWith("@")) {
-    p.key = url.replace("@", "");
-    p.url = `https://cdn.jsdelivr.net/gh/publishkit/community@latest${getPath(p.key)}`;
-  } else {
-    p.key = url;
-    p.url = `${window.pk.base}${window.pk.folder}${getPath(p.key)}`;
+    p.error = e;
   }
 
   return p;
+};
+
+
+export const resolvePluginUrl = (
+  id: string,
+  value: string | boolean,
+  type: PluginType = "js"
+): string => {
+  if (typeof value != "string" || !(value = value.trim())) return "";
+  let url = "";
+
+  const getPath = (name: string) =>
+    ({
+      css: `/themes/${name}.css`,
+      js: `/plugins/${name}.js`,
+    }[type]);
+
+  const path = getPath(id);
+
+  switch (resolveType(value)) {
+    case "internal":
+      url = `${window.pk.folder}${path}`;
+      break;
+    case "external":
+      url = value;
+      break;
+    case "community":
+      url = `https://cdn.jsdelivr.net/gh/publishkit/community@latest${path}`;
+      break;
+  }
+
+  return url;
 };

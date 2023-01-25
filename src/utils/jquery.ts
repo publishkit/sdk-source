@@ -1,5 +1,10 @@
 // @ts-nocheck
 
+interface JQueryStatic {
+  throttle(delay: number, cb: Function): Function;
+  debounce(delay: number, cb: Function): Function;
+}
+
 $.throttle = function (delay, no_trailing, callback, debounce_mode) {
   let timeout_id,
     last_exec = 0;

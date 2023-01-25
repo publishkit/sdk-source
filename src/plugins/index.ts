@@ -1,6 +1,8 @@
 import global from './global'
 import header from './header'
-import cdnfonts from './cdnfonts'
+import css from './css'
+import fonts from './fonts'
+import ga from './ga'
 import hotkeys from './hotkeys'
 import modal from './modal'
 import search from './search'
@@ -8,24 +10,28 @@ import darkmode from './darkmode'
 import navbar from './navbar'
 import toc from './toc'
 import frontmatter from './frontmatter'
-import highlightjs from './highlightjs'
+import highlight from './highlight'
 import social from './social'
 import pdf from './pdf'
+import breadcrumbs from './breadcrumbs'
 
 const plugins: ObjectAny = {
     global,
-    header,
-    cdnfonts,
     hotkeys,
+    header,
+    fonts,
+    ga,
     modal,
     search,
     darkmode,
     navbar,
     toc,
     frontmatter,
-    highlightjs,
+    highlight,
     social,
-    pdf
+    pdf,
+    breadcrumbs,
+    css,
 }
 
 export default plugins

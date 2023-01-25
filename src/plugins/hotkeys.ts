@@ -1,16 +1,22 @@
-import { App } from "src/def/app";
 import BasePlugin from "./basePlugin";
 
 export default class Plugin extends BasePlugin {
-  constructor(app: App) {
-    super(app);
-    this.id = "hotkeys";
+  shortcuts: { shortcut: string; description: string; fn: Function }[];
+
+  constructor(id: string, options: ObjectAny = {}) {
+    super(id, options);
     this.deps = [
       "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.min.js",
     ];
   }
 
-  code = async () => {
+  register = (shortcut: string, description: string, fn: Function) => {
+    this.shortcuts = this.shortcuts || [];
+    this.shortcuts.push({ shortcut, description, fn });
+    window.hotkeys(shortcut, fn);
+  };
+
+  bind = async () => {
     // enable hotkeys to work in inputs
     window.hotkeys.filter = function (event: any) {
       const tagName = (event.target || event.srcElement).tagName;
@@ -19,10 +25,5 @@ export default class Plugin extends BasePlugin {
       );
       return true;
     };
-
-    // handle escape
-    window.hotkeys("esc", function (event: any) {
-      window.modal && window.modal.prop("open", false);
-    });
   };
 }

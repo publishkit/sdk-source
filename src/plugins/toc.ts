@@ -1,36 +1,42 @@
-import { App } from "src/def/app";
 import BasePlugin from "./basePlugin";
 
 export default class Plugin extends BasePlugin {
-  constructor(app: App) {
-    super(app);
-    this.id = "toc";
+  constructor(id: string, options: ObjectAny = {}) {
+    super(id, options);
   }
 
   init = async () => {
-    const self = this;
-    const content = this.app.ui.get("content");
+    const { utils, ui } = this;
+    const content = ui.base.get("center.content");
     const dom = $("<div/>").html(content);
     const headings = dom.find(">h1, >h2, >h3");
 
     if (headings.length <= 1) return;
 
     headings.map(function () {
-      this.id = "heading-" + self.utils.s.slugify($(this).text());
+      this.id = "heading-" + utils.s.slugify($(this).text());
     });
 
-    this.app.ui.set("content", dom.html());
+    ui.base.set("center.content", dom.html());
     return true;
   };
 
-  ui = async () => {
-    const { ui } = this.app;
-    ui.set("toc", '<ul id="toc"></ul>');
-    ui.push("right", ui.get("toc"));
+  render = async () => {
+    const { ui } = this;
+    ui.addElement("right", "main", "<ul></ul>");
   };
 
-  code = async () => {
+  bind = async () => {
+    const { ui, options } = this;
+
+    const toc = this.ui.getElement("right", "main").el.find("ul");
     const headings = $('[id^="heading-"]');
+    const lastHeading = headings.last();
+
+    if(options.title) $(`<div class="mb-2"><small>${options.title}</small></div>`).insertBefore(
+      toc
+    );
+
     const links = headings
       .map(function () {
         return `<li><a href="#${
@@ -40,21 +46,20 @@ export default class Plugin extends BasePlugin {
       .toArray()
       .join("");
 
-    const scrollTo = (el: string) => this.utils.w.scrollTo(el, 90, 600);
+    const scrollTo = (el: string) => this.utils.w.scrollTo(el, 120, 600);
 
-    $("#toc")
-      .html(links)
-      .on("click", "a", function (e) {
-        e.preventDefault();
-        scrollTo(this.getAttribute("href"));
-        window.location.hash = this.getAttribute("href");
-      });
+    toc.html(links).on("click", "a", function (e) {
+      e.preventDefault();
+      scrollTo(this.getAttribute("href"));
+      window.location.hash = this.getAttribute("href");
+    });
 
     // scrollspy
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        const isVisible = entry.isIntersecting;
         const id = entry.target.getAttribute("id");
+        const isLast = lastHeading[0].id == id;
+        const isVisible = entry.isIntersecting || isLast;
         const item = document.querySelector('a[href="#' + id + '"]');
         // @ts-ignore
         $(item).parent().toggleClass("is-visible", isVisible);
@@ -71,4 +76,42 @@ export default class Plugin extends BasePlugin {
         scrollTo(hash);
       }, 0);
   };
+
+  style = async () => `
+    [id="right.toc.main"] ul {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      li {
+        list-style: none;
+        margin: 0;
+        border-left: 2px solid var(--muted-border-color);
+        a {
+          font-size: 0.8rem;
+          color: var(--secondary);
+          display: block;
+          padding: 0.3rem 0;
+          text-decoration: none;
+          margin-left: 10px;
+          &:focus {
+            background-color: transparent;
+          }
+          &.is-h2 {
+            margin-left: 20px;
+          }
+          &.is-h3 {
+            margin-left: 30px;
+          }
+        }
+      }
+      &> .is-visible {
+        border-left: 2px solid var(--primary);
+        background: var(--card-background-color);
+      }
+      .is-visible ~ .is-visible {
+        border-left: 2px solid var(--muted-border-color);
+        background: transparent;
+      }
+    }
+  `;
 }

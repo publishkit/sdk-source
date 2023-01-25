@@ -14,7 +14,7 @@ export default {
     s: String,
     w: Web,
     a: Array,
-    d: Dom,
+    dom: Dom,
     m : Misc,
     n: Number
 }

@@ -2,7 +2,7 @@ export const asArray = (
   input: string | string[] | undefined,
   { delim = ",", trim = true, uniq = true, compact = true } = {}
 ): string[] => {
-  if(!input) return []
+  if (!input) return [];
   let output = typeof input == "string" ? input.split(delim) : input || [];
 
   if (trim) output = output.map((v) => v?.trim?.() || v);
@@ -24,6 +24,15 @@ export const unique = (array: any[]): any[] => {
 
 // flaten, truthy, unique
 export const clean = (array: any[]) => unique(array.flat().filter(Boolean));
+
+export const sequence = async (arr: any[], cb: Function) => {
+  const results = [];
+  for (let i = 0; i < arr.length; i++) {
+    const result = await cb(arr[i], i, arr);
+    results.push(result);
+  }
+  return results;
+};
 
 // extract value from html
 export const fromUl = (html: string) => {

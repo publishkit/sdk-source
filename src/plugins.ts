@@ -1,15 +1,15 @@
-import { App } from "./def/app";
 import CorePlugins from "./plugins/index";
+import BasePlugin from "./plugins/basePlugin";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["global", "cssvars", "hotkeys", "modal"];
+const requiredPlugins = ["global", "hotkeys"];
 const lastPlugins = ["header"];
 
 export default class Plugins {
-  app;
+  app: App;
   utils;
 
-  cache: ObjectAny = {};
+  cache: PluginCache = {};
   options: ObjectAny = {};
   active: string[] = [];
   inactive: string[] = [];
@@ -26,8 +26,8 @@ export default class Plugins {
       console.log(`plugins ➔`, ...args);
   };
 
-  register = (id: string, Plugin: IPlugin) => {
-    const plugin = new Plugin(this.app, this.options[id]);
+  register = (id: string, Plugin: any): BasePlugin => {
+    const plugin: BasePlugin = new Plugin(id, this.options[id]);
     if (!id || !plugin.id) throw new Error(`plugin is missing an id`);
     if (id != plugin.id)
       throw new Error(
@@ -35,14 +35,16 @@ export default class Plugins {
       );
     if (this.cache[id]) throw new Error(`plugin id '${id}' already exist`);
     this.cache[id] = plugin;
+    return plugin;
   };
 
   registerExternal = async (id: string, url: string) => {
-    const script = await this.utils.w.getData(url);
+    url = this.utils.m.resolvePluginUrl(id, url, "js");
+    const script = url && (await this.utils.w.getData(url, { nocache: true }));
     if (!script) throw new Error(`external file not found: ${url}`);
-    const fn = new Function(script);
+    const fn = new Function(script as string);
     const plugin = await fn();
-    this.log(id, "external", url);
+    // this.log(id, "external", url);
     return this.register(id, plugin);
   };
 
@@ -50,29 +52,32 @@ export default class Plugins {
     return !!this.cache[key];
   };
 
-  getPluginsIndex = () => {
-    const { pkrc } = this.app.cache;
+  getFlyPluginsConfig = (index: ObjectAny = {}) => {
     const fly = this.utils.w.urlParams.getAll("p").filter(Boolean);
 
     fly.forEach((value) => {
-      const p = this.utils.m.parseValue(value, "js");
-      if (!p.key) return;
-      const currentOptions = pkrc[p.key] || {};
-      const options = this.utils.o.merge(currentOptions, p.options);
-      this.utils.o.put(pkrc, `plugins.${p.key}`, p.url);
-      this.utils.o.put(pkrc, p.key, options);
+      const p = this.utils.m.parseFlyPlugin(value);
+      if (!p.id) return;
+      if (CoreKeys.includes(p.id) && p.value !== false) p.value = true;
+      this.utils.o.put(index, `plugins.${p.id}`, p.value);
+      if (Object.keys(p.options).length)
+        this.utils.o.put(index, p.id, p.options);
     });
 
-    return pkrc.plugins;
+    return index;
   };
 
   init = async () => {
-    const { pkrc } = this.app.cache;
-    const plugins = this.getPluginsIndex();
-    const unsortedKeys = this.utils.a.clean([
-      ...CoreKeys,
-      ...Object.keys(plugins),
-    ]);
+    // expose BasePlugin for external plugins
+    window.BasePlugin = BasePlugin;
+
+    const { app, utils } = this;
+    const { cache } = app;
+    cache.fly = this.getFlyPluginsConfig();
+    cache.config = utils.o.merge(cache.config, cache.fly);
+    const { plugins } = cache.config;
+
+    const unsortedKeys = utils.a.clean([...CoreKeys, ...Object.keys(plugins)]);
     const sorted = unsortedKeys.reduce(
       (acc, key) => {
         if (lastPlugins.includes(key)) acc.last.push(key);
@@ -89,7 +94,7 @@ export default class Plugins {
       const acc = await prev;
       const pluginValue = plugins[key];
       // const pluginOptions = pkrc[key] = {}
-      const isActive = requiredPlugins.includes(key) || pluginValue;
+      const isActive = requiredPlugins.includes(key) || !!pluginValue;
 
       if (!isActive) return this.inactive.push(key) && acc;
 
@@ -97,9 +102,9 @@ export default class Plugins {
         this.options[key] = this.app.cfg(key) || {};
 
         if (CoreKeys.includes(key)) this.register(key, CorePlugins[key]);
-        else await this.registerExternal(key, plugins[key]);
+        else await this.registerExternal(key, pluginValue);
 
-        const p: IPlugin = this.cache[key];
+        const p = this.cache[key];
 
         if (p.init) {
           const init = await p.init();
@@ -113,52 +118,95 @@ export default class Plugins {
         if (p.deps)
           acc.deps.push(typeof p.deps == "function" ? p.deps() : p.deps);
         if (p.css) acc.css.push(typeof p.css == "function" ? p.css() : p.css);
-        if (p.ui) acc.ui.push([p.ui, p.options]);
+        if (p.render) acc.render.push([p.id, p.render, p.options]);
+        if (p.style) acc.styles.push([p.id, await p.style()]);
 
         this.active.push(key);
         return acc;
       } catch (e) {
         this.log(key, `💥 ${key}`, { err: e.message });
-        this.failed.push([key, e.message]);
+        this.failed.push([key, "load()", e.message]);
         return acc;
       }
-    }, Promise.resolve({ init: [], deps: [], css: [], ui: [] }));
+    }, Promise.resolve({ init: [], deps: [], css: [], render: [], styles: [] }));
+
+    const addStyle = (id: string, css: string) => {
+      const style = document.createElement("style");
+      style.id = `style.${id}`;
+      style.textContent = css;
+      document.head.append(style);
+    };
 
     // append css
-    this.utils.a
+    utils.a
       .clean(load.css)
       .map((css) =>
-        window.document.querySelector("head")!.append(this.utils.d.cssEl(css))
+        window.document.querySelector("head")!.append(utils.dom.cssEl(css))
       );
-    // append deps
-    await this.utils.d.loadScript(this.utils.a.clean(load.deps));
-    // apply ui
-    // for now running in parallel is acceptable because few plugins
-    // but because we push to ui arrays, ui will behave at random if not applied in sequence
+    // append styles (parralel)
     // @ts-ignore
-    await Promise.all(load.ui.map(([fn, options]) => fn(options)));
+    await Promise.all(
+      load.styles.map(async ([id, css]: [string, string]) => {
+        try {
+          if (typeof css != "string" || !css.trim()) return;
+          const style = window.less ? (await window.less.render(css)).css : css;
+          addStyle(id, style);
+        } catch (e) {
+          this.active.splice(this.active.indexOf(id), 1);
+          this.failed.push([id, "style()", `invalid css`]);
+        }
+      })
+    );
+    // append deps (parralel)
+    await utils.dom.loadScript(utils.a.clean(load.deps));
+
+    // apply render (sequence)
+    // @ts-ignore
+    await utils.a.sequence(
+      load.render,
+      async ([id, fn, options]: [string, Function, ObjectAny]) => {
+        try {
+          if (this.active.indexOf(id) >= 0) await fn(options);
+        } catch (e) {
+          this.active.splice(this.active.indexOf(id), 1);
+          this.failed.push([id, "render()", e]);
+        }
+      }
+    );
 
     return load;
   };
 
-  get = (key: string | void) => {
-    if (key) return this.cache[key];
-    else return this.active.map((k) => this.cache[k]).filter(Boolean);
+  get = (id: string): BasePlugin | undefined => {
+    return this.cache[id];
+  };
+
+  getActive = (): BasePlugin[] => {
+    return this.active.map((k) => this.cache[k]).filter(Boolean);
   };
 
   run = async () => {
-    const plugins = this.get();
-    const codes = plugins
-      .map((p: IPlugin) => {
-        this.log(
-          p.id,
-          `✅ ${p.id}`,
-          Object.keys(this.options[p.id]).length ? this.options[p.id] : ""
-        );
-        p.code && p.code();
-      })
-      .filter(Boolean);
+    const { utils } = this;
+    const plugins = this.getActive();
 
-    return Promise.all(codes);
+    const binds = await utils.a.sequence(plugins, async (p: BasePlugin) => {
+      const type = utils.m.resolveType(this.app.cfg(`plugins.${p.id}`));
+      try {
+        if (p.bind) await p.bind();
+        const ptype = type ? ` (${type})` : "";
+        const poptions =
+          (Object.keys(this.options[p.id]).length && this.options[p.id]) || "";
+        this.log(p.id, `✅ ${p.id}${ptype}`, poptions);
+        return true;
+      } catch (e) {
+        this.active.splice(this.active.indexOf(p.id), 1);
+        this.failed.push([p.id, "bind()", e]);
+        return false;
+      }
+    });
+
+    this.failed.map(([id, scope, err]) => {
+      this.log(id, `💥 ${id}.${scope}`, err.message || err);
+    });
   };
 }

@@ -2,7 +2,6 @@ import Utils from "./utils/index";
 import Plugins from "./plugins";
 import Theme from "./theme";
 import UI from "./ui";
-import { AppCache } from "./def/app";
 
 export default class App {
   utils: typeof Utils;
@@ -24,23 +23,56 @@ export default class App {
     else return value;
   };
 
+  loadDirsConfig = async () => {
+    if (!window.pk.dirs) return [];
+
+    const dirs = location.pathname
+      .replace(window.pk.base, "")
+      .split("/")
+      .slice(0, -1)
+      .filter(Boolean);
+
+    const paths = dirs.map((dir, i) => {
+      if (i == 0) return dir;
+      const prev = dirs[i - 1];
+      return [prev, dir].join("/");
+    });
+
+    const files = await Promise.allSettled(
+      paths.map(async (path) => {
+        return this.utils.w.getData(`${path}/_dir.json`, {
+          nocache: true,
+          json: true,
+        });
+      })
+    );
+
+    // @ts-ignore
+    return files.map((r) => r.value).filter(Boolean);
+  };
+
   init = async () => {
     const pkrc = window.pkrc || {};
     let pkdb: ObjectAny = {};
     let frontmatter = {};
     let tags: string[] = [];
+    const dirs = await this.loadDirsConfig();
 
     try {
-      pkdb = JSON.parse(await this.utils.w.getData("pkdb.json"));
+      pkdb = <ObjectAny>(
+        await this.utils.w.getData(`pkdb.json`, { nocache: true, json: true })
+      );
     } catch (e) {}
     try {
-      frontmatter = JSON.parse($("template#pkrc").html());
+      frontmatter = JSON.parse($("template#frontmatter").html());
     } catch (e) {}
 
     this.cache = {
+      config: this.utils.o.merge({}, pkrc, ...dirs, frontmatter),
       pkrc,
-      config: this.utils.o.merge(pkrc, frontmatter),
+      dirs,
       frontmatter,
+      fly: {},
       pkdb,
       tags,
     };
@@ -48,6 +80,6 @@ export default class App {
     const ui = await this.ui.create();
     await this.plugins.init();
     await ui.render();
-    const run = await this.plugins.run();
+    await this.plugins.run();
   };
 }

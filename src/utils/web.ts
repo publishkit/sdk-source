@@ -24,11 +24,26 @@ export const pageHeight = () => {
   );
 };
 
-export const getData = async (path: string): Promise<string> => {
-  const url = `${window.pk.base}${path}`
+type getDataOptions = {
+  nocache: Boolean;
+  json: Boolean;
+};
+
+export const getData = async (
+  path: string,
+  options?: Partial<getDataOptions>
+): Promise<string | ObjectAny | any[]> => {
+  options = options || {};
+  options.nocache = options.nocache || !!urlParams.get("nocache");
+  // const base = path.includes("//") ? "" : window.pk.base;
+  let url = `${path}`;
+  // console.log("oooo", base, url)
+  if (options.nocache) url += `?v=${Date.now()}`;
   const myRequest = new Request(url);
   const res = await fetch(myRequest);
-  return res.ok ? res.text() : "";
+  let text = res.ok ? await res.text() : "";
+  if (options.json) text = JSON.parse(text);
+  return text;
 };
 
 // local storage

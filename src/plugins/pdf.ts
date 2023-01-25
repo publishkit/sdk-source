@@ -1,27 +1,27 @@
-import { App } from "src/def/app";
 import BasePlugin from "./basePlugin";
 
 export default class Plugin extends BasePlugin {
-  constructor(app: App) {
-    super(app);
-    this.id = "pdf";
+  constructor(id: string, options: ObjectAny = {}) {
+    super(id, options);
   }
 
-  code = async () => {
+  bind = async () => {
+    const { options } = this;
+
     const pdfs = [...document.querySelectorAll("iframe[src]")].filter(
       (e: HTMLIFrameElement) => e.src.includes(".pdf")
     );
 
     for (const el of pdfs) {
       const wrapper = $(el).parent();
-      if (this.app.cfg("pdf.toolbar") === false) {
+      if (options.toolbar === false) {
         const src = el.getAttribute("src") + "#toolbar=0";
         el.setAttribute("src", "");
         setTimeout(() => el.setAttribute("src", src), 10);
         wrapper.addClass("notoolbar");
       }
-      if (this.app.cfg("pdf.width")) {
-        wrapper.css("width", this.app.cfg("pdf.width"));
+      if (options.width) {
+        wrapper.css("width", options.width);
       }
     }
   };

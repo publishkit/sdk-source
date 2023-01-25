@@ -7,7 +7,7 @@ export default class PK {
   base: string;
   version: string;
   folder: string;
-  assets: string;
+  dirs: Boolean;
   api;
   debug;
   ready: Boolean;
@@ -24,6 +24,7 @@ export default class PK {
   }
 
   setBase = (href: string) => {
+    if(!href) return
     const base = document.createElement("base");
     base.href = href;
     document.getElementsByTagName("head")[0].appendChild(base);
@@ -34,11 +35,15 @@ export default class PK {
 
     let pkrc = {};
     try {
-      pkrc = JSON.parse(await (await fetch(`${this.base}pkrc.json`)).text());
+      pkrc = JSON.parse(
+        await (await fetch(`${this.base}pkrc.json?v=${Date.now()}`)).text()
+      );
     } catch (e) {
       try {
         this.base = `/${window.location.pathname.split("/")[1]}/`;
-        pkrc = JSON.parse(await (await fetch(`${this.base}pkrc.json`)).text());
+        pkrc = JSON.parse(
+          await (await fetch(`${this.base}pkrc.json?v=${Date.now()}`)).text()
+        );
       } catch (e) {
         this.base = "/";
         pkrc = {};
@@ -63,11 +68,17 @@ export default class PK {
       this.pkrc.pk?.folder ||
       "_pk"
     ).trim();
-    this.assets = (
-      localStorage.getItem("pk.assets") ||
-      this.pkrc.pk?.assets ||
-      "assets"
-    ).trim();
+
+    let dirsValue = localStorage.getItem("pk.dirs") || this.pkrc.pk?.dirs;
+    
+    if (typeof dirsValue == "undefined" || typeof dirsValue == "object")
+      dirsValue = false;
+    if (typeof dirsValue == "string") {
+      dirsValue = dirsValue.trim();
+      if (dirsValue == "false") dirsValue = false;
+      if (dirsValue == "true") dirsValue = true;
+    }
+    this.dirs = dirsValue;
 
     if (this.version != "latest")
       this.url = this.url.replace("@latest", `@${this.version}`);

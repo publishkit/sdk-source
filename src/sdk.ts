@@ -5,17 +5,21 @@ import PK from "./pk";
   await pk.init();
 
   try {
-    var script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js";
-    script.onload = function () {
+    const jquery = document.createElement("script");
+    jquery.src = "https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js";
+    jquery.onload = function () {
       (async () => {
-        while (!pk.ready) await new Promise((solve) => setTimeout(solve, 200));
+        while (!pk.ready || !window.less) await new Promise((solve) => setTimeout(solve, 200));
         if (!pk.error) $.ajax({ url: `${pk.url}/pk.js`, dataType: "script" });
         else pk.unregistered();
       })();
     };
 
-    document.head.appendChild(script);
+    const less = document.createElement("script");
+    less.src = "https://cdn.jsdelivr.net/npm/less@latest/dist/less.min.js";
+
+    document.head.appendChild(less);
+    document.head.appendChild(jquery);
   } catch (e) {
     alert(e.message);
   }

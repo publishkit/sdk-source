@@ -1,10 +1,8 @@
-import { App } from "src/def/app";
 import BasePlugin from "./basePlugin";
 
 export default class Plugin extends BasePlugin {
-  constructor(app: App) {
-    super(app);
-    this.id = "global";
+  constructor(id: string, options: ObjectAny = {}) {
+    super(id, options);
     this.deps = [
       "https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js",
     ];
@@ -13,32 +11,16 @@ export default class Plugin extends BasePlugin {
     ];
   }
 
-  code = async () => {
+  bind = async () => {
+    window.documentOnClick = [];
+
     // global click listener
     $(document).on("click", (event) => {
-      const target: any = event.target;
-
-      // close modal
-      if (window.modal) {
-        // const searchBtn = $(target).parents('#search-btn').length
-        // const searchIcon = ($(target).attr('class')||'').indexOf('search') >= 0
-        const modalContent = window.modal[0]
-          .querySelector("article")
-          .contains(target);
-        // if(!(searchBtn || searchIcon || modalContent)) window.modal.prop('open', false)
-        if (!modalContent) window.modal.prop("open", false);
-      }
-
-      // close menu if open
-      if ($("#navbar.open")[0]) {
-        const isIcon = target.id == "navbar-icon";
-        const isNav = $(target).parents("#navbar").length;
-        if (!(isIcon || isNav)) this.app.plugins.get("navbar").toggle();
-      }
+      window.documentOnClick.map((fn: Function) => fn(event));
     });
 
     // onclick prop is not passed in html in obsidian, so we use data-click and then rename it here
-    this.utils.d.renameProp("data-click", "onclick");
+    this.utils.dom.renameProp("data-click", "onclick");
 
     // tables
     $("table").wrap("<figure></figure>"); // make tables scrollable

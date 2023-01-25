@@ -23,13 +23,6 @@
     --callout-border-radius: var(--border-radius);
     --callout-icon-width: 20px;
 
-    /* --callout-info-bg: #233a45;
-    --callout-tip-bg: #233a40;
-    --callout-success-bg: #233b37;
-    --callout-question-bg: #2d3e31;
-    --callout-warning-bg: #3d362f;
-    --callout-danger-bg: #3d2936;
-    --callout-quote-bg: #33373f; */
     --callout-info-bg: #00b8d430;
     --callout-tip-bg: #00bfa521;
     --callout-success-bg: #19c5602b;
@@ -54,9 +47,6 @@
 
     --mark-background-color: var(--primary);
     --mark-color: var(--primary-contrast);
-    
-    --active-color: var(--color);
-    --active-background-color: var(--muted-border-color);
 
     --container-sm-width: 510px;
     --container-md-width: 700px;

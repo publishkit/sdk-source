@@ -34,7 +34,7 @@ export const get = (obj: ObjectAny, path: string) =>
 // put(lunch, 'sides.chips', 'Cape Cod');
 // put(lunch, 'sides.cookie', true);
 // put(lunch, 'sides.drink', 'soda');
-export const put = (obj: ObjectAny, path: any, val: any) => {
+export const put = (obj: ObjectAny, path: any, val: any): ObjectAny => {
   function stringToPath(path: any) {
     if (typeof path !== "string") return path;
 
@@ -69,4 +69,6 @@ export const put = (obj: ObjectAny, path: any, val: any) => {
       current = current[key];
     }
   });
+
+  return val
 };

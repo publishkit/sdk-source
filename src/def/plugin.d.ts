@@ -1,13 +1,34 @@
 
-interface IPlugin {
-    id: string;
-    options: ObjectAny;
-    deps: string[] | Function;
-    css: string[] | Function;
+type BasePlugin = import("src/plugins/basePlugin").default;
+type PluginType = "js" | "css";
 
-    new(app: any, options?: ObjectAny): IPlugin
 
-    init(): Promise<boolean>
-    code(): Promise<void>
-    ui(): Promise<void>
+interface PluginCache {
+  [key: string]: BasePlugin;
+}
+
+interface PluginObject {
+  id: string;
+  value: string | boolean;
+  options: ObjectAny;
+  url?: string;
+}
+
+interface HotkeysPlugin extends BasePlugin {
+  register(shortcut: string, description: string, fn: Function): void;
+}
+
+interface ModalPlugin extends BasePlugin {
+  stack: any[];
+  modal: JQuery | false;
+  open(id: string, cb?: Function): void;
+  close(cb?: Function): void;
+}
+
+interface HighlightPlugin extends BasePlugin {
+  apply(el: Element): void;
+}
+
+interface NavbarPlugin extends BasePlugin {
+  toggle(): void;
 }

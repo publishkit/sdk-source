@@ -5,3 +5,4 @@ dev/
 dist/
 .env
 .env*
+tmp.js
