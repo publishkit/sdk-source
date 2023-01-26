@@ -40,7 +40,7 @@ export default class App {
 
     const files = await Promise.allSettled(
       paths.map(async (path) => {
-        return this.utils.w.getData(`${path}/_dir.json`, {
+        return this.utils.w.getData(`${path}/dirrc.json`, {
           nocache: true,
           json: true,
         });
