@@ -54,8 +54,8 @@ export default class PK {
     this.setBase(this.base);
 
     this.url = (
-      localStorage.getItem("pk.url") ||
-      process.env.PK_URL ||
+      localStorage.getItem("pk.sdk") ||
+      process.env.PK_SDK ||
       ""
     ).trim();
     this.version = (
@@ -114,6 +114,7 @@ export default class PK {
     try {
       const hostname = window.location.hostname;
       if (hostname == "localhost") return (this.ready = true);
+
       const siteID = this.pkrc.site?.id;
       if (!siteID)
         throw new Error(

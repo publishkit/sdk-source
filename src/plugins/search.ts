@@ -107,7 +107,7 @@ export default class Plugin extends BasePlugin {
       const selectedIndex = list.find(".selected").index();
       const url = results[selectedIndex];
       // @ts-ignore
-      window.location = `/${window.pk.base}${url}`;
+      window.location = `${window.pk.base}${url}`;
     };
 
     const highlight = (terms: string[], str: string) => {
@@ -277,9 +277,11 @@ export default class Plugin extends BasePlugin {
     
     [id="header.elements.search.btn"] {
       display: none;
-      min-width: 130px;
       .text {
         font-size: 0.8rem;
+      }
+      > button {
+        min-width: 130px;
       }
       kbd {
         font-size: 0.6rem;
@@ -322,7 +324,7 @@ export default class Plugin extends BasePlugin {
     }
 
     @media (min-width: 992px) {
-      [id="header.elements.search.btn"] {
+      [id="header.elements.search.btn"] button {
         min-width: 200px;
       }
     }

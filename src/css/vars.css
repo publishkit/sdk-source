@@ -60,6 +60,7 @@
 /* light theme */
 :root:not([data-theme=dark]), [data-theme=light] {
     --background-color: #fff;
+    --card-background-color: #f7f7f7;
     --color: hsl(205deg, 20%, 32%);
 }
 /* dark theme */

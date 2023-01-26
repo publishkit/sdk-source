@@ -20,8 +20,8 @@ if (NODE_ENV == "prod") {
     plugins: [
       typescript(),
       replace({
-        "process.env.PK_URL": JSON.stringify(process.env.PK_URL),
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
+        "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
       }),
       cleanup(),
       css({ output: "pk.css", minify: true }),
@@ -36,8 +36,8 @@ if (NODE_ENV == "prod") {
     plugins: [
       typescript(),
       replace({
-        "process.env.PK_URL": JSON.stringify(process.env.PK_URL),
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
+        "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
       }),
       cleanup(),
       obfuscator.default(),
@@ -53,8 +53,8 @@ if (NODE_ENV == "dev") {
     plugins: [
       typescript(),
       replace({
-        "process.env.PK_URL": JSON.stringify(process.env.PK_URL),
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
+        "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
       }),
       cleanup(),
       css({ output: "pk.css", minify: false }),
@@ -70,8 +70,8 @@ if (NODE_ENV == "dev") {
         include: ["src/sdk.ts", "src/pk.ts", "src/utils/crypto.ts", "src/**/global.d.ts"],
       }),
       replace({
-        "process.env.PK_URL": JSON.stringify(process.env.PK_URL),
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
+        "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
       }),
       cleanup(),
     ],

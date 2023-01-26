@@ -7,7 +7,10 @@ export default class Plugin extends BasePlugin {
 
   init = async () => {
     // TODO add json parse inside getdata fn
-    const data = (await this.utils.w.getData(`navbar.json`, { json: true, nocache: true })) as ObjectAny
+    const data = (await this.utils.w.getData(`navbar.json`, {
+      json: true,
+      nocache: true,
+    })) as ObjectAny;
     const { nested, items } = data;
     return items.length ? { nested, items } : false;
   };
@@ -25,7 +28,7 @@ export default class Plugin extends BasePlugin {
             {{#each items}} 
               <li class="d-flex align-items-center">
                 {{#if this.[1]}}
-                <i class='bx bx-{{this.[1]}} me-2'></i>
+                <i class='bx {{this.[1]}} me-2'></i>
                 {{else}}
                 <i class='bx bx-chevron-right me-2'></i>
                 {{/if}}
@@ -40,7 +43,7 @@ export default class Plugin extends BasePlugin {
           {{#each items}} 
             <li class="d-flex align-items-center">
             {{#if this.[1]}}
-            <i class='bx bx-{{this.[1]}} me-2'></i>
+            <i class='bx {{this.[1]}} me-2'></i>
             {{else}}
             <i class='bx bx-chevron-right me-2'></i>
             {{/if}}
@@ -60,26 +63,31 @@ export default class Plugin extends BasePlugin {
     });
   };
 
+  activeLinks = () => {
+    // set aria-current if url match nav links
+    const path = window.location.pathname.replace(window.pk.base, "");
+
+    if (path == "/") $('a[href="/index"]').attr("aria-current", "");
+    else
+      $(
+        'a[href="' +
+          path +
+          '"], a[href="' +
+          path +
+          'index"], a[href="' +
+          path +
+          '.html"], a[href="' +
+          path +
+          'index.html"]'
+      ).attr("aria-current", "");
+  };
+
   bind = async () => {
     const self = this;
     const icon = this.ui.getHeaderIcon("icon");
     const nav = this.ui.getElement("left", "main").el.find("nav");
 
-    // set aria-current if url match nav links
-    // if (window.location.pathname == "/")
-    //   $('a[href="/index"]').attr("aria-current", "");
-    // else
-    //   $(
-    //     'a[href="' +
-    //       window.location.pathname +
-    //       '"], a[href="' +
-    //       window.location.pathname +
-    //       '/index"], a[href="' +
-    //       window.location.pathname +
-    //       '.html"], a[href="' +
-    //       window.location.pathname +
-    //       '/index.html"]'
-    //   ).attr("aria-current", "");
+    this.activeLinks();
 
     // bind nav menu icon
     icon.el.on("click", function (e) {
@@ -142,6 +150,10 @@ export default class Plugin extends BasePlugin {
           color: var(--h1-color);
           font-weight: 300;
           text-transform: uppercase;
+
+          &:after {
+            display: none;
+          }
         }
       }
       details[open] summary {

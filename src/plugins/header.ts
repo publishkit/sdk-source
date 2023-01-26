@@ -71,12 +71,14 @@ export default class Plugin extends BasePlugin {
   
     #header {
       --nav-link-spacing-vertical: 1rem;
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
       z-index: 99;
       position: fixed;
+      padding: 0 10px;
       top: 0;
       right: 0;
       left: 0;
+      background: var(--card-background-color);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
       backdrop-filter: saturate(100%) blur(20px);
       
       i {
@@ -115,13 +117,14 @@ export default class Plugin extends BasePlugin {
       }
         
       &.bg-contrast {
-        padding: 0 10px;
+        background: var(--contrast);
         color: var(--card-background-color);
         
         .sitename {
           color: var(--card-background-color);
         }
         kbd {
+          background-color: var(--card-background-color);
           color: var(--contrast);
         }
       }

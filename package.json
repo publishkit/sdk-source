@@ -1,13 +1,13 @@
 {
   "name": "sdk",
-  "version": "0.9.0",
+  "version": "0.9.3",
   "description": "publishkit sdk",
   "author": "louis",
   "license": "MIT",
   "scripts": {
     "dev": "npx concurrently --names 'serve_dev,rollup' --prefix-colors 'yellow,blue' --kill-others 'yarn run serve:dev' 'yarn run rollup'",
-    "serve:dist": "npx serve@14.1.2 ../pk-sdk-dist -l 1339",
-    "serve:dev": "npx serve@14.1.2 dev -l 1337",
+    "serve:dist": "npx serve@14.1.2 ../pk-sdk-dist -l 1402",
+    "serve:dev": "npx serve@14.1.2 dev -l 1402",
     "rollup": "rollup -c -w",
     "build": "NODE_ENV=prod rollup -c",
     "build:dev": "rollup -c"

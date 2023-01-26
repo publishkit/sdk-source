@@ -119,7 +119,7 @@ export default class Plugins {
           acc.deps.push(typeof p.deps == "function" ? p.deps() : p.deps);
         if (p.css) acc.css.push(typeof p.css == "function" ? p.css() : p.css);
         if (p.render) acc.render.push([p.id, p.render, p.options]);
-        if (p.style) acc.styles.push([p.id, await p.style()]);
+        if (p.style) acc.styles.push([p.id, p.style]);
 
         this.active.push(key);
         return acc;
@@ -143,20 +143,6 @@ export default class Plugins {
       .map((css) =>
         window.document.querySelector("head")!.append(utils.dom.cssEl(css))
       );
-    // append styles (parralel)
-    // @ts-ignore
-    await Promise.all(
-      load.styles.map(async ([id, css]: [string, string]) => {
-        try {
-          if (typeof css != "string" || !css.trim()) return;
-          const style = window.less ? (await window.less.render(css)).css : css;
-          addStyle(id, style);
-        } catch (e) {
-          this.active.splice(this.active.indexOf(id), 1);
-          this.failed.push([id, "style()", `invalid css`]);
-        }
-      })
-    );
     // append deps (parralel)
     await utils.dom.loadScript(utils.a.clean(load.deps));
 
@@ -172,6 +158,23 @@ export default class Plugins {
           this.failed.push([id, "render()", e]);
         }
       }
+    );
+
+    // append styles (parralel)
+    // @ts-ignore
+    await Promise.all(
+      load.styles.map(async ([id, css]: [string, string]) => {
+        try {
+          // @ts-ignore
+          css = await css()
+          if (typeof css != "string" || !css.trim()) return;
+          const style = window.less ? (await window.less.render(css)).css : css;
+          addStyle(id, style);
+        } catch (e) {
+          this.active.splice(this.active.indexOf(id), 1);
+          this.failed.push([id, "style()", `invalid css`]);
+        }
+      })
     );
 
     return load;

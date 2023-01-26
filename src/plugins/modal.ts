@@ -38,15 +38,19 @@ export default class Plugin extends BasePlugin {
     }
 
     this.stack.forEach((m) => m.prop("open", false));
-    const self = this
+    const self = this;
     setTimeout(() => {
       modal.prop("open", true);
       self.modal = modal;
 
       // inject UIModal to callback
-      const [_, pluginId, elementId] = id.split(".")
+      const [_, pluginId, elementId] = id.split(".");
       cb && cb(self.app.ui.getModal(pluginId, elementId));
-    }, 0)
+    }, 0);
+
+    // https://stackoverflow.com/a/7056673/1428445
+    // we return false so we can use <a href="#" onclick="return $modal.open('')" /> to prevent default
+    return false
   };
 
   close = (cb?: Function) => {
@@ -60,6 +64,10 @@ export default class Plugin extends BasePlugin {
       this.modal = modal;
     }
     cb && cb();
+
+    // https://stackoverflow.com/a/7056673/1428445
+    // we return false so we can use <a href="#" onclick="return $modal.open('')" /> to prevent default
+    return false;
   };
 
   bind = async () => {
@@ -69,12 +77,12 @@ export default class Plugin extends BasePlugin {
     window.documentOnClick.push((event: JQuery.ClickEvent) => {
       if (!self.modal) return;
       const target: any = event.target;
-      
+
       // @ts-ignore
       const modalContent = self.modal[0]
-      .querySelector("article")
-      .contains(target);
-      
+        .querySelector("article")
+        .contains(target);
+
       // close modal
       if (!modalContent && !self.modal.attr("noesc")) self.close();
     });
