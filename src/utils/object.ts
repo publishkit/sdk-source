@@ -2,31 +2,54 @@ export const isObject = (item: any): boolean => {
   return item && typeof item === "object" && !Array.isArray(item);
 };
 
+// @ts-ignore
+function merged(target, source) {
+  for (const [key, val] of Object.entries(source)) {
+    if (val !== null && typeof val === `object`) {
+      if (target[key] === undefined) {
+        // @ts-ignore
+        target[key] = new val.__proto__.constructor();
+      }
+      merged(target[key], val);
+    } else {
+      if (val !== null) target[key] = val;
+    }
+  }
+  return target; 
+}
+
 export const merge = (
   target: ObjectAny,
   ...sources: ObjectAny[]
 ): ObjectAny => {
-  if (!sources.length) return target;
   const source = sources.shift();
-
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        merge(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
-  }
-
-  return merge(target, ...sources);
+  return sources ? merged(target, source) : target;
 };
+
+// export const merge = (
+//   target: ObjectAny,
+//   ...sources: ObjectAny[]
+// ): ObjectAny => {
+//   if (!sources.length) return target;
+//   const source = sources.shift();
+
+//   if (isObject(target) && isObject(source)) {
+//     for (const key in source) {
+//       if (isObject(source[key])) {
+//         if (!target[key]) Object.assign(target, { [key]: {} });
+//         merge(target[key], source[key]);
+//       } else {
+//         if(source[key] !== null) Object.assign(target, { [key]: source[key] });
+//       }
+//     }
+//   }
+
+//   return merge(target, ...sources);
+// };
 
 // dot notation object get
 export const get = (obj: ObjectAny, path: string) =>
   path.split(".").reduce((acc, part) => acc && acc[part], obj);
-
 
 // let lunch = {};
 // put(lunch, 'sandwich.toppings[]', 'mayo');
@@ -49,20 +72,19 @@ export const put = (obj: ObjectAny, path: any, val: any): ObjectAny => {
     return output;
   }
 
-  
   path = stringToPath(path);
-  
+
   let length = path.length;
   let current = obj;
-  
+
   // @ts-ignore
   path.forEach(function (key, index) {
     let isArray = key.slice(-2) === "[]";
     key = isArray ? key.slice(0, -2) : key;
-    
+
     if (isArray && !Array.isArray(current[key])) current[key] = [];
     if (index === length - 1) {
-    if (isArray) current[key].push(val);
+      if (isArray) current[key].push(val);
       else current[key] = val;
     } else {
       if (!current[key]) current[key] = {};
@@ -70,5 +92,5 @@ export const put = (obj: ObjectAny, path: any, val: any): ObjectAny => {
     }
   });
 
-  return val
+  return val;
 };

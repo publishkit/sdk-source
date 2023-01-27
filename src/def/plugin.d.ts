@@ -1,6 +1,6 @@
 
 type BasePlugin = import("src/plugins/basePlugin").default;
-type PluginType = "js" | "css";
+type PluginType = "plugin" | "theme";
 
 
 interface PluginCache {

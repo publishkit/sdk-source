@@ -24,10 +24,11 @@ export const addScript = async (
   Promise.all(
     asArray(path).map(
       (path) =>
-        new Promise((success, error) => {
+        new Promise((success: Function, error) => {
           target = target || document.head;
           const tag = scriptEl(path, props);
           target.append(tag);
+          success()
         })
     )
   );
@@ -40,10 +41,11 @@ export const addStylesheet = async (
   Promise.all(
     asArray(path).map(
       (path) =>
-        new Promise((success, error) => {
+        new Promise((success: Function, error) => {
           target = target || document.head;
           const tag = cssEl(path, props);
           target.append(tag);
+          success()
         })
     )
   );
@@ -97,7 +99,9 @@ export const waitForEl = (selector: string) => {
 };
 
 export const cssvar = (key: string, value: any) =>
-  document.documentElement.style.setProperty(key, value);
+  // @ts-ignore
+  document.querySelector(":root")?.style.setProperty(key, value);
+// same as document.documentElement.style.setProperty(key, value);
 
 export const reloadStylesheets = () => {
   var links = document.getElementsByTagName("link");
@@ -107,11 +111,10 @@ export const reloadStylesheets = () => {
   }
 };
 
-
 // rename every props on documents
 // renameProp('data-target', 'onclick')
-export const renameProp = (from: string, to: string) => $('['+from+']').each(function() {
-    const el = $(this)
-    el.attr({ [to]: el.attr(from)})
-      .removeAttr(from)
-  })
+export const renameProp = (from: string, to: string) =>
+  $("[" + from + "]").each(function () {
+    const el = $(this);
+    el.attr({ [to]: el.attr(from) }).removeAttr(from);
+  });

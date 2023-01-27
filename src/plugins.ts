@@ -3,7 +3,7 @@ import BasePlugin from "./plugins/basePlugin";
 
 const CoreKeys = Object.keys(CorePlugins);
 const requiredPlugins = ["global", "hotkeys"];
-const lastPlugins = ["header"];
+const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
   app: App;
@@ -38,8 +38,21 @@ export default class Plugins {
     return plugin;
   };
 
-  registerExternal = async (id: string, url: string) => {
-    url = this.utils.m.resolvePluginUrl(id, url, "js");
+  registerExternal = async (
+    id: string,
+    url: string | boolean,
+    type?: PluginType
+  ) => {
+    if (id == "theme") {
+      if (url === true) url = "@default";
+      if (url === false) return;
+      type = "theme";
+    } else {
+      if (typeof url == "boolean") return;
+    }
+
+    const p = this.utils.m.parseFlyPlugin(url);
+    url = this.utils.m.resolvePluginUrl(type, p);
     const script = url && (await this.utils.w.getData(url, { nocache: true }));
     if (!script) throw new Error(`external file not found: ${url}`);
     const fn = new Function(script as string);
@@ -52,16 +65,31 @@ export default class Plugins {
     return !!this.cache[key];
   };
 
-  getFlyPluginsConfig = (index: ObjectAny = {}) => {
-    const fly = this.utils.w.urlParams.getAll("p").filter(Boolean);
+  parseInjectedPlugins = (urlParams: string[] = []): PluginObject[] => {
+    const plugins = urlParams.filter(Boolean);
+    return plugins.map(this.utils.m.parseFlyPlugin);
+  };
 
-    fly.forEach((value) => {
-      const p = this.utils.m.parseFlyPlugin(value);
+  injectPlugins = (index: ObjectAny = {}) => {
+    const { utils } = this;
+    const plugins = this.parseInjectedPlugins(utils.w.urlParams.getAll("p"));
+    let themes: PluginObject | PluginObject[] = this.parseInjectedPlugins(
+      utils.w.urlParams.getAll("theme")
+    );
+
+    themes = themes.map((theme) => {
+      theme.url = utils.m.resolvePluginUrl("theme", theme);
+      theme.id = "theme";
+      return theme;
+    });
+
+    const fly = [...plugins, ...themes].filter(Boolean);
+
+    fly.forEach((p: PluginObject) => {
       if (!p.id) return;
-      if (CoreKeys.includes(p.id) && p.value !== false) p.value = true;
-      this.utils.o.put(index, `plugins.${p.id}`, p.value);
-      if (Object.keys(p.options).length)
-        this.utils.o.put(index, p.id, p.options);
+      if (CoreKeys.includes(p.id)) p.value = true;
+      utils.o.put(index, `plugins.${p.id}`, p.value);
+      if (Object.keys(p.options).length) utils.o.put(index, p.id, p.options);
     });
 
     return index;
@@ -69,13 +97,13 @@ export default class Plugins {
 
   init = async () => {
     // expose BasePlugin for external plugins
-    window.BasePlugin = BasePlugin;
+    window.BasePlugin = window.BaseTheme = BasePlugin;
 
     const { app, utils } = this;
     const { cache } = app;
-    cache.fly = this.getFlyPluginsConfig();
+    cache.fly = this.injectPlugins();
     cache.config = utils.o.merge(cache.config, cache.fly);
-    const { plugins } = cache.config;
+    const { plugins = {} } = cache.config;
 
     const unsortedKeys = utils.a.clean([...CoreKeys, ...Object.keys(plugins)]);
     const sorted = unsortedKeys.reduce(
@@ -102,9 +130,15 @@ export default class Plugins {
         this.options[key] = this.app.cfg(key) || {};
 
         if (CoreKeys.includes(key)) this.register(key, CorePlugins[key]);
-        else await this.registerExternal(key, pluginValue);
+        else
+          await this.registerExternal(
+            key,
+            pluginValue,
+            (key == "theme" && "theme") || undefined
+          );
 
         const p = this.cache[key];
+        if (!p) return acc;
 
         if (p.init) {
           const init = await p.init();
@@ -166,7 +200,7 @@ export default class Plugins {
       load.styles.map(async ([id, css]: [string, string]) => {
         try {
           // @ts-ignore
-          css = await css()
+          css = await css();
           if (typeof css != "string" || !css.trim()) return;
           const style = window.less ? (await window.less.render(css)).css : css;
           addStyle(id, style);

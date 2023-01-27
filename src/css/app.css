@@ -1,3 +1,7 @@
+html {
+  font-family: var(--font-family, inherit);
+}
+
 /* IFRAMES */
 
 iframe::-webkit-scrollbar {
@@ -75,7 +79,7 @@ h4,
 h5,
 h6 {
   border-bottom: 2px solid var(--muted-border-color);
-  font-family: var(--heading-font-family, var(--font-family, "inherit"));
+  font-family: var(--headings-font-family, var(--font-family, inherit));
 }
 address,
 blockquote,
@@ -156,7 +160,6 @@ kbd {
 .left-bar {
   position: fixed;
   margin-top: -20px;
-  background: var(--background-color);
   border-radius: var(--border-radius);
   z-index: 100;
 }
@@ -252,7 +255,7 @@ details.dropdown-btn li a {
 details.dropdown-btn[role=list] summary:not([role]) {
   height: 28px;
   line-height: 30px;
-  border-color: var(--secondary);
+  border-color: var(--muted-border-color)
 }
 
 details.dropdown-btn[role=list][open] summary {

@@ -9,7 +9,8 @@ import PK from "./pk";
     jquery.src = "https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js";
     jquery.onload = function () {
       (async () => {
-        while (!pk.ready || !window.less) await new Promise((solve) => setTimeout(solve, 200));
+        while (!pk.ready || !window.less)
+          await new Promise((solve) => setTimeout(solve, 200));
         if (!pk.error) $.ajax({ url: `${pk.url}/pk.js`, dataType: "script" });
         else pk.unregistered();
       })();

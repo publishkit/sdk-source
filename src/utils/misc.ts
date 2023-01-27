@@ -62,7 +62,7 @@ export const parseFlyPlugin = (value: string): PluginObject => {
 
     let [name = "", options = ""] = value.split("|");
 
-    p.value = name;
+    p.value = value;
     if (options === "false") p.value = false;
     else p.options = parseOptions(options);
 
@@ -77,6 +77,7 @@ export const parseFlyPlugin = (value: string): PluginObject => {
         p.id = name.replace("@", "");
         break;
     }
+
   } catch (e) {
     // @ts-ignore
     p.error = e;
@@ -87,17 +88,17 @@ export const parseFlyPlugin = (value: string): PluginObject => {
 
 
 export const resolvePluginUrl = (
-  id: string,
-  value: string | boolean,
-  type: PluginType = "js"
+  type: PluginType = "plugin",
+  plugin: ObjectAny = {}
 ): string => {
+  let { id, value} = plugin
   if (typeof value != "string" || !(value = value.trim())) return "";
   let url = "";
 
   const getPath = (name: string) =>
     ({
-      css: `/themes/${name}.css`,
-      js: `/plugins/${name}.js`,
+      theme: `/themes/${name}.js`,
+      plugin: `/plugins/${name}.js`,
     }[type]);
 
   const path = getPath(id);
@@ -107,7 +108,7 @@ export const resolvePluginUrl = (
       url = `${window.pk.folder}${path}`;
       break;
     case "external":
-      url = value;
+      url = value.split("|")[0];
       break;
     case "community":
       url = `https://cdn.jsdelivr.net/gh/publishkit/community@latest${path}`;

@@ -1,7 +1,6 @@
 import global from "./global";
 import header from "./header";
 import css from "./css";
-import fonts from "./fonts";
 import ga from "./ga";
 import hotkeys from "./hotkeys";
 import modal from "./modal";
@@ -20,7 +19,6 @@ const plugins: ObjectAny = {
   global,
   hotkeys,
   header,
-  fonts,
   ga,
   modal,
   search,

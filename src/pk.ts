@@ -24,7 +24,7 @@ export default class PK {
   }
 
   setBase = (href: string) => {
-    if(!href) return
+    if (!href) return;
     const base = document.createElement("base");
     base.href = href;
     document.getElementsByTagName("head")[0].appendChild(base);
@@ -70,7 +70,7 @@ export default class PK {
     ).trim();
 
     let dirsValue = localStorage.getItem("pk.dirs") || this.pkrc.pk?.dirs;
-    
+
     if (typeof dirsValue == "undefined" || typeof dirsValue == "object")
       dirsValue = false;
     if (typeof dirsValue == "string") {

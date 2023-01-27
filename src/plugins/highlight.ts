@@ -3,15 +3,6 @@ import BasePlugin from "./basePlugin";
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
     super(id, options);
-    this.deps = [
-      "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js",
-    ];
-    this.css = () =>
-      this.options.theme
-        ? [
-            `https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/${this.options.theme}.min.css`,
-          ]
-        : [];
   }
 
   apply = (el: Element) => {
@@ -19,15 +10,28 @@ export default class Plugin extends BasePlugin {
   };
 
   bind = async () => {
-    // themes - https://github.com/highlightjs/highlight.js/tree/main/src/styles
-    // demo - https://highlightjs.org/static/demo/
+    const { options, utils } = this;
 
-    window.hljs.configure({
-      ignoreUnescapedHTML: true
-    })
+    if (options.theme) {
+      await utils.dom.addScript(
+        "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"
+      );
+      await utils.dom.addStylesheet(
+        `https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/${options.theme}.min.css`
+      );
+      (function wait() {
+        if (!window.hljs) {
+          setTimeout(wait, 100);
+        } else {
+          window.hljs.configure({
+            ignoreUnescapedHTML: true,
+          });
 
-    document.querySelectorAll("pre code").forEach((el) => {
-      this.apply(el);
-    });
+          document.querySelectorAll("pre code").forEach((el) => {
+            window.hljs.highlightElement(el);
+          });
+        }
+      })();
+    }
   };
 }
