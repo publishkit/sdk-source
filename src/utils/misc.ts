@@ -105,7 +105,7 @@ export const resolvePluginUrl = (
 
   switch (resolveType(value)) {
     case "internal":
-      url = `${window.pk.folder}${path}`;
+      url = `${window.pk.local}${path}`;
       break;
     case "external":
       url = value.split("|")[0];

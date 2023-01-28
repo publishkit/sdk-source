@@ -25,6 +25,12 @@ export default class Plugin extends BasePlugin {
             background-position: center;
             height: ${options.height || "300px"};
         }
+
+        @media (max-width: 991px) {
+            #hero {
+                height: 150px;
+            }
+        }
     `;
   };
 }

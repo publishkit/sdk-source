@@ -87,7 +87,6 @@ export default class Plugins {
 
     fly.forEach((p: PluginObject) => {
       if (!p.id) return;
-      if (CoreKeys.includes(p.id)) p.value = true;
       utils.o.put(index, `plugins.${p.id}`, p.value);
       if (Object.keys(p.options).length) utils.o.put(index, p.id, p.options);
     });

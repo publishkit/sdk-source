@@ -6,6 +6,7 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
+    if(this.app.cfg("navbar") === false) return false
     // TODO add json parse inside getdata fn
     const data = (await this.utils.w.getData(`navbar.json`, {
       json: true,

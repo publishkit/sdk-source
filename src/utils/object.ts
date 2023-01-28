@@ -2,50 +2,28 @@ export const isObject = (item: any): boolean => {
   return item && typeof item === "object" && !Array.isArray(item);
 };
 
-// @ts-ignore
-function merged(target, source) {
-  for (const [key, val] of Object.entries(source)) {
-    if (val !== null && typeof val === `object`) {
-      if (target[key] === undefined) {
-        // @ts-ignore
-        target[key] = new val.__proto__.constructor();
-      }
-      merged(target[key], val);
-    } else {
-      if (val !== null) target[key] = val;
-    }
-  }
-  return target; 
-}
+
 
 export const merge = (
   target: ObjectAny,
   ...sources: ObjectAny[]
 ): ObjectAny => {
+  if (!sources.length) return target;
   const source = sources.shift();
-  return sources ? merged(target, source) : target;
+
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        merge(target[key], source[key]);
+      } else {
+        if(source[key] !== null) Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+
+  return merge(target, ...sources);
 };
-
-// export const merge = (
-//   target: ObjectAny,
-//   ...sources: ObjectAny[]
-// ): ObjectAny => {
-//   if (!sources.length) return target;
-//   const source = sources.shift();
-
-//   if (isObject(target) && isObject(source)) {
-//     for (const key in source) {
-//       if (isObject(source[key])) {
-//         if (!target[key]) Object.assign(target, { [key]: {} });
-//         merge(target[key], source[key]);
-//       } else {
-//         if(source[key] !== null) Object.assign(target, { [key]: source[key] });
-//       }
-//     }
-//   }
-
-//   return merge(target, ...sources);
-// };
 
 // dot notation object get
 export const get = (obj: ObjectAny, path: string) =>

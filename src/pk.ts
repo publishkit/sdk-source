@@ -6,7 +6,7 @@ export default class PK {
   url: string;
   base: string;
   version: string;
-  folder: string;
+  local: string;
   dirs: Boolean;
   api;
   debug;
@@ -63,10 +63,10 @@ export default class PK {
       this.pkrc.pk?.version ||
       "latest"
     ).trim();
-    this.folder = (
-      localStorage.getItem("pk.folder") ||
-      this.pkrc.pk?.folder ||
-      "_pk"
+    this.local = (
+      localStorage.getItem("pk.local") ||
+      this.pkrc.pk?.local ||
+      "pklocal"
     ).trim();
 
     let dirsValue = localStorage.getItem("pk.dirs") || this.pkrc.pk?.dirs;

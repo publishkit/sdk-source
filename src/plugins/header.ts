@@ -130,15 +130,15 @@ export default class Plugin extends BasePlugin {
       }
     }
 
-    #header ~ main {
-      padding-top: calc(var(--block-spacing-vertical) + 3rem);
-    }
-
     @media (min-width: 768px) {
       #header {
         &.container-fluid {
           padding: 0 20px;
         }
+      }
+      
+      &~ {
+        padding-top: calc(var(--block-spacing-vertical) + 3rem);
       }
     }
   `;

@@ -111,7 +111,17 @@ dialog article {
 
 body main {
   padding-top: calc(var(--block-spacing-vertical));
+  padding-top: 0;
 }
+
+[role="document"]{
+  margin: 0 -20px;
+  padding: 20px;
+}
+#header ~ main {
+  padding-top: calc(var(--block-spacing-vertical) + 1.8rem);
+}
+  
 
 blockquote p {
   margin: 0;
