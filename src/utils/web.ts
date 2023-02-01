@@ -5,6 +5,9 @@ export const isDark = () =>
     ? "dark"
     : "";
 
+export const isLocalhost = () =>
+  location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
 export const isMac = () => navigator.platform.indexOf("Mac") > -1;
 
 export const isWindows = () => navigator.platform.indexOf("Win") > -1;

@@ -12,7 +12,7 @@ export default class Plugin extends BasePlugin {
 
   bind = async () => {
     const { id } = this.options;
-    if (!id) return;
+    if (this.utils.w.isLocalhost() || !id) return;
 
     window.dataLayer = window.dataLayer || [];
     function gtag() {
