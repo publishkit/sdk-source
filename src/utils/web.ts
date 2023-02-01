@@ -1,7 +1,9 @@
 export const urlParams = new URLSearchParams(window.location.search);
 
 export const isDark = () =>
-  window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+  (window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches) ||
+  document.querySelectorAll('[data-theme="dark"]').length
     ? "dark"
     : "";
 
@@ -16,14 +18,13 @@ export const scrollTo = (el: string, offset = 0, timeout: number) =>
   $("html, body").animate({ scrollTop: $(el).offset()!.top - offset }, timeout);
 
 export const pageHeight = () => {
-  const body = document.body,
-    html = document.documentElement;
+  const { body, documentElement } = document;
   return Math.max(
     body.scrollHeight,
     body.offsetHeight,
-    html.clientHeight,
-    html.scrollHeight,
-    html.offsetHeight
+    documentElement.clientHeight,
+    documentElement.scrollHeight,
+    documentElement.offsetHeight
   );
 };
 
@@ -75,7 +76,7 @@ export const ls = function (key: string, value?: string) {
   }
 };
 
-export const colorToHsl = (color: string) => {
+export const colorToHsl = (color: string): ObjectAny => {
   const hex = colorToHex(color);
   return hexToHsl(hex);
 };

@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -68,18 +68,27 @@ export default class Plugin extends BasePlugin {
   };
 
   style = async () => `
+
+    #header ~ main {
+      padding-top: calc(var(--block-spacing-vertical) + 1.1rem);
+    }
   
     #header {
       --nav-link-spacing-vertical: 1rem;
       z-index: 99;
       position: fixed;
-      padding: 0 10px;
+      padding: 0 20px;
       top: 0;
       right: 0;
       left: 0;
       background: var(--card-background-color);
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       backdrop-filter: saturate(100%) blur(20px);
+
+      &:not(.container-fluid){
+        border-bottom-left-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+      }
       
       i {
         ${this.options.icons_fontsize && `
@@ -87,6 +96,10 @@ export default class Plugin extends BasePlugin {
         font-size: var(--header-icons-fontsize, inherit) !important;
         ` || ""}
         cursor: pointer;
+
+        &.ham {
+          margin-right: -4px;
+        }
       }
       ul {
         --color: var(--contrast);
@@ -99,6 +112,10 @@ export default class Plugin extends BasePlugin {
           &:first-child {
             padding-left: 0;
           }
+          font-size: 2.2rem;
+          padding: 0.5rem 0.2rem;
+
+          
         }
       }
       
@@ -113,7 +130,7 @@ export default class Plugin extends BasePlugin {
       }
       .sitename {
         ${this.options.name_fontsize && `--header-name-fontsize: ${this.options.name_fontsize};` || ""}
-        font-size: var(--header-name-fontsize, 1.2rem);
+        font-size: var(--header-name-fontsize, 1.4rem);
         color: var(--contrast);
       }
 

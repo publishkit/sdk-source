@@ -12,12 +12,11 @@ export default class Theme {
     window.pk.debug.includes("theme") && console.log(`theme ➔`, ...args);
 
   init = () => {
-    const { cfg } = this.app;
-
-    this.utils.dom.addStylesheet([
-      "https://cdn.jsdelivr.net/npm/@picocss/pico@1.5.6/css/pico.min.css",
-      `${window.pk.url}/pk.css`,
-    ]);
+    console.log("oesod", this.options)
+    // this.utils.dom.load([
+    //   "https://cdn.jsdelivr.net/npm/@picocss/pico@1.5.6/css/pico.min.css",
+    //   `${window.pk.url}/pk.css`,
+    // ]);
   };
 
   mode = () =>

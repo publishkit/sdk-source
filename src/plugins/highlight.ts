@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -13,10 +13,10 @@ export default class Plugin extends BasePlugin {
     const { options, utils } = this;
 
     if (options.theme) {
-      await utils.dom.addScript(
+      await utils.dom.load(
         "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/highlight.min.js"
       );
-      await utils.dom.addStylesheet(
+      await utils.dom.load(
         `https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/styles/${options.theme}.min.css`
       );
       (function wait() {

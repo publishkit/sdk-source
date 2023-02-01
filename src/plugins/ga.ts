@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -10,9 +10,14 @@ export default class Plugin extends BasePlugin {
         : [];
   }
 
+  init = async () => {
+    const { options, utils} = this
+    const byPassLocahost = utils.w.isLocalhost() ? options.localhost : true
+    return !!(byPassLocahost && this.options.id)
+  }
+
   bind = async () => {
     const { id } = this.options;
-    if (this.utils.w.isLocalhost() || !id) return;
 
     window.dataLayer = window.dataLayer || [];
     function gtag() {
@@ -24,5 +29,3 @@ export default class Plugin extends BasePlugin {
     gtag("config", id);
   };
 }
-
-// G-MWGQ40965V

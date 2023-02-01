@@ -1,5 +1,5 @@
 
-type BasePlugin = import("src/plugins/basePlugin").default;
+type BasePlugin = import("src/class/basePlugin").default;
 type PluginClass = "plugin" | "theme";
 type PluginType = "core" | "external" | "community" | "unknown";
 

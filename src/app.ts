@@ -11,10 +11,10 @@ export default class App {
   ui: UI;
 
   constructor() {
-    this.utils = Utils;
+    this.utils = window.$utils = Utils;
     this.theme = new Theme(this);
-    this.plugins = new Plugins(this);
-    this.ui = new UI(this);
+    this.plugins =  window.$plugins = new Plugins(this);
+    this.ui = window.$ui = new UI(this);
   }
 
   cfg = (key: string, fallback: any) => {

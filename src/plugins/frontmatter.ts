@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -12,7 +12,7 @@ export default class Plugin extends BasePlugin {
     const yaml = (d: ObjectAny) => window.YAML.stringify(d, 2);
 
     options.data = {
-      frontmatter: yaml(cache.frontmatter),
+      frontmatter: yaml({foo:"bar"}),
       pkrc: yaml(cache.pkrc),
       config: yaml(cache.config),
     };
@@ -23,7 +23,7 @@ export default class Plugin extends BasePlugin {
         <option value="pkrc">pkrc</option>
         <option value="config">config</option>
       </select>
-      <pre class="m-0"><code>${options.data.frontmatter}</code></pre>
+      <pre class="m-0"><code class="language-yaml">${options.data.frontmatter}</code></pre>
     `;
 
     ui.addModal("main", modal);
@@ -36,12 +36,11 @@ export default class Plugin extends BasePlugin {
   };
 
   bind = async () => {
-    const { options, ui, app } = this;
+    const { options, ui } = this;
     const action = ui.getAction("main");
     const modal = ui.getModal("main");
     const select = modal.el.find("select");
     const code = modal.el.find("code");
-    const highlight = <HighlightPlugin>app.plugins.get("highlight");
 
     $(`[id="${action.id}"]`).on("click", (e) => {
       e.preventDefault();
@@ -50,7 +49,7 @@ export default class Plugin extends BasePlugin {
 
     select.on("change", function () {
       code.html(options.data[this.value]);
-      highlight && highlight.apply(code[0]);
+      window.$theme?.highlightCode(code[0])
     });
   };
 }

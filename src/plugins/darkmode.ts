@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -20,13 +20,13 @@ export default class Plugin extends BasePlugin {
     ui.addHeaderIcon("moon", {
       icon: "bx-moon",
       className: "moon",
-      fn: () => app.theme.switch("dark"),
+      fn: () => window.$theme.switch("dark"),
     });
 
     ui.addHeaderIcon("sun", {
       icon: "bx-sun",
       className: "sun",
-      fn: () => app.theme.switch("light"),
+      fn: () => window.$theme.switch("light"),
     });
   };
 

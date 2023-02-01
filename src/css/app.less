@@ -170,8 +170,10 @@ details[role=list] {
 
   &.dropdown-icon {
     summary {
-      height: 28px;
-      line-height: 30px;
+      padding-left: 11px;
+      height: 40px;
+      width: 42px;
+      line-height: 40px;
 
       &::after {
         display: none;
@@ -182,7 +184,8 @@ details[role=list] {
     summary+ul {
       width: fit-content;
       a {
-        font-size: 0.8rem;
+        // font-size: 0.8rem;
+        font-size: 1.3rem;
       }
     }
 
@@ -199,7 +202,7 @@ details[role=list] {
 
 
 [role="document"] {
-  margin: 0 -20px;
+  margin: 10px -20px;
   padding: 20px;
   a {
     text-decoration: underline;
@@ -212,9 +215,7 @@ details[role=list] {
 }
 
 
-#header ~ main {
-  padding-top: calc(var(--block-spacing-vertical) + 1.1rem);
-}
+
   
 
 blockquote p {
@@ -451,7 +452,7 @@ details[open]>summary:not([role]):not(:focus) {
 }
 .callout-title {
   display: flex;
-  padding: 0.2rem;
+  padding: 0.7rem;
   color: var(--callout-color);
   font-weight: bold;
 }

@@ -266,7 +266,7 @@ export default class UI {
   ): UIHeaderIcon => {
     const id = this.buildId("header.icons", pluginId, elementId);
     let { icon, fn, className = "" } = options;
-    const html = `<i id="${id}" class="bx ${icon} bx-sm ${className}"></i>`;
+    const html = `<i id="${id}" class="bx ${icon} ${className}"></i>`;
     return this.set(id, { id, icon, fn, html });
   };
 

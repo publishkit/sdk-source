@@ -1,5 +1,6 @@
 import CorePlugins from "./plugins/index";
-import BasePlugin from "./plugins/basePlugin";
+import BasePlugin from "./class/basePlugin";
+import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
 const requiredPlugins = ["global", "hotkeys"];
@@ -30,7 +31,7 @@ export default class Plugins {
     plugin: Partial<PluginObject>,
     Plugin?: BasePlugin
   ): Promise<BasePlugin> => {
-    const { utils } = this;
+    const { utils, app } = this;
     let { id = "", value } = plugin;
 
     if (plugin.type == "core") {
@@ -67,8 +68,16 @@ export default class Plugins {
     if (this.cache[id]) throw new Error(`plugin id '${id}' already exist`);
     this.cache[id] = badboy;
 
+    // $plugin expose
     const windowKey = `$${badboy.id.replace("-", "")}`;
     window[windowKey] = badboy;
+
+    // merge cache config
+    utils.o.put(
+      app.cache.config,
+      badboy.id,
+      utils.o.clone(badboy.options, "_init")
+      );
 
     return badboy;
   };
@@ -109,8 +118,8 @@ export default class Plugins {
 
   init = async () => {
     // expose BasePlugin for external plugins
-    window.BasePlugin = window.BaseTheme = BasePlugin;
-    window.$plugins = this.get;
+    window.BasePlugin = BasePlugin;
+    window.BaseTheme = BaseTheme;
 
     const { app, utils } = this;
     const { cache } = app;
@@ -186,14 +195,13 @@ export default class Plugins {
       document.head.append(style);
     };
 
-    // append css
-    utils.a
-      .clean(load.css)
-      .map((css) =>
-        window.document.querySelector("head")!.append(utils.dom.cssEl(css))
-      );
-    // append deps (parralel)
-    await utils.dom.loadScript(utils.a.clean(load.deps));
+    // append css (don't wait)
+    const css = (window.$plugins.css = utils.a.clean(load.css));
+    css.map(utils.dom.load);
+
+    // load deps (parralel)
+    const deps = (window.$plugins.deps = utils.a.clean(load.deps));
+    await utils.dom.load(deps);
 
     // apply render (sequence)
     // @ts-ignore
@@ -306,7 +314,7 @@ export default class Plugins {
     red: (v: any) => `red`,
   };
 
-  parseOptionValue = (value: string) => {
+  private parseOptionValue = (value: string) => {
     const [name, ...rest] = value.split(":");
     const options = rest.join(":");
     const plugin = this.parsePlugin(name);
@@ -321,7 +329,7 @@ export default class Plugins {
     // return `${name}(${value})`
   };
 
-  parseOptions = (s: string, o: ObjectAny = {}) => {
+  private parseOptions = (s: string, o: ObjectAny = {}) => {
     if (!s || !o) return {};
     const { utils } = this;
     const vars = s.split(",");
@@ -338,7 +346,7 @@ export default class Plugins {
     return o;
   };
 
-  resolveType = (name: string) => {
+  private resolveType = (name: string) => {
     name = (name + "").trim();
     if (!name) return "unknown";
 

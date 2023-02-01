@@ -1,4 +1,4 @@
-import BasePlugin from "./basePlugin";
+import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
@@ -121,15 +121,32 @@ export default class Plugin extends BasePlugin {
     [id="left.navbar.main"] nav {
       display: none;
       user-select: none;
-      padding: 20px;
+      padding: 30px;
       width: 100%;
-    
+      
       &.open {
-        display: block;
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: space-around;
+        user-select: none;
+        width: 100%;
         position: fixed;
+        top: 4.3rem;
         left: 0;
-        top: calc(var(--nav-element-spacing-vertical) * 3.8);
+        display: grid;
+        grid-column-gap: 10px;
+        grid-row-gap: 3rem;
+        grid-template-columns: 1fr 1fr;
+        justify-content: left;
+        font-size: 1rem;
         background: var(--bg);
+        border-bottom: 2px solid var(--muted-color);
+        border-top: 2px solid var(--muted-color);
+
+        details {
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
       }
 
       ul {
@@ -168,7 +185,7 @@ export default class Plugin extends BasePlugin {
       li, summary {
         padding-top: 0;
         padding-bottom: 0;
-        font-size: 0.8rem;
+        
       }
       li {
         padding-bottom: 10px;
@@ -181,17 +198,33 @@ export default class Plugin extends BasePlugin {
     [id="header.icons.navbar.icon"] {
       // font-size: 2em !important;
     }
+
+    @media (min-width: 576px) {
+      [id="left.navbar.main"] nav {
+        &.open {
+          padding: 50px;
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+    }
     
     @media (min-width: 768px) {
       [id="left.navbar.main"] nav {
         display: block;
         border: none;
-        &.open {
-          display: block;
-        }
+        font-size: 0.8rem;
+
       }
       #header li:has([id="header.icons.navbar.icon"]) {
         display: none;
+      }
+    }
+
+    @media (min-width: 991px) {
+      [id="left.navbar.main"] nav {
+        &.open {
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
       }
     }
   `;
