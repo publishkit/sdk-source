@@ -128,8 +128,10 @@ export default class BaseTheme extends BasePlugin {
       const result = [];
       for (const [mode, tokens] of Object.entries(this.theme.cache)) {
         const alias = `${mode}Mode`;
+        // @ts-ignore
         const method = this[alias];
         const token = method && method(this);
+        // @ts-ignore
         if (token) tokens.push(token);
 
         // console.log('tokeexe', alias, token)

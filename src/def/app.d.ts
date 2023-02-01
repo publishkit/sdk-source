@@ -3,7 +3,6 @@ interface App {
   utils: typeof import("../utils/index").default;
   plugins: import("../plugins").default;
   ui: import("../ui").default;
-  theme: ObjectAny;
   cfg: Function;
 }
 

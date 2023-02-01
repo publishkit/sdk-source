@@ -1,18 +1,15 @@
 import Utils from "./utils/index";
 import Plugins from "./plugins";
-import Theme from "./theme";
 import UI from "./ui";
 
 export default class App {
   utils: typeof Utils;
   cache: AppCache;
   plugins: Plugins;
-  theme: Theme;
   ui: UI;
 
   constructor() {
     this.utils = window.$utils = Utils;
-    this.theme = new Theme(this);
     this.plugins =  window.$plugins = new Plugins(this);
     this.ui = window.$ui = new UI(this);
   }
