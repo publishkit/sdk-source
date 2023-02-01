@@ -1,8 +1,15 @@
+import { asArray } from "./array";
+
 export const isObject = (item: any): boolean => {
   return item && typeof item === "object" && !Array.isArray(item);
 };
 
-
+export const clone = (source: ObjectAny, del?: string) => {
+  const remove = del ? asArray(del) : [];
+  const copy = JSON.parse(JSON.stringify(source));
+  remove.forEach((k) => delete copy[k]);
+  return copy;
+};
 
 export const merge = (
   target: ObjectAny,
@@ -17,7 +24,7 @@ export const merge = (
         if (!target[key]) Object.assign(target, { [key]: {} });
         merge(target[key], source[key]);
       } else {
-        if(source[key] !== null) Object.assign(target, { [key]: source[key] });
+        if (source[key] !== null) Object.assign(target, { [key]: source[key] });
       }
     }
   }

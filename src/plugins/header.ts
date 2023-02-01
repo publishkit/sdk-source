@@ -89,6 +89,7 @@ export default class Plugin extends BasePlugin {
         cursor: pointer;
       }
       ul {
+        --color: var(--contrast);
         margin-left: 0;
         margin-right: 0;
         li {
@@ -115,19 +116,8 @@ export default class Plugin extends BasePlugin {
         font-size: var(--header-name-fontsize, 1.2rem);
         color: var(--contrast);
       }
-        
-      &.bg-contrast {
-        background: var(--contrast);
-        color: var(--card-background-color);
-        
-        .sitename {
-          color: var(--card-background-color);
-        }
-        kbd {
-          background-color: var(--card-background-color);
-          color: var(--contrast);
-        }
-      }
+
+      
     }
 
     @media (min-width: 768px) {

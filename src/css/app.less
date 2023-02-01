@@ -2,6 +2,13 @@ html {
   font-family: var(--font-family, inherit);
 }
 
+
+
+/* BACKGROUNDS */
+.bg-contrast {
+  background: var(--contrast);
+}
+
 /* IFRAMES */
 
 iframe::-webkit-scrollbar {
@@ -22,10 +29,7 @@ iframe::-webkit-scrollbar {
   height: inherit;
 }
 
-/* BACKGROUNDS */
-.bg-contrast {
-  background: var(--contrast);
-}
+
 
 
 /* EMBEDS */
@@ -78,6 +82,7 @@ h3,
 h4,
 h5,
 h6 {
+  color: var(--h-color);
   border-bottom: 2px solid var(--muted-border-color);
   font-family: var(--headings-font-family, var(--font-family, inherit));
 }
@@ -91,7 +96,6 @@ p,
 pre,
 table,
 ul {
-  color: inherit;
   font-weight: inherit;
   font-size: inherit;
 }
@@ -102,24 +106,114 @@ body h1:first-of-type {
 
 /* MODAL */
 
-dialog article {
-  max-height: calc(100vh - var(--spacing) * 6);
-}
+dialog {
+
+  article {
+    max-height: calc(100vh - var(--spacing) * 6);
+    background: var(--bg);
+  }
+
+  &[open] {
+
+  }
+} 
 
 
 /* LAYOUT */
 
 body main {
-  padding-top: calc(var(--block-spacing-vertical));
+  /* padding-top: calc(var(--block-spacing-vertical) / 2); */
   padding-top: 0;
 }
 
-[role="document"]{
+details[role=list] {
+
+  &[open] {
+    summary {
+      border-bottom-left-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+  }
+
+  summary+ul {
+    width: auto;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    margin-top: 5px;
+
+    li {
+      &:first-of-type {
+        margin-top: 0;
+        margin-bottom: 0;
+        a {
+          border-top-left-radius: var(--border-radius);
+          border-top-right-radius: var(--border-radius);
+        }
+      }
+      &:last-of-type {
+        margin-bottom: 0;
+        a {
+          border-bottom-left-radius: var(--border-radius);
+          border-bottom-right-radius: var(--border-radius);
+        }
+      }
+
+      a {
+        &:hover {
+          background-color: var(--dropdown-hover-background-color);
+          color: var(--dropdown-hover-color);
+        }
+      }
+    }
+
+  }
+
+  &.dropdown-icon {
+    summary {
+      height: 28px;
+      line-height: 30px;
+
+      &::after {
+        display: none;
+      }
+
+    }
+    
+    summary+ul {
+      width: fit-content;
+      a {
+        font-size: 0.8rem;
+      }
+    }
+
+    &.right {
+      summary+ul {
+        left: auto;
+      }
+    }
+  }
+}
+
+
+/* DOCUMENT */
+
+
+[role="document"] {
   margin: 0 -20px;
   padding: 20px;
+  a {
+    text-decoration: underline;
+
+    &::after {
+      text-decoration: none;
+    }
+  }
+
 }
+
+
 #header ~ main {
-  padding-top: calc(var(--block-spacing-vertical) + 1.8rem);
+  padding-top: calc(var(--block-spacing-vertical) + 1.1rem);
 }
   
 
@@ -138,11 +232,13 @@ mark {
 }
 code,
 kbd {
-  display: inline-block;
+  // display: inline-block;
   padding: 0.2rem 0.3rem;
   font-size: 0.8rem;
-  /* background: var(--code-background-color); */
-  /* color: var(--code-color); */
+  --code-color: var(--bg);
+  --code-background-color: var(--color);
+  color: var(--code-color) !important;
+  background-color: var(--code-background-color) !important;
 }
 
 @media (max-width: 576px) {
@@ -160,16 +256,15 @@ kbd {
 
 .left-bar,
 .right-bar {
+  margin-top: 20px;
   width: calc(100% - var(--spacing) * 2);
   max-height: calc(100vh - 10rem);
   overflow-x: hidden;
   overflow-y: auto;
-  /* border: 3px solid var(--primary); */
 }
 
 .left-bar {
   position: fixed;
-  margin-top: -20px;
   border-radius: var(--border-radius);
   z-index: 100;
 }
@@ -189,7 +284,6 @@ kbd {
   /* md */
   .left-bar {
     width: var(--leftbar-width);
-    margin-top: 0;
   }
   .right-bar {
     width: var(--rightbar-width);
@@ -258,35 +352,52 @@ button {
   display: inline-block;
 }
 
-details.dropdown-btn li a {
-  font-size: 0.8rem;
+details[open]>summary:not([role]):not(:focus) {
+  color: inherit;
 }
 
-details.dropdown-btn[role=list] summary:not([role]) {
-  height: 28px;
-  line-height: 30px;
-  border-color: var(--muted-border-color)
-}
+// details.dropdown-btn li a {
+//   font-size: 0.8rem;
+// }
 
-details.dropdown-btn[role=list][open] summary {
-  border-bottom-right-radius: var(--border-radius);
-  border-bottom-left-radius: var(--border-radius);
-}
+// details.dropdown-btn[role=list] summary:not([role]) {
+//   height: 28px;
+//   line-height: 30px;
+//   border-color: var(--muted-border-color)
+// }
 
-details.dropdown-btn[role=list] summary::after {
-  display: none;
-}
+// details.dropdown-btn[role=list][open] summary {
+//   border-bottom-right-radius: var(--border-radius);
+//   border-bottom-left-radius: var(--border-radius);
+// }
 
-details.dropdown-btn[role=list] summary+ul {
-    width: fit-content;
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    margin-top: 5px;
-}
+// details.dropdown-btn[role=list] summary::after {
+//   display: none;
+// }
 
-details.dropdown-btn.right[role=list] summary+ul {
-  left: auto;
-}
+// details.dropdown-btn[role=list] summary+ul {
+//     width: fit-content;
+//     border-top-left-radius: var(--border-radius);
+//     border-top-right-radius: var(--border-radius);
+//     margin-top: 5px;
+// }
+
+// details.dropdown-btn.right[role=list] summary+ul {
+//   left: auto;
+// }
+// details[role=list] summary+ul, li[role=list]>ul {
+//   z-index: 1;
+// }
+
+// details[role=list] summary+ul li a, li[role=list]>ul li a {
+//   color: var(--dropdown-color);
+// }
+
+// details[role=list] summary+ul li a:hover, li[role=list]>ul li a:hover {
+//   color: var(--dropdown-hover-color);
+//   background-color: var(--dropdown-hover-background-color);
+// }
+
 
 
 /* HEADER */
@@ -304,6 +415,18 @@ details.dropdown-btn.right[role=list] summary+ul {
 }
 
 @media (min-width: 768px) {
+  #footer > div > div + div {
+    margin-left: 20px;
+  }
+}
+
+@media (min-width: 991px) {
+  #footer > div > div + div {
+    margin-left: 0px;
+  }
+}
+
+@media (min-width: 1200px) {
   #footer > div > div + div {
     margin-left: 20px;
   }
@@ -354,6 +477,13 @@ details.dropdown-btn.right[role=list] summary+ul {
 .callout-content p:last-child, .callout-content ul:last-child, .callout-content ul:last-child li:last-child {
   margin-bottom: 0;
 }
+
+@media (max-width: 576px) {
+  .callout {
+    margin: var(--typography-spacing-vertical) -20px;
+  }
+}
+
 
 [data-callout="info"],
 [data-callout="note"],

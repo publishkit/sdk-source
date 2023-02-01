@@ -54,7 +54,7 @@ export default class Plugin extends BasePlugin {
       .replace("control", "✲");
     s2 = s2.toUpperCase();
 
-    const button = `<button type="button" class="secondary outline d-flex justify-content-between align-items-center">
+    const button = `<button type="button" class="contrast outline d-flex justify-content-between align-items-center">
       <span class="d-flex align-items-center">
         <i class="bx bx-search-alt"></i>
         <span class="text">Search</span>
@@ -227,7 +227,6 @@ export default class Plugin extends BasePlugin {
       article {
         margin: 0;
         padding: 20px;
-        background: var(--card-background-color);
         width: -webkit-fill-available;
       }
       ul:first-of-type {
@@ -235,16 +234,19 @@ export default class Plugin extends BasePlugin {
         margin: 0;
         li {
           list-style: none;
-          padding: 10px;
+          padding: 1rem;
           border-radius: var(--border-radius);
           cursor: pointer;
+          border: var(--border-width) solid transparent;
+
           &.selected {
-            background: var(--card-sectionning-background-color);
+            border: var(--border-width) solid var(--muted-border-color);
+            background: var(--card-background-color);
           }
           div.text {
             font-size: 0.8rem;
-            color: var(--muted-color);
-            border-top: 2px solid var(--muted-border-color);
+            color: hsl(var(--color-hsl) / .3);
+            border-top: var(--border-width) solid var(--muted-border-color);
             margin-top: 0.4rem;
             padding-top: 0.4rem;
           }

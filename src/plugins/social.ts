@@ -24,7 +24,7 @@ export default class Plugin extends BasePlugin {
     for (const [key, icon] of Object.entries(links)) {
       const url = cfg(`social.${key}`);
       if (url)
-        body += `<a href="${url}" target="_blank" class="secondary" data-tooltip="${key}" >
+        body += `<a href="${url}" target="_blank" class="contrast" data-tooltip="${key}" >
           <i class="bx ${icon} bx-xs"></i>
         </a>`;
     }

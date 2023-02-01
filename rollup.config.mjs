@@ -6,6 +6,8 @@ import css from "rollup-plugin-import-css";
 import obfuscator from "rollup-plugin-obfuscator";
 import cleanup from "rollup-plugin-cleanup";
 import replace from "rollup-plugin-replace";
+import less from "./plugins/rollup-less.mjs";
+
 import pkg from "./package.json" assert { type: "json" };
 
 const { NODE_ENV = "dev" } = process.env;
@@ -19,6 +21,7 @@ if (NODE_ENV == "prod") {
     output: { file: `${dist}/pk.js`, format: "iife" },
     plugins: [
       typescript(),
+      less({ output: `${dist}/pk.css`, sourcemap: false, minify: true }),
       replace({
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
         "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
@@ -52,12 +55,13 @@ if (NODE_ENV == "dev") {
     output: { file: `dev/pk.js`, format: "iife" },
     plugins: [
       typescript(),
+      less({ output: "dev/pk.css", sourcemap: true, minify: false }),
       replace({
         "process.env.PK_API": JSON.stringify(process.env.PK_API),
         "process.env.PK_SDK": JSON.stringify(process.env.PK_SDK),
       }),
       cleanup(),
-      css({ output: "pk.css", minify: false }),
+      // css({ output: "pk.css", minify: false }),
     ],
   });
 

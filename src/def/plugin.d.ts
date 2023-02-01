@@ -1,6 +1,7 @@
 
 type BasePlugin = import("src/plugins/basePlugin").default;
-type PluginType = "plugin" | "theme";
+type PluginClass = "plugin" | "theme";
+type PluginType = "core" | "external" | "community" | "unknown";
 
 
 interface PluginCache {
@@ -11,6 +12,9 @@ interface PluginObject {
   id: string;
   value: string | boolean;
   options: ObjectAny;
+  name: string;
+  type: string;
+  class: string;
   url?: string;
 }
 

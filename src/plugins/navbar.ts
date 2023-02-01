@@ -123,13 +123,17 @@ export default class Plugin extends BasePlugin {
       user-select: none;
       padding: 20px;
       width: 100%;
-      background: var(--card-background-color);
     
       &.open {
         display: block;
         position: fixed;
         left: 0;
         top: calc(var(--nav-element-spacing-vertical) * 3.8);
+        background: var(--bg);
+      }
+
+      ul {
+        --color: var(--primary);
       }
       
       a:focus {

@@ -1,9 +1,9 @@
 import Utils from "./utils/index";
 import App from "./app";
 
-import "./css/vars.css";
-import "./css/app.css";
-import "./css/utils.css";
+import "./css/vars.less";
+import "./css/app.less";
+import "./css/utils.less";
 
 const app = (window.app = new App());
 console.log(Utils.s.banner());

@@ -18,19 +18,25 @@ export default class Plugin extends BasePlugin {
     if (!this.image) return "";
     const { options } = this;
     return `
+      #hero {
+        background-image: url(${this.image});
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        height: ${options.height || "300px"};
+        margin: -20px;
+      }
+      @media (min-width: 576px) {
         #hero {
-            background-image: url(${this.image});
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            height: ${options.height || "300px"};
+          margin: auto 0px;
         }
+      }
 
-        @media (max-width: 991px) {
-            #hero {
-                height: 150px;
-            }
+      @media (max-width: 991px) {
+        #hero {
+          height: 150px;
         }
+      }
     `;
   };
 }

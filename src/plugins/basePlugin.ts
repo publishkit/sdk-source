@@ -3,13 +3,14 @@ export default class BasePlugin {
   utils;
 
   id: string;
+  base: ObjectAny;
   options: ObjectAny;
   ui: UIBuilder;
 
   deps: string[] | Function;
   css: string[] | Function;
 
-  constructor(id: string, options?: ObjectAny) {
+  constructor(id: string, options?: ObjectAny, propsd?: ObjectAny) {
     this.id = id;
     this.app = window.app;
     this.utils = this.app.utils;

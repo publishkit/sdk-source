@@ -55,7 +55,7 @@ export default class UI {
       "poweredby",
       "footer.right",
       "main",
-      `<span class="poweredby">powered by</span> <a href="https://publishkit.dev" target="_new" class="contrast outline"><i class='bx bx-paper-plane'></i> PublishKit</a>`,
+      `<span class="poweredby">powered by</span> <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Ship markdown websites"><i class='bx bx-paper-plane'></i> PublishKit</a>`,
       { index: 1000 }
     );
 
@@ -129,7 +129,7 @@ export default class UI {
       this.joinUIElements(rx.actions, (el) => `<li>${el.html}</li>`);
     rx.actions =
       (rx.actions &&
-        `<details class="dropdown-btn right float-end" role="list">
+        `<details class="dropdown-icon right float-end" role="list">
           <summary aria-haspopup="listbox">
             <i class="bx bx-dots-vertical-rounded"></i>
           </summary>
