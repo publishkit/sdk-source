@@ -77,7 +77,7 @@ export default class Plugins {
       app.cache.config,
       badboy.id,
       utils.o.clone(badboy.options, "_init")
-      );
+    );
 
     return badboy;
   };
@@ -96,8 +96,9 @@ export default class Plugins {
 
   injectPlugins = (index: ObjectAny = {}) => {
     const { utils } = this;
-    const plugins = this.parseFromUrlKey("p");
+    const { cache } = this.app;
 
+    const plugins = this.parseFromUrlKey("p");
     const themes = this.parseFromUrlKey("theme");
 
     themes.map((theme) => {
@@ -108,12 +109,23 @@ export default class Plugins {
 
     fly.forEach((p: PluginObject) => {
       if (!p.id) return;
-      utils.o.put(index, `plugins.${p.id}`, p.value);
+
+      // if pkrc value is string
+      // parse plugin & merge
+      const pkrcValue = utils.o.get(cache.config, `plugins.${p.id}`);
+      if (typeof pkrcValue == "string") {
+        const plugin = this.parsePlugin(pkrcValue);
+        if (plugin.type == p.type)
+          p.options = { ...(plugin.options || {}), ...p.options };
+      }
+
+      // merge in cache config
+      utils.o.put(cache.config, `plugins.${p.id}`, p.value);
       if (Object.keys(p.options || {}).length)
-        utils.o.put(index, p.id, p.options);
+        utils.o.put(cache.config, p.id, p.options);
     });
 
-    return index;
+    return cache.config;
   };
 
   init = async () => {
@@ -122,10 +134,9 @@ export default class Plugins {
     window.BaseTheme = BaseTheme;
 
     const { app, utils } = this;
-    const { cache } = app;
-    cache.fly = this.injectPlugins();
-    cache.config = utils.o.merge(cache.config, cache.fly);
-    const { plugins = {} } = cache.config;
+    this.injectPlugins();
+
+    const { plugins = {} } = app.cache.config;
 
     const unsortedKeys = utils.a.clean([...CoreKeys, ...Object.keys(plugins)]);
     const sorted = unsortedKeys.reduce(

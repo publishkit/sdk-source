@@ -9,8 +9,6 @@ const $app = window.$app = new App();
 console.log(Utils.s.banner());
 
 (async function () {
-  $("body").append('<div id="spinner" class="text-center mt-5"><progress style="width: 100px"></progress></div>'); // add spinner
-  (document.getElementsByTagName("progress")[0] as any).indeterminate = true; // spin
+  
   await $app.init();
-  $("#spinner").remove();
 })();

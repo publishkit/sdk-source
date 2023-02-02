@@ -8,7 +8,9 @@ export const isDark = () =>
     : "";
 
 export const isLocalhost = () =>
-  location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.hostname.startsWith("192.168");
 
 export const isMac = () => navigator.platform.indexOf("Mac") > -1;
 

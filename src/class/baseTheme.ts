@@ -10,24 +10,31 @@ export default class BaseTheme extends BasePlugin {
     super(id, options);
   }
 
+  spin = (yes: boolean) => {
+    if(yes) $("#spinner").removeClass("d-none")
+    else $("#spinner").addClass("d-none")
+  }
+
   postSetup = () => {
     const setup = this.setupOptions;
 
     $("html").attr("data-theme", this.mode()); // set mode
+    // set sipnner
+    $("body").append('<progress id="spinner"></progress>'); // add spinner
+    (document.getElementsByTagName("progress")[0] as any).indeterminate = true; // spin
 
     if (setup.highlight) {
-      // to timeout or not to timeout, that is the question
-      this.highlightCode = (el: Element) =>
-        setTimeout(() => window.hljs.highlightElement(el), 50) && true;
-      // this.highlightCode = window.hljs.highlightElement
+      this.highlightCode = window.hljs.highlightElement
 
       window.hljs.configure({
         ignoreUnescapedHTML: true,
       });
 
-      document.querySelectorAll("pre code").forEach((el) => {
-        window.hljs.highlightElement(el);
-      });
+      setTimeout(() => {
+        document.querySelectorAll("pre code").forEach((el) => {
+          window.hljs.highlightElement(el)
+        });
+      }, 50)
     }
   };
 

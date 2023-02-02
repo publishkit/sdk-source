@@ -1,10 +1,27 @@
+/* LAYOUT */
 html {
   font-family: var(--font-family, inherit);
+}
+
+body main {
+  padding-top: 0;
+}
+
+#spinner {
+  z-index: 100;
+  width: 100%;
+  --progress-background-color: var(--card-background-color);
+  height: 5px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-radius: 0;
 }
 
 
 
 /* BACKGROUNDS */
+
 .bg-contrast {
   background: var(--contrast);
 }
@@ -68,7 +85,7 @@ input:not(
   -webkit-padding-start: 1.6rem;
 }
 
-/* TYPOGRAPHY */
+/* HEADINGS */
 
 .h1,
 .h2,
@@ -86,19 +103,7 @@ h6 {
   border-bottom: 2px solid var(--muted-border-color);
   font-family: var(--headings-font-family, var(--font-family, inherit));
 }
-address,
-blockquote,
-dl,
-figure,
-form,
-ol,
-p,
-pre,
-table,
-ul {
-  font-weight: inherit;
-  font-size: inherit;
-}
+
 body h1:first-of-type {
   margin-top: 0px;
 }
@@ -119,12 +124,9 @@ dialog {
 } 
 
 
-/* LAYOUT */
 
-body main {
-  /* padding-top: calc(var(--block-spacing-vertical) / 2); */
-  padding-top: 0;
-}
+/* DROPDOWN DETAILS */
+
 
 details[role=list] {
 
@@ -215,9 +217,21 @@ details[role=list] {
 }
 
 
+/* ELEMENTS */
 
-  
-
+address,
+blockquote,
+dl,
+figure,
+form,
+ol,
+p,
+pre,
+table,
+ul {
+  font-weight: inherit;
+  font-size: inherit;
+}
 blockquote p {
   margin: 0;
 }
@@ -239,7 +253,10 @@ kbd {
   --code-color: var(--bg);
   --code-background-color: var(--color);
   color: var(--code-color);
-  background-color: var(--code-background-color);
+}
+
+pre code {
+  background: var(--code-background-color);
 }
 
 @media (max-width: 576px) {
@@ -356,53 +373,6 @@ button {
 details[open]>summary:not([role]):not(:focus) {
   color: inherit;
 }
-
-// details.dropdown-btn li a {
-//   font-size: 0.8rem;
-// }
-
-// details.dropdown-btn[role=list] summary:not([role]) {
-//   height: 28px;
-//   line-height: 30px;
-//   border-color: var(--muted-border-color)
-// }
-
-// details.dropdown-btn[role=list][open] summary {
-//   border-bottom-right-radius: var(--border-radius);
-//   border-bottom-left-radius: var(--border-radius);
-// }
-
-// details.dropdown-btn[role=list] summary::after {
-//   display: none;
-// }
-
-// details.dropdown-btn[role=list] summary+ul {
-//     width: fit-content;
-//     border-top-left-radius: var(--border-radius);
-//     border-top-right-radius: var(--border-radius);
-//     margin-top: 5px;
-// }
-
-// details.dropdown-btn.right[role=list] summary+ul {
-//   left: auto;
-// }
-// details[role=list] summary+ul, li[role=list]>ul {
-//   z-index: 1;
-// }
-
-// details[role=list] summary+ul li a, li[role=list]>ul li a {
-//   color: var(--dropdown-color);
-// }
-
-// details[role=list] summary+ul li a:hover, li[role=list]>ul li a:hover {
-//   color: var(--dropdown-hover-color);
-//   background-color: var(--dropdown-hover-background-color);
-// }
-
-
-
-/* HEADER */
-
 
 
 /* FOOTER */

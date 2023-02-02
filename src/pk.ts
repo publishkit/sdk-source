@@ -3,7 +3,8 @@ import { decrypt } from "./utils/crypto";
 export default class PK {
   pkrc: ObjectAny;
 
-  url: string;
+  url: string; // sdk file url base
+  localhost: boolean;
   base: string;
   version: string;
   local: string;
@@ -15,6 +16,10 @@ export default class PK {
   help: string;
 
   constructor() {
+    this.localhost =
+      location.hostname === "localhost" ||
+      location.hostname === "127.0.0.1" ||
+      location.hostname.startsWith("192.168");
     this.base = "/";
     this.api = process.env.PK_API;
     this.debug = localStorage.getItem("pk.debug") || "";
@@ -112,8 +117,7 @@ export default class PK {
 
   liscence = async () => {
     try {
-      const hostname = window.location.hostname;
-      if (hostname == "localhost") return (this.ready = true);
+      if (this.localhost) return (this.ready = true);
 
       const siteID = this.pkrc.site?.id;
       if (!siteID)
@@ -122,6 +126,8 @@ export default class PK {
         );
       const r = await (await fetch(`${this.api}/site?id=${siteID}`)).json();
       const sites = r.site.split("|").slice(0, 2).filter(Boolean);
+
+      const hostname = window.location.hostname;
       if (!sites.includes(hostname))
         throw new Error(
           `💥 "${hostname}" is unregistered. more at https://publishkit.dev`

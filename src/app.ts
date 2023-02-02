@@ -20,6 +20,7 @@ export default class App {
     else return value;
   };
 
+
   loadDirsConfig = async () => {
     if (!window.pk.dirs) return [];
 
@@ -78,5 +79,9 @@ export default class App {
     await this.plugins.init();
     await ui.render();
     await this.plugins.run();
+
+    setTimeout(() => {
+      window.$theme.spin(false)
+    }, 800)
   };
 }
