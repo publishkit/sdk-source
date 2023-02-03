@@ -25,19 +25,23 @@ export default class Plugin extends BasePlugin {
       const url = cfg(`social.${key}`);
       if (url)
         body += `<a href="${url}" target="_blank" class="contrast" data-tooltip="${key}" >
-          <i class="bx ${icon} bx-xs"></i>
+          <i class="bx ${icon}"></i>
         </a>`;
     }
 
-    if (body) this.ui.addElement("footer.left", "main", body);
+    if (body) this.ui.addElement("footer.left", "main", body, { className: "d-grid" });
   };
 
   style = async () => `
     [id="footer.left.social.main"] {
-      display: flex;
+      justify-content: space-around;
+      grid-auto-flow: column;
+      grid-column-gap: .3rem;
+    }
 
-      a + a {
-        margin-left: 5px;
+    @media (max-width: 768px) {
+      [id="footer.left.social.main"] {
+        --icon-size: 2rem;
       }
     }
   `;

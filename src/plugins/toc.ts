@@ -7,17 +7,18 @@ export default class Plugin extends BasePlugin {
 
   init = async () => {
     const { utils, ui } = this;
-    const content = ui.base.get("center.content");
+    const content = ui.base.get("content");
     const dom = $("<div/>").html(content);
-    const headings = dom.find(">h1, >h2, >h3");
+    const headings = dom.find("h1, h2, h3");
 
     if (headings.length <= 1) return;
 
-    headings.map(function () {
+    headings.each(function () {
+      if($(this).attr("class")?.includes("noprocess")) return
       this.id = "heading-" + utils.s.slugify($(this).text());
     });
 
-    ui.base.set("center.content", dom.html());
+    ui.base.set("content", dom.html());
     return true;
   };
 

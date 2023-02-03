@@ -130,8 +130,10 @@ export default class Plugin extends BasePlugin {
       }
       .sitename {
         ${this.options.name_fontsize && `--header-name-fontsize: ${this.options.name_fontsize};` || ""}
-        font-size: var(--header-name-fontsize, 1.4rem);
+        font-size: var(--site-name-fontsize, 1.4rem);
         color: var(--contrast);
+        padding: 0;
+        margin: 0;
       }
 
       

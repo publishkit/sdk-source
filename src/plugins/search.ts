@@ -6,14 +6,13 @@ export default class Plugin extends BasePlugin {
     this.deps = [
       "https://cdn.jsdelivr.net/npm/minisearch@6.0.0/dist/umd/index.min.js",
     ];
-    this.options = {
+    this.defaults({
       shortcut: "command+k", // shift,command,control
       padding: 15,
       fuzzy: 0.2,
       chars: 3,
-      max_results: 5,
-      ...this.options,
-    };
+      results: 5
+    });
   }
 
   init = async () => {
@@ -29,7 +28,7 @@ export default class Plugin extends BasePlugin {
     const modal = `
       <input type="search" placeholder="search" value="${defaultValue}" />
       <ul></ul>
-      <div class="help d-flex justify-content-between">
+      <div class="help">
         <ul class="d-flex">
           <li>
             <kbd><svg width="15" height="15" aria-label="Enter key" role="img"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"><path d="M12 3.53088v3c0 1-1 2-2 2H4M7 11.53088l-3-3 3-3"></path></g></svg></kbd>
@@ -134,6 +133,9 @@ export default class Plugin extends BasePlugin {
           fuzzy: options.fuzzy,
           boost: { title: 2 },
         });
+
+        searchResults.splice(options.results)
+
         console.log("search", value, searchResults);
         searchResults.map((r: ObjectAny, i: number) => {
           const titleTerms = getsTerms(r.terms, r.match, "title");
@@ -223,52 +225,66 @@ export default class Plugin extends BasePlugin {
   style = async () => `
     [id="modals.search.main"] {
       align-items: flex-start;
+
+      ul {
+        margin: 0;
+        padding: 0;
+      }
       
       article {
         margin: 0;
-        padding: 20px;
+        padding: 1rem;
         width: -webkit-fill-available;
-      }
-      ul:first-of-type {
-        padding: 0;
-        margin: 0;
-        li {
-          list-style: none;
-          padding: 1rem;
-          border-radius: var(--border-radius);
-          cursor: pointer;
-          border: var(--border-width) solid transparent;
 
-          &.selected {
-            border: var(--border-width) solid var(--muted-border-color);
-            background: var(--card-background-color);
-          }
-          div.text {
-            font-size: 0.8rem;
-            color: hsl(var(--color-hsl) / .3);
-            border-top: var(--border-width) solid var(--muted-border-color);
-            margin-top: 0.4rem;
-            padding-top: 0.4rem;
+        &> ul {
+          li {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            list-style: none;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            border: var(--border-width) solid transparent;
+    
+            &.selected {
+              border: var(--border-width) solid var(--muted-border-color);
+              background: var(--card-background-color);
+            }
+            div.text {
+              font-size: 0.8rem;
+              color: hsl(var(--color-hsl) / .3);
+              border-top: var(--border-width) solid var(--muted-border-color);
+              margin-top: 0.4rem;
+              padding-top: 0.4rem;
+            }
           }
         }
+      }
+
+      .title {
+        font-size: 0.9rem;
+        font-weight: bold;
       }
 
       .help {
-        border-top: 2px dashed var(--muted-border-color);
-        margin-top: 20px;
-        padding-top: 20px;
+        padding: 2rem 0.6rem;
+        // border-top: 2px dashed var(--muted-border-color);
         ul {
-          padding: 0;
-          margin: 0;
+          grid-template-columns: repeat(3, auto);
+          grid-column-gap: 1rem;
+          justify-content: center;
+          li {
+            list-style: none;
+            padding: 0;
+            padding-right: 10px;
+            margin-bottom: 0;
+
+            &:first-child {
+              border-top-color: transparent;
+            }
+          }
         }
         span {
           font-size: 0.8rem;
-        }
-        li {
-          list-style: none;
-          padding: 0;
-          padding-right: 10px;
-          margin-bottom: 0;
         }
         kbd {
           font-size: 0.8rem;
@@ -301,13 +317,36 @@ export default class Plugin extends BasePlugin {
       [id="modals.search.main"] {
         padding: 0;
         article {
+          padding: 0;
           border-radius: 0;
           max-height: 100vh;
+          padding: 0;
+
+          &> ul {
+            margin: 0;
+
+            li {
+              --border-radius: 0;
+              margin-bottom: 0;
+              padding: 1.3rem 1rem;
+              &.selected {
+                border-left-color: transparent;
+                border-right-color: transparent;
+              }
+              &:first-child {
+                border-top: transparent;
+              }
+            }
+          }
 
           input {
-            border-radius: 0;
             height: 50px;
-            border-bottom: 1px solid;
+            margin: 0;
+            --border-radius: 0;
+            border-radius: 0;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
           }
         }
       }

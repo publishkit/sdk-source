@@ -31,13 +31,14 @@
   --contrast-inverse: var(--card-background-color);
 
   --primary-contrast: #fff;
-  --primary-focus: var(--primary);
-  --primary-hover: hsl(var(--primary-hs) calc(var(--primary-lig) - 10%));
+  --primary-hover: hsl(var(--primary-hs) calc(var(--primary-lig) + 10%));
+  --primary-focus: hsl(var(--primary-hsl) / 0.1);
   --primary-inverse: var(--bg);
 
   --secondary-contrast: #fff;
-  --secondary-focus: var(--secondary);
-  --secondary-hover: hsl(var(--secondary-hs) calc(var(--secondary-lig) - 10%));
+  --secondary-hover: hsl(var(--secondary-hs) calc(var(--secondary-lig) + 10%));
+  --secondary-focus: hsl(var(--secondary-hsl) / 0.1);
+  --secondary-focus: hsl(var(--secondary-hs) 50%);
   --secondary-inverse: var(--bg);
 
   --border-width: 2px;

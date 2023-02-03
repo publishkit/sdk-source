@@ -40,9 +40,9 @@ export default class UI {
     this.set("left", {});
     this.set("right", {});
     this.set("footer", { left: {}, right: {} });
-    this.set("center", { hero: "", content: "", elements: {} });
-    this.set("center.content", document.getElementById("content")!.innerHTML);
+    this.set("center", { hero: "", elements: {} });
     this.set("body", {});
+    this.set("content", document.getElementById("content")!.innerHTML);
 
     this.addElement(
       "copyright",
@@ -55,7 +55,7 @@ export default class UI {
       "poweredby",
       "footer.right",
       "main",
-      `<span class="poweredby">powered by</span> <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Ship markdown websites"><i class='bx bx-paper-plane'></i> PublishKit</a>`,
+      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Ship markdown websites"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
       { index: 1000 }
     );
 
@@ -67,7 +67,7 @@ export default class UI {
 
     rx.header = this.get("header.html", "");
     rx.hero = this.get("center.hero", "");
-    rx.content = this.get("center.content");
+    rx.content = this.get("content")
 
     rx.left = this.getUIElements("left");
     rx.left =
@@ -92,10 +92,10 @@ export default class UI {
     rx.footerLeft = this.getUIElements("footer.left");
     rx.footerLeft =
       (rx.footerLeft.length &&
-        `<div class="d-flex flex-column flex-md-row flex-lg-column flex-xl-row align-items-center justify-content-between">
+        `<div class="d-grid left">
             ${this.joinUIElements(
               rx.footerLeft,
-              (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
+              // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
             )}
           </div>`) ||
       "";
@@ -103,10 +103,10 @@ export default class UI {
     rx.footerRight = this.getUIElements("footer.right");
     rx.footerRight =
       (rx.footerRight.length &&
-        `<div class="d-flex flex-column flex-md-row flex-lg-column flex-xl-row align-items-center justify-content-between">
+        `<div class="d-grid right">
             ${this.joinUIElements(
               rx.footerRight,
-              (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
+              // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
             )}
           </div>`) ||
       "";
@@ -114,7 +114,7 @@ export default class UI {
     rx.footer = rx.footerLeft || rx.footerRight;
     rx.footer =
       (!!rx.footer &&
-        `<footer id="footer" class="d-flex flex-column flex-md-row flex-lg-column flex-xl-row align-items-center justify-content-between">
+        `<footer id="footer" class="d-grid">
           ${rx.footerLeft}
           ${rx.footerRight}
         </footer>`) ||
@@ -241,7 +241,8 @@ export default class UI {
     options?: Partial<UIElement>
   ): UIElement => {
     const id = this.buildId(ns, pluginId, elementId);
-    const html = `<div id="${id}">${body}</div>`;
+    const className = options?.className ? `class="${options.className}"` : ""
+    const html = `<div id="${id}" ${className}>${body}</div>`;
     return this.set(id, { id, html, ...options });
   };
 
