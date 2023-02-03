@@ -55,7 +55,7 @@ export default class UI {
       "poweredby",
       "footer.right",
       "main",
-      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Ship markdown websites"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
+      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Publish markdown content"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
       { index: 1000 }
     );
 

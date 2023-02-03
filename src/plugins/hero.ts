@@ -9,7 +9,7 @@ export default class Plugin extends BasePlugin {
 
   render = async () => {
     const { options, app } = this;
-    this.image = options.image || app.cfg("og.image");
+    this.image = options.image || app.cfg("image");
     if (!this.image) return;
     this.ui.base.set("center.hero", `<div id="hero" class="mb-3"></div>`);
   };

@@ -9,6 +9,5 @@ const $app = window.$app = new App();
 console.log(Utils.s.banner());
 
 (async function () {
-  
   await $app.init();
 })();
