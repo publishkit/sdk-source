@@ -3,12 +3,19 @@ import BasePlugin from "./class/basePlugin";
 import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["global", "hotkeys"];
+const requiredPlugins = ["dom", "global", "hotkeys"];
 const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
   app: App;
   utils;
+  load: ObjectAny = {};
+  run: ObjectAny = {};
+
+  // // @ts-ignore
+  // on<U extends keyof EE>(event: U, listener: EE[U]): this;
+  // // @ts-ignore
+  // emit<U extends keyof EE>(event: U, ...args: Parameters<EE[U]>): boolean;
 
   cache: PluginCache = {};
   options: ObjectAny = {};
@@ -22,9 +29,12 @@ export default class Plugins {
   }
 
   log = (key: string, ...args: any[]) => {
-    const cond = ["p=" + key, "plugins", "p*"];
-    cond.some((value) => window.pk.debug.includes(value)) &&
-      console.log(`plugins ➔`, ...args);
+    const { $kit} = window
+    if (!$kit.debug) return;
+    const cond =
+      ["plugins", "p", "*", key, `$${key}`].includes($kit.debug) ||
+      ["plugins", "p", "*"].includes(key);
+    cond && console.log(`plugins ➔`, ...args);
   };
 
   registerPlugin = async (
@@ -151,15 +161,14 @@ export default class Plugins {
 
     // https://www.stackfive.io/work/javascript/using-async-await-with-the-array-reduce-method
     // async reduce
-    const load = await keys.reduce(async (prev, key: string) => {
+    const load = (this.load = await keys.reduce(async (prev, key: string) => {
       const acc = await prev;
 
       const plugin = this.parsePlugin(key, plugins[key]);
 
       const isActive =
-        plugin.type == "unknown" ||
-        requiredPlugins.includes(key) ||
-        !!plugin.value;
+        // plugin.type == "unknown" || // TOCHECK
+        requiredPlugins.includes(key) || !!plugin.value;
       if (!isActive) return this.inactive.push(key) && acc;
 
       try {
@@ -170,10 +179,7 @@ export default class Plugins {
           this.app.cfg(key)
         );
 
-        await this.registerPlugin(plugin);
-
-        const p = this.cache[key];
-        if (!p) return acc;
+        const p = await this.registerPlugin(plugin);
 
         if (p.init) {
           const init = await p.init();
@@ -184,11 +190,12 @@ export default class Plugins {
             this.options[key]._init = init;
           } else return this.inactive.push(key) && acc;
         }
-        if (p.deps)
-          acc.deps.push(typeof p.deps == "function" ? p.deps() : p.deps);
-        if (p.css) acc.css.push(typeof p.css == "function" ? p.css() : p.css);
+        // if (p.deps)
+        if (p.deps) acc.deps.push([p.id, p.deps]);
+        if (p.style) acc.style.push([p.id, p.style]);
         if (p.render) acc.render.push([p.id, p.render, p.options]);
-        if (p.style) acc.styles.push([p.id, p.style]);
+        if (p.transform) acc.transform.push([p.id, p.transform]);
+        if (p.bind) acc.bind.push([p.id, p.bind]);
 
         this.active.push(key);
         return acc;
@@ -197,53 +204,7 @@ export default class Plugins {
         this.failed.push([key, "load()", e.message]);
         return acc;
       }
-    }, Promise.resolve({ init: [], deps: [], css: [], render: [], styles: [] }));
-
-    const addStyle = (id: string, css: string) => {
-      const style = document.createElement("style");
-      style.id = `style.${id}`;
-      style.textContent = css;
-      document.head.append(style);
-    };
-
-    // append css (don't wait)
-    const css = (window.$plugins.css = utils.a.clean(load.css));
-    css.map(utils.dom.load);
-
-    // load deps (parralel)
-    const deps = (window.$plugins.deps = utils.a.clean(load.deps));
-    await utils.dom.load(deps);
-
-    // apply render (sequence)
-    // @ts-ignore
-    await utils.a.sequence(
-      load.render,
-      async ([id, fn, options]: [string, Function, ObjectAny]) => {
-        try {
-          if (this.active.indexOf(id) >= 0) await fn(options);
-        } catch (e) {
-          this.active.splice(this.active.indexOf(id), 1);
-          this.failed.push([id, "render()", e]);
-        }
-      }
-    );
-
-    // append styles (parralel)
-    // @ts-ignore
-    await Promise.all(
-      load.styles.map(async ([id, css]: [string, string]) => {
-        try {
-          // @ts-ignore
-          css = await css();
-          if (typeof css != "string" || !css.trim()) return;
-          const style = window.less ? (await window.less.render(css)).css : css;
-          addStyle(id, style);
-        } catch (e) {
-          this.active.splice(this.active.indexOf(id), 1);
-          this.failed.push([id, "style()", `invalid css`]);
-        }
-      })
-    );
+    }, Promise.resolve({ init: [], deps: [], style: [], render: [], transform: [], bind: [] })));
 
     return load;
   };
@@ -256,25 +217,96 @@ export default class Plugins {
     return this.active.map((k) => this.cache[k]).filter(Boolean);
   };
 
-  run = async () => {
-    const { utils } = this;
-    const plugins = this.getActive();
+  execute = async (sequence: string, options?: ObjectAny, cb?: Function) => {
+    const { $ee } = window;
 
-    const binds = await utils.a.sequence(plugins, async (p: BasePlugin) => {
+    if (typeof options == "function") {
+      cb = options;
+    }
+    options = options || {};
+    options.run = options.run || "parallel";
+
+    const { utils, load, cache } = this;
+
+    this.log("*", (" " + sequence + "()").padStart(40, "-"));
+
+    const fn = async ([id, fn, options]: [string, Function, ObjectAny]) => {
+      const plugin = cache[id];
       try {
-        if (p.bind) await p.bind();
-        const poptions = (Object.keys(p.options).length && p.options) || "";
-        this.log(p.id, `✅ ${p.id} (${p.base.type})`, poptions);
-        return true;
+        if (this.active.indexOf(id) == -1) return;
+        const result = typeof fn == "function" ? await fn(options) : fn;
+        cb && (await cb(id, result));
+        this.log(id, `✅ ${id}`, `post:${sequence}`);
+        $ee.emit(`post:${sequence}:${plugin.id}`, plugin);
+        $ee.emit(`post:${sequence}`, plugin);
+        return result;
       } catch (e) {
-        this.active.splice(this.active.indexOf(p.id), 1);
-        this.failed.push([p.id, "bind()", e]);
-        return false;
+        this.active.splice(this.active.indexOf(id), 1);
+        this.failed.push([id, sequence, e]);
+        this.log(id, `💥 ${id} - err:`, e.message);
       }
+    };
+
+    // @ts-ignore
+    const run = await utils.a[options.run](load[sequence], fn);
+    $ee.emit(`post:${sequence}s`, run.filter(Boolean));
+    return run;
+  };
+
+  deps = async () => {
+    const run = await this.execute("deps");
+    this.run.deps = this.utils.a.clean(run);
+    return this.utils.dom.load(this.run.deps);
+  };
+
+  style = async () =>
+    this.execute("style", async (id: string, css: any) => {
+      css = window.less ? (await window.less.render(css)).css : css;
+      this.addStyle(id, css);
     });
 
-    this.failed.map(([id, scope, err]) => {
-      this.log(id, `💥 ${id}.${scope}`, err.message || err);
+  render = async () => this.execute("render");
+  transform = async () => this.execute("transform");
+  bind = async () => this.execute("bind");
+
+  addStyle = (id: string, css: string) => {
+    const style = document.createElement("style");
+    style.id = `style.${id}`;
+    style.textContent = css;
+    document.head.append(style);
+  };
+
+  summary = async () => {
+    const { cache, utils } = this;
+    const plugins = this.getActive();
+
+    this.log("*", ` summary`.padStart(40, "-"));
+
+    this.active.map((id) => {
+      const p = cache[id];
+      this.log(
+        id,
+        `✅ ${p.base.type} - ${id}`,
+        utils.o.isEmpty(p.options) ? "" : p.options
+      );
+    });
+
+    this.failed.map(([id, sequence, err]) => {
+      const p = cache[id];
+      this.log(
+        id,
+        `💥 ${p.base?.type || "register:fail"} - ${id}.${sequence}() - err:`,
+        err.message || err
+      );
+    });
+
+    this.log("*", ` dependencies (${this.run.deps.length})`.padStart(40, "-"));
+    this.run.deps.map((dep: any) => {
+      const type = dep.push
+        ? dep[1]?.type || dep[0]?.split(".").pop() || "unknown"
+        : dep.split(".").pop();
+      const path = dep.push ? dep[0] : dep;
+      this.log("*", ` ${type} - ${path}`);
     });
   };
 
@@ -388,7 +420,7 @@ export default class Plugins {
 
     switch (plugin.type) {
       case "internal":
-        url = `${window.pk.local}${path}`;
+        url = `${window.$kit.local}${path}`;
         break;
       case "external":
         url = plugin.value.split("|")[0];

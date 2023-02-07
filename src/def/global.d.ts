@@ -1,7 +1,15 @@
 interface Window {
-    [key: string]: any
+  [key: string]: any;
 }
 
 interface ObjectAny {
-    [key: string]: any
+  [key: string]: any;
 }
+
+// type EEOn = (key: string, fn: Function) => void;
+// type EEEmit = (key: string, data?: any) => void;
+
+// interface EE {
+//   on: EEOn;
+//   emit: EEEmit;
+// }

@@ -5,26 +5,21 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
-  init = async () => {
-    const { utils, ui } = this;
-    const content = ui.base.get("content");
-    const dom = $("<div/>").html(content);
-    const headings = dom.find("h1, h2, h3");
+  render = async () => {
+    const { ui } = this;
+    ui.addElement("right", "main", "<ul></ul>");
+  };
+
+  transform = async () => {
+    const { $dom, $utils } = window;
+    const headings = $dom.body.find("h1, h2, h3");
 
     if (headings.length <= 1) return;
 
     headings.each(function () {
       if($(this).attr("class")?.includes("noprocess")) return
-      this.id = "heading-" + utils.s.slugify($(this).text());
+      this.id = "heading-" + $utils.s.slugify($(this).text());
     });
-
-    ui.base.set("content", dom.html());
-    return true;
-  };
-
-  render = async () => {
-    const { ui } = this;
-    ui.addElement("right", "main", "<ul></ul>");
   };
 
   bind = async () => {
@@ -107,11 +102,17 @@ export default class Plugin extends BasePlugin {
       }
       &> .is-visible {
         border-left: 2px solid var(--primary);
-        background: var(--card-background-color);
+        background: var(--card-sectionning-background-color);
+        a {
+          color: var(--card-sectionning-color);
+        }
       }
       .is-visible ~ .is-visible {
         border-left: 2px solid var(--muted-border-color);
         background: transparent;
+        a {
+          color: var(--secondary);
+        }
       }
     }
   `;

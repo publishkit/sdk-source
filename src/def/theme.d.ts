@@ -1,12 +1,20 @@
-type ThemeMode = "all" | "light" | "dark";
+type ThemeMode = {
+  selector: string;
+  tokens: string[];
+};
+type ThemeModeName = "all" | "light" | "dark";
 
-interface SetupOptions {
+interface ThemeOptions {
+  bg?: string;
   font?: string;
-  headings?: HeadingSetup;
+  color?: string;
+  headings?: ThemeHeadingOptions;
   highlight?: string;
   primary?: string;
+  secondary?: string;
 }
 
-interface HeadingSetup {
+interface ThemeHeadingOptions {
   font?: string;
+  color?: string;
 }

@@ -12,6 +12,19 @@ export const asArray = (
   return output;
 };
 
+export const map = async (arr: any[], fn: Function) => {
+  const results = [];
+  for (let i = 0; i < arr.length; i++) {
+    const result = await fn(arr[i], i, arr);
+    results.push(result);
+  }
+  return results;
+};
+
+export const serie = map;
+
+export const parallel = async (a: [], fn: any) => await Promise.all(a.map(fn));
+
 export const unique = (array: any[]): any[] => {
   var a = array.concat();
   for (var i = 0; i < a.length; ++i) {

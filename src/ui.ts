@@ -33,6 +33,8 @@ export default class UI {
     }, {});
   };
 
+  outline = () => $("html").toggleClass("show-ui");
+
   create = async () => {
     this.set("header", { icons: {}, elements: {} });
     this.set("actions", {});
@@ -42,7 +44,6 @@ export default class UI {
     this.set("footer", { left: {}, right: {} });
     this.set("center", { hero: "", elements: {} });
     this.set("body", {});
-    this.set("content", document.getElementById("content")!.innerHTML);
 
     this.addElement(
       "copyright",
@@ -55,7 +56,7 @@ export default class UI {
       "poweredby",
       "footer.right",
       "main",
-      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Publish markdown content"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
+      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Markdown web apps"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
       { index: 1000 }
     );
 
@@ -63,17 +64,18 @@ export default class UI {
   };
 
   render = async () => {
+    const { $dom } = window;
     const rx: ObjectAny = {};
 
     rx.header = this.get("header.html", "");
     rx.hero = this.get("center.hero", "");
-    rx.content = this.get("content")
+    rx.content = $(`[id="content"]`).html();
 
     rx.left = this.getUIElements("left");
     rx.left =
       (rx.left.length &&
         `<aside>
-            <div class="left-bar">
+            <div class="ui-left">
             ${this.joinUIElements(rx.left)}
             </div>
         </aside>`) ||
@@ -83,7 +85,7 @@ export default class UI {
     rx.right =
       (rx.right.length &&
         `<div>
-          <div class="right-bar">
+          <div class="ui-right">
             ${this.joinUIElements(rx.right)}
           </div>
         </div>`) ||
@@ -92,9 +94,9 @@ export default class UI {
     rx.footerLeft = this.getUIElements("footer.left");
     rx.footerLeft =
       (rx.footerLeft.length &&
-        `<div class="d-grid left">
+        `<div class="d-grid ui-footer-left">
             ${this.joinUIElements(
-              rx.footerLeft,
+              rx.footerLeft
               // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
             )}
           </div>`) ||
@@ -103,9 +105,9 @@ export default class UI {
     rx.footerRight = this.getUIElements("footer.right");
     rx.footerRight =
       (rx.footerRight.length &&
-        `<div class="d-grid right">
+        `<div class="d-grid ui-footer-right">
             ${this.joinUIElements(
-              rx.footerRight,
+              rx.footerRight
               // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
             )}
           </div>`) ||
@@ -121,7 +123,7 @@ export default class UI {
       "";
 
     rx.elements = this.getUIElements("center.elements");
-    rx.elements = rx.elements.length && this.joinUIElements(rx.elements);
+    rx.elements = rx.elements.length && `<div class="ui-content-top">${this.joinUIElements(rx.elements)}</div>`;
 
     rx.actions = this.getUIElements("actions");
     rx.actions =
@@ -129,7 +131,7 @@ export default class UI {
       this.joinUIElements(rx.actions, (el) => `<li>${el.html}</li>`);
     rx.actions =
       (rx.actions &&
-        `<details class="dropdown-icon right float-end" role="list">
+        `<details class="ui-actions dropdown-icon right float-end" role="list">
           <summary aria-haspopup="listbox">
             <i class="bx bx-dots-vertical-rounded"></i>
           </summary>
@@ -154,27 +156,26 @@ export default class UI {
         `<div class="modals">${this.joinUIElements(rx.modals)}</div>`) ||
       "";
 
-    rx.layout = `
-        ${rx.header}
-        <main class="ready container${
-          this.app.cfg("layout.fluid") ? "-fluid" : ""
-        }">
-            ${rx.left}
-            ${rx.center}
-            ${rx.right}
-            ${rx.modals}
-        </main>`;
-
     rx.body = this.getUIElements("body");
     rx.body = (rx.body.length && this.joinUIElements(rx.body)) || "";
 
-    this.renderView(rx);
-    return await this.utils.dom.waitForEl("main.ready");
+    $dom.body = $dom.create(`
+      ${rx.body}
+      ${rx.header}
+      <main class="ready container${
+        this.app.cfg("layout.fluid") ? "-fluid" : ""
+      }">
+          ${rx.left}
+          ${rx.center}
+          ${rx.right}
+          ${rx.modals}
+      </main>`);
   };
 
-  renderView = (view: ObjectAny) => {
-    if(view.body) $("body").prepend(view.body);
-    this.tpl.replaceWith(view.layout);
+  draw = async () => {
+    const { $dom } = window;
+    $("body").html($dom.body.html());
+    return await this.utils.dom.waitForEl("main.ready");
   };
 
   getUIElements = (ns: UINamespace): UIElement[] => {
@@ -241,7 +242,7 @@ export default class UI {
     options?: Partial<UIElement>
   ): UIElement => {
     const id = this.buildId(ns, pluginId, elementId);
-    const className = options?.className ? `class="${options.className}"` : ""
+    const className = options?.className ? `class="${options.className}"` : "";
     const html = `<div id="${id}" ${className}>${body}</div>`;
     return this.set(id, { id, html, ...options });
   };

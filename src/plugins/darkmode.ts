@@ -15,18 +15,19 @@ export default class Plugin extends BasePlugin {
   `;
 
   render = async () => {
-    const { ui, app } = this;
+    const { $theme } = window;
+    const { ui } = this;
 
     ui.addHeaderIcon("moon", {
       icon: "bx-moon",
       className: "moon",
-      fn: () => window.$theme.switch("dark"),
+      fn: () => $theme.switch("dark"),
     });
 
     ui.addHeaderIcon("sun", {
       icon: "bx-sun",
       className: "sun",
-      fn: () => window.$theme.switch("light"),
+      fn: () => $theme.switch("light"),
     });
   };
 

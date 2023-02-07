@@ -3,25 +3,26 @@ export default class BasePlugin {
   utils;
 
   id: string;
-  base: ObjectAny;
-  options: ObjectAny;
-  default: ObjectAny;
+  options: ObjectAny = {};
+  defaults: ObjectAny = {};
+  deps: string[] = [];
+
+  base: ObjectAny; // parsePlugin result
   ui: UIBuilder;
 
-  deps: string[] | Function;
-  css: string[] | Function;
-
-  constructor(id: string, options?: ObjectAny) {
+  constructor(id: string, options?: ObjectAny, defaults?: ObjectAny) {
     this.id = id;
     this.app = window.$app;
     this.utils = this.app.utils;
-    this.options = options || {};
+    this.defaults = defaults || {};
+    // @ts-ignore
+    this.options = this.utils.o.merge({}, this.defaults, options);
     this.ui = this.app.ui.bind(this.id);
   }
 
-  defaults = (options: ObjectAny = {}) => {
-    this.default = options;
-    this.options = this.utils.o.merge({}, options, this.options);
+  setDefaults = (def: ObjectAny = {}) => {
+    this.defaults = def;
+    this.options = this.utils.o.merge({}, this.defaults, this.options);
   };
 
   log = (...args: any[]) => {
@@ -40,4 +41,5 @@ export default class BasePlugin {
   render?(): Promise<void>;
   bind?(): Promise<void>;
   style?(): Promise<string>;
+  transform?(): Promise<JQuery | void>;
 }

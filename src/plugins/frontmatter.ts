@@ -3,7 +3,7 @@ import BasePlugin from "../class/basePlugin";
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
     super(id, options);
-    this.deps = ["https://cdn.jsdelivr.net/npm/yamljs@0.3.0/dist/yaml.min.js"];
+    this.deps.push("https://cdn.jsdelivr.net/npm/yamljs@0.3.0/dist/yaml.min.js");
   }
 
   render = async () => {
@@ -12,7 +12,7 @@ export default class Plugin extends BasePlugin {
     const yaml = (d: ObjectAny) => window.YAML.stringify(d, 2);
 
     options.data = {
-      frontmatter: yaml({foo:"bar"}),
+      frontmatter: yaml(cache.frontmatter),
       pkrc: yaml(cache.pkrc),
       config: yaml(cache.config),
     };

@@ -8,10 +8,10 @@
   --container-lg-width: 920px;
   --container-xl-width: 1130px;
 
-  --color-hs: var(--color-hue) var(--color-sat);
-  --color-hsl: var(--color-hs) var(--color-lig);
   --bg-hs: var(--bg-hue) var(--bg-sat);
   --bg-hsl: var(--bg-hs) var(--bg-lig);
+  --color-hs: var(--color-hue) var(--color-sat);
+  --color-hsl: var(--color-hs) var(--color-lig);
   --primary-hs: var(--primary-hue) var(--primary-sat, 80%);
   --primary-hsl: var(--primary-hs) var(--primary-lig, 50%);
   --secondary-hue: 0;
@@ -47,7 +47,7 @@
   --muted-border-color: hsl(var(--color-hsl) / 0.1);
   --form-element-background-color: transparent;
   --form-element-active-background-color: var(--bg);
-  --form-element-placeholder-color: hsl(var(--color-hsl) / 1);
+  --form-element-placeholder-color: hsl(var(--color-hsl) / .8);
   --form-element-border-color: hsl(var(--color-hsl) / 0.2);
   --form-element-disabled-background-color: var(--muted-border-color);
   --form-element-disabled-border-color: var(--muted-border-color);
@@ -59,7 +59,7 @@
   --input-fs: 0.9rem;
 
   --switch-color: var(--primary-inverse);
-  --switch-background-color: var(--muted-color);
+  --switch-background-color: var(--form-element-disabled-border-color);
   --switch-checked-background-color: var(--primary);
 
   --dropdown-background-color: var(--bg);
@@ -77,7 +77,8 @@
   --table-row-stripped-background-color: var(--card-background-color);
 
   --card-background-color: hsl(var(--bg-hs) calc(var(--bg-lig) - 3%) / 1);
-  --card-sectionning-background-color: var(--bg);
+  --card-sectionning-background-color: var(--card-background-color);
+  // --card-sectionning-color: var(--bg);
   --card-box-shadow: 0 0 0 var(--outline-width) var(--muted-border-color);
 
   --callout-bg: var(--blockquote-border-color);

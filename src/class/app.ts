@@ -1,17 +1,21 @@
-import Utils from "./utils/index";
-import Plugins from "./plugins";
-import UI from "./ui";
+import Utils from "../utils/index";
+import Plugins from "../plugins";
+import UI from "../ui";
+// @ts-ignore
+import EventEmitter from "../lib/ee.js";
 
 export default class App {
   utils: typeof Utils;
   cache: AppCache;
   plugins: Plugins;
   ui: UI;
+  ee: EventEmitter;
 
   constructor() {
-    this.utils = window.$utils = Utils;
-    this.plugins =  window.$plugins = new Plugins(this);
+    this.utils = window.utils = window.$utils = Utils;
+    this.plugins = window.$plugins = new Plugins(this);
     this.ui = window.$ui = new UI(this);
+    this.ee = window.$ee = new EventEmitter();
   }
 
   cfg = (key: string, fallback: any) => {
@@ -20,12 +24,11 @@ export default class App {
     else return value;
   };
 
-
   loadDirsConfig = async () => {
-    if (!window.pk.dirs) return [];
+    if (!window.kit.dirs) return [];
 
     const dirs = location.pathname
-      .replace(window.pk.base, "")
+      .replace(window.kit.base, "")
       .split("/")
       .slice(0, -1)
       .filter(Boolean);
@@ -50,6 +53,7 @@ export default class App {
   };
 
   init = async () => {
+    const { plugins } = this;
     const pkrc = window.pkrc || {};
     let pkdb: ObjectAny = {};
     let frontmatter = {};
@@ -75,13 +79,18 @@ export default class App {
       tags,
     };
 
-    const ui = await this.ui.create();
-    await this.plugins.init();
-    await ui.render();
-    await this.plugins.run();
+    window.$pkrc = window.pkrc = pkrc;
+    window.$pkdb = window.pkdb = pkdb;
 
-    setTimeout(() => {
-      window.$theme.spin(false)
-    }, 800)
+    const ui = await this.ui.create();
+    await plugins.init();
+    await plugins.deps();
+    await plugins.style();
+    await plugins.render();
+    await ui.render();
+    await plugins.transform();
+    await ui.draw();
+    await plugins.bind();
+    plugins.summary();
   };
 }

@@ -6,8 +6,9 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
+    const { $kit } = window;
     const dirs = location.pathname
-      .replace(window.pk.base, "")
+      .replace($kit.base, "")
       .split("/")
       .filter(Boolean);
 
@@ -40,4 +41,15 @@ export default class Plugin extends BasePlugin {
 
     this.ui.addElement("center.elements", "main", element);
   };
+
+  style = async () => `
+    [id="center.elements.breadcrumbs.main"] {
+      font-size: 1rem;
+      padding-bottom: 20px;
+
+      li {
+        padding: 0 var(--nav-element-spacing-horizontal);
+      }
+    }
+  `;
 }

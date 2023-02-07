@@ -1,18 +1,18 @@
-import PK from "./pk";
+import Kit from "./class/kit";
 
 (async () => {
-  const pk: ObjectAny = (window.pk = new PK());
-  await pk.init();
+  const kit = window.kit = window.$kit = new Kit();
+  await kit.init();
 
   try {
     const jquery = document.createElement("script");
     jquery.src = "https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js";
     jquery.onload = function () {
       (async () => {
-        while (!pk.ready || !window.less)
+        while (!kit.ready || !window.less)
           await new Promise((solve) => setTimeout(solve, 200));
-        if (!pk.error) $.ajax({ url: `${pk.url}/pk.js`, dataType: "script" });
-        else pk.unregistered();
+        if (!kit.error) $.ajax({ url: `${kit.url}/kit.js`, dataType: "script" });
+        else kit.unregistered();
       })();
     };
 

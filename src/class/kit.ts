@@ -1,9 +1,8 @@
-import { decrypt } from "./utils/crypto";
+import { decrypt } from "../utils/crypto";
 
-export default class PK {
+export default class Kit {
   pkrc: ObjectAny;
-
-  url: string; // sdk file url base
+  url: string; // kit repo
   localhost: boolean;
   base: string;
   version: string;
@@ -21,12 +20,20 @@ export default class PK {
       location.hostname === "127.0.0.1" ||
       location.hostname.startsWith("192.168");
     this.base = "/";
-    this.api = process.env.PK_API;
-    this.debug = localStorage.getItem("pk.debug") || "";
+    this.api = process.env.KIT_API;
+    this.debug = localStorage.getItem("kit.debug") || "";
     this.ready = false;
     this.error = "";
-    this.help = `documentation @ https://publishkit.dev\n\n`;
+    this.help = `visit @ https://publishkit.dev\n\n`;
   }
+
+  log = (key: string, ...args: any[]) => {
+    if (!this.debug) return;
+    const cond =
+      ["pk", "*", key, `$${key}`].includes(window.kit.debug) ||
+      ["pk", "*"].includes(key);
+    cond && console.log(`pk ➔`, ...args);
+  };
 
   setBase = (href: string) => {
     if (!href) return;
@@ -59,22 +66,22 @@ export default class PK {
     this.setBase(this.base);
 
     this.url = (
-      localStorage.getItem("pk.sdk") ||
-      process.env.PK_SDK ||
+      localStorage.getItem("kit.url") ||
+      process.env.KIT_URL ||
       ""
     ).trim();
     this.version = (
-      localStorage.getItem("pk.version") ||
+      localStorage.getItem("kit.version") ||
       this.pkrc.pk?.version ||
       "latest"
     ).trim();
     this.local = (
-      localStorage.getItem("pk.local") ||
+      localStorage.getItem("kit.local") ||
       this.pkrc.pk?.local ||
       "pklocal"
     ).trim();
 
-    let dirsValue = localStorage.getItem("pk.dirs") || this.pkrc.pk?.dirs;
+    let dirsValue = localStorage.getItem("kit.dirs") || this.pkrc.pk?.dirs;
 
     if (typeof dirsValue == "undefined" || typeof dirsValue == "object")
       dirsValue = false;
@@ -87,6 +94,8 @@ export default class PK {
 
     if (this.version != "latest")
       this.url = this.url.replace("@latest", `@${this.version}`);
+
+    this.log("*", `debug:`, this.debug);
 
     this.liscence();
   };

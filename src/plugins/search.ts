@@ -3,15 +3,16 @@ import BasePlugin from "../class/basePlugin";
 export default class Plugin extends BasePlugin {
   constructor(id: string, options: ObjectAny = {}) {
     super(id, options);
-    this.deps = [
-      "https://cdn.jsdelivr.net/npm/minisearch@6.0.0/dist/umd/index.min.js",
-    ];
-    this.defaults({
+    this.deps.push(
+      "https://cdn.jsdelivr.net/npm/minisearch@6.0.0/dist/umd/index.min.js"
+    );
+
+    this.setDefaults({
       shortcut: "command+k", // shift,command,control
       padding: 15,
       fuzzy: 0.2,
       chars: 3,
-      results: 5
+      results: 5,
     });
   }
 
@@ -38,7 +39,7 @@ export default class Plugin extends BasePlugin {
             <kbd><svg width="15" height="15" aria-label="Arrow down" role="img"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"><path d="M7.5 3.5v8M10.5 8.5l-3 3-3-3"></path></g></svg></kbd><kbd><svg width="15" height="15" aria-label="Arrow up" role="img"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"><path d="M7.5 11.5v-8M10.5 6.5l-3-3-3 3"></path></g></svg></kbd>
             <span>navigate</span>
           </li>
-          <li onclick="$modal.close()">
+          <li onclick="$modal.close()" class="cursor">
             <kbd><svg width="15" height="15" aria-label="Escape key" role="img"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"><path d="M13.6167 8.936c-.1065.3583-.6883.962-1.4875.962-.7993 0-1.653-.9165-1.653-2.1258v-.5678c0-1.2548.7896-2.1016 1.653-2.1016.8634 0 1.3601.4778 1.4875 1.0724M9 6c-.1352-.4735-.7506-.9219-1.46-.8972-.7092.0246-1.344.57-1.344 1.2166s.4198.8812 1.3445.9805C8.465 7.3992 8.968 7.9337 9 8.5c.032.5663-.454 1.398-1.4595 1.398C6.6593 9.898 6 9 5.963 8.4851m-1.4748.5368c-.2635.5941-.8099.876-1.5443.876s-1.7073-.6248-1.7073-2.204v-.4603c0-1.0416.721-2.131 1.7073-2.131.9864 0 1.6425 1.031 1.5443 2.2492h-2.956"></path></g></svg></kbd>
             <span>close</span>
           </li>
@@ -63,7 +64,9 @@ export default class Plugin extends BasePlugin {
 
     const open = () =>
       ui.getModal("main").open((modal) => {
-        modal.el.find("input").trigger("focus");
+        setTimeout(() => {
+          modal.el.find("input").trigger("focus");
+        }, 200);
       });
 
     ui.addModal("main", modal);
@@ -75,6 +78,7 @@ export default class Plugin extends BasePlugin {
   };
 
   bind = async () => {
+    const { $kit } = window;
     const { ui, app, options, utils } = this;
 
     const icon = ui.getHeaderIcon("icon");
@@ -106,7 +110,7 @@ export default class Plugin extends BasePlugin {
       const selectedIndex = list.find(".selected").index();
       const url = results[selectedIndex];
       // @ts-ignore
-      window.location = `${window.pk.base}${url}`;
+      window.location = `${$kit.base}${url}`;
     };
 
     const highlight = (terms: string[], str: string) => {
@@ -134,7 +138,7 @@ export default class Plugin extends BasePlugin {
           boost: { title: 2 },
         });
 
-        searchResults.splice(options.results)
+        searchResults.splice(options.results);
 
         console.log("search", value, searchResults);
         searchResults.map((r: ObjectAny, i: number) => {
@@ -151,9 +155,17 @@ export default class Plugin extends BasePlugin {
                 " ... "
               )
             : "";
+
+          const titleDifferentFromText =
+            r.title.toLowerCase() != r.text.toLowerCase();
+
           str += `<li class="${i == 0 ? "selected" : ""}">
               <div class="title"><i class='bx bx-file-blank' ></i> ${title}</div>
-              ${text ? `<div class="text">${text}</div>` : ""}
+              ${
+                text && titleDifferentFromText
+                  ? `<div class="text">${text}</div>`
+                  : ""
+              }
           </li>`;
           results.push(r.url);
         });
@@ -230,6 +242,11 @@ export default class Plugin extends BasePlugin {
         margin: 0;
         padding: 0;
       }
+
+      input[type="search"]{
+        padding: 2rem;
+        font-size: 1.4rem;
+      }
       
       article {
         margin: 0;
@@ -251,7 +268,7 @@ export default class Plugin extends BasePlugin {
             }
             div.text {
               font-size: 0.8rem;
-              color: hsl(var(--color-hsl) / .3);
+              color: hsl(var(--color-hsl) / .8);
               border-top: var(--border-width) solid var(--muted-border-color);
               margin-top: 0.4rem;
               padding-top: 0.4rem;
@@ -261,7 +278,7 @@ export default class Plugin extends BasePlugin {
       }
 
       .title {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
         font-weight: bold;
       }
 
@@ -324,6 +341,7 @@ export default class Plugin extends BasePlugin {
 
           &> ul {
             margin: 0;
+            margin-top: 66px;
 
             li {
               --border-radius: 0;
@@ -339,7 +357,7 @@ export default class Plugin extends BasePlugin {
             }
           }
 
-          input {
+          input[type="search"]{
             height: 50px;
             margin: 0;
             --border-radius: 0;
@@ -347,6 +365,9 @@ export default class Plugin extends BasePlugin {
             border-top: 0;
             border-left: 0;
             border-right: 0;
+            background: var(--bg);
+            position: fixed;
+            padding-inline-start: 1rem;
           }
         }
       }

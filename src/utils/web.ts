@@ -41,7 +41,7 @@ export const getData = async (
 ): Promise<string | ObjectAny | any[]> => {
   options = options || {};
   options.nocache = options.nocache || !!urlParams.get("nocache");
-  // const base = path.includes("//") ? "" : window.pk.base;
+  // const base = path.includes("//") ? "" : window.$kit.base;
   let url = `${path}`;
   // console.log("oooo", base, url)
   if (options.nocache) url += `?v=${Date.now()}`;
@@ -78,8 +78,8 @@ export const ls = function (key: string, value?: string) {
   }
 };
 
-export const colorToHsl = (color: string): ObjectAny => {
-  const hex = colorToHex(color);
+export const colorToHsl = (color: string | undefined): ObjectAny => {
+  const hex = colorToHex(color+"");
   return hexToHsl(hex);
 };
 

@@ -19,17 +19,17 @@ export default class Plugin extends BasePlugin {
       reddit: "bxl-reddit",
     };
 
-    let body = "";
+    let icons = "";
 
     for (const [key, icon] of Object.entries(links)) {
       const url = cfg(`social.${key}`);
       if (url)
-        body += `<a href="${url}" target="_blank" class="contrast" data-tooltip="${key}" >
+        icons += `<a href="${url}" target="_blank" class="contrast" data-tooltip="${key}" >
           <i class="bx ${icon}"></i>
         </a>`;
     }
 
-    if (body) this.ui.addElement("footer.left", "main", body, { className: "d-grid" });
+    if (icons) this.ui.addElement("footer.left", "main", icons, { className: "d-grid" });
   };
 
   style = async () => `

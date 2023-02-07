@@ -1,7 +1,16 @@
-import { asArray } from "./array";
-import LoadJS from "../lib/loadjs"
+import LoadJS from "../lib/loadjs";
+import { serie } from "./array";
 
-export const load = LoadJS
+export const load = async (paths: any, options?: any) => {
+  paths = paths.push ? paths : [paths];
+  paths = await serie(paths, (path: any) => {
+    // @ts-ignore
+    if (path.push) return LoadJS(...path);
+    else if (path.trim) return LoadJS(path, options);
+    else throw "load: invalid path";
+  });
+  return paths;
+};
 
 export const waitForEl = (selector: string) => {
   return new Promise((resolve) => {

@@ -5,9 +5,9 @@ export default class Plugin extends BasePlugin {
 
   constructor(id: string, options: ObjectAny = {}) {
     super(id, options);
-    this.deps = [
-      "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.min.js",
-    ];
+    this.deps.push(
+      "https://cdn.jsdelivr.net/npm/hotkeys-js@3.7.3/dist/hotkeys.min.js"
+    );
   }
 
   register = (shortcut: string, description: string, fn: Function) => {

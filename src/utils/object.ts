@@ -32,6 +32,8 @@ export const merge = (
   return merge(target, ...sources);
 };
 
+export const isEmpty = (o: ObjectAny) => !Object.keys(o).length;
+
 // dot notation object get
 export const get = (obj: ObjectAny, path: string) =>
   path.split(".").reduce((acc, part) => acc && acc[part], obj);

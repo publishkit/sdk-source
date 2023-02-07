@@ -66,7 +66,7 @@ export default class Plugin extends BasePlugin {
 
   activeLinks = () => {
     // set aria-current if url match nav links
-    const path = window.location.pathname.replace(window.pk.base, "");
+    const path = window.location.pathname.replace(window.$kit.base, "");
 
     if (path == "/") $('a[href="/index"]').attr("aria-current", "");
     else
@@ -110,7 +110,7 @@ export default class Plugin extends BasePlugin {
     });
   };
 
-  toggle = async () => {
+  toggle = () => {
     const icon = this.ui.getHeaderIcon("icon").el;
     const nav = this.ui.getElement("left", "main").el.find("nav");
     icon.toggleClass("open");
@@ -121,7 +121,6 @@ export default class Plugin extends BasePlugin {
     [id="left.navbar.main"] nav {
       display: none;
       user-select: none;
-      padding: 30px;
       width: 100%;
       
       &.open {
@@ -131,7 +130,7 @@ export default class Plugin extends BasePlugin {
         user-select: none;
         width: 100%;
         position: fixed;
-        top: 4.3rem;
+        top: 4.2rem;
         left: 0;
         display: grid;
         grid-column-gap: 10px;

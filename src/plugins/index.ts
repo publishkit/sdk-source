@@ -1,3 +1,4 @@
+import dom from "./dom";
 import global from "./global";
 import header from "./header";
 import css from "./css";
@@ -15,6 +16,7 @@ import breadcrumbs from "./breadcrumbs";
 import hero from "./hero";
 
 const plugins: ObjectAny = {
+  dom,
   global,
   hotkeys,
   header,

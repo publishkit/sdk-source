@@ -220,10 +220,9 @@ export default (function () {
    */
   function loadjs(paths, arg1?, arg2?) {
     var bundleId, args;
-
     // bundleId (if string)
     if (arg1 && arg1.trim) bundleId = arg1;
-
+    
     // args (default is {})
     args = (bundleId ? arg2 : arg1) || {};
 

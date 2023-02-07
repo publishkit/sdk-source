@@ -46,7 +46,7 @@ export default class Plugin extends BasePlugin {
     rx.icons = base.getUIElements("header.icons");
     rx.icons =
       (rx.icons.length &&
-        `<ul class="ms-2">${base.joinUIElements(
+        `<ul class="ms-3">${base.joinUIElements(
           rx.icons,
           (el) => `<li>${el.html}</li>`
         )}</ul>`) ||
@@ -54,11 +54,11 @@ export default class Plugin extends BasePlugin {
 
     const header = this.utils.s
       .handlebar(`<nav id="header" class="container${classFluid} ${bgContrast}">
-        <ul>
+        <ul class="ui-header-left">
           ${rx.logo}
           ${rx.name}
         </ul>
-        <div class="d-flex">
+        <div class="ui-header-right d-flex">
           ${rx.elements}
           ${rx.icons}
         </div>
@@ -70,14 +70,13 @@ export default class Plugin extends BasePlugin {
   style = async () => `
 
     #header ~ main {
-      padding-top: calc(var(--block-spacing-vertical) + 1.1rem);
+      padding-top: calc(var(--block-spacing-vertical) + 3rem);
     }
   
     #header {
       --nav-link-spacing-vertical: 1rem;
       z-index: 99;
       position: fixed;
-      padding: 0 20px;
       top: 0;
       right: 0;
       left: 0;
@@ -88,13 +87,19 @@ export default class Plugin extends BasePlugin {
       &:not(.container-fluid){
         border-bottom-left-radius: var(--border-radius);
         border-bottom-right-radius: var(--border-radius);
+        padding-right: var(--spacing);
+        padding-left: var(--spacing);
       }
       
       i {
-        ${this.options.icons_fontsize && `
+        ${
+          (this.options.icons_fontsize &&
+            `
         --header-icons-fontsize: ${this.options.icons_fontsize};
         font-size: var(--header-icons-fontsize, inherit) !important;
-        ` || ""}
+        `) ||
+          ""
+        }
         cursor: pointer;
 
         &.ham {
@@ -112,10 +117,11 @@ export default class Plugin extends BasePlugin {
           &:first-child {
             padding-left: 0;
           }
+          &:last-child {
+            padding-right: 0;
+          }
           font-size: 2.2rem;
-          padding: 0.5rem 0.2rem;
-
-          
+          padding: 0.5rem 0.3rem;
         }
       }
       
@@ -123,32 +129,27 @@ export default class Plugin extends BasePlugin {
         padding: 0;
         margin-left: 0;
         margin-right: 0;
-        ${this.options.logo_height && `--logo-height: ${this.options.logo_height};` || ""}
+        ${
+          (this.options.logo_height &&
+            `--logo-height: ${this.options.logo_height};`) ||
+          ""
+        }
         img {
           max-height: var(--logo-height, 76px);
         }
       }
       .sitename {
-        ${this.options.name_fontsize && `--header-name-fontsize: ${this.options.name_fontsize};` || ""}
+        ${
+          (this.options.name_fontsize &&
+            `--header-name-fontsize: ${this.options.name_fontsize};`) ||
+          ""
+        }
         font-size: var(--site-name-fontsize, 1.4rem);
         color: var(--contrast);
         padding: 0;
         margin: 0;
       }
-
-      
     }
 
-    @media (min-width: 768px) {
-      #header {
-        &.container-fluid {
-          padding: 0 20px;
-        }
-      }
-      
-      &~ {
-        padding-top: calc(var(--block-spacing-vertical) + 3rem);
-      }
-    }
   `;
 }
