@@ -29,18 +29,19 @@ export default class Plugin extends BasePlugin {
         </a>`;
     }
 
-    if (icons) this.ui.addElement("footer.left", "main", icons, { className: "d-grid" });
+    if (icons) this.ui.addElement("main", "footer.left", `<div>${icons}</div>`, { className: "d-grid" });
   };
 
   style = async () => `
-    [id="footer.left.social.main"] {
+    [id="social.main"] {
       justify-content: space-around;
       grid-auto-flow: column;
       grid-column-gap: .3rem;
+
     }
 
-    @media (max-width: 768px) {
-      [id="footer.left.social.main"] {
+    @media (max-width: 767px) {
+      [id="social.main"] {
         --icon-size: 2rem;
       }
     }

@@ -18,6 +18,7 @@ export default class Plugin extends BasePlugin {
     };
 
     const modal = `
+      <a href="#" class="close" onclick="return $modal.close()"></a>
       <select required>
         <option value="frontmatter" selected>frontmatter</option>
         <option value="pkrc">pkrc</option>
@@ -26,23 +27,23 @@ export default class Plugin extends BasePlugin {
       <pre class="m-0"><code class="language-yaml">${options.data.frontmatter}</code></pre>
     `;
 
-    ui.addModal("main", modal);
+    ui.addModal("modal", modal);
 
-    ui.addAction("main", {
+    ui.addAction("run", {
       text: "show frontmatter",
       icon: "bxl-markdown",
-      fn: () => ui.getModal("main").open(),
+      fn: () => ui.get("modal").open(),
     });
   };
 
   bind = async () => {
     const { options, ui } = this;
-    const action = ui.getAction("main");
-    const modal = ui.getModal("main");
+    const action = ui.get("run");
+    const modal = ui.get("modal");
     const select = modal.el.find("select");
     const code = modal.el.find("code");
 
-    $(`[id="${action.id}"]`).on("click", (e) => {
+    if(action.fn) $(`[id="${action.id}"]`).on("click", (e) => {
       e.preventDefault();
       action.fn();
     });

@@ -3,13 +3,32 @@ import { serie } from "./array";
 
 export const load = async (paths: any, options?: any) => {
   paths = paths.push ? paths : [paths];
-  paths = await serie(paths, (path: any) => {
-    // @ts-ignore
-    if (path.push) return LoadJS(...path);
-    else if (path.trim) return LoadJS(path, options);
-    else throw "load: invalid path";
+
+  let success: string[] = [];
+  let failed: string[] = [];
+
+  await serie(paths, async (path: any) => {
+    try {
+      if (path.push) await LoadJS(...path);
+      else if (path.trim) await LoadJS(path, options);
+      else throw "load: invalid path";
+      path.push ? path.map((p: string) => success.push(p)) : success.push(path);
+    } catch (e) {
+      path.push ? path.map((p: string) => failed.push(p)) : failed.push(path);
+    }
   });
-  return paths;
+
+  failed = failed.reduce((acc, v) => {
+    if (typeof v == "string") acc.push(v);
+    return acc;
+  }, []);
+
+  success = success.reduce((acc, v) => {
+    if (typeof v == "string") acc.push(v);
+    return acc;
+  }, []);
+
+  return { success, failed };
 };
 
 export const waitForEl = (selector: string) => {

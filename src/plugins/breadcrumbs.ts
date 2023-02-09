@@ -28,28 +28,45 @@ export default class Plugin extends BasePlugin {
     const { dirs, paths } = this.options._init;
     const current = dirs.pop().replace(".html", "");
 
-    const element = `<nav aria-label="breadcrumb">
-      <ul>
-      ${dirs
-        .map((dir: string, i: number) => {
-          return `<li><a href="${paths[i]}">${dir}</a></li>`;
-        })
-        .join("\n")}
-        <li>${current}</li>
-      </ul>
-    </nav>`;
+    // <a href="#"><i class="bx bxs-home me-2"></i></a>
+    const element = `<div>
+      <nav aria-label="breadcrumb">
+        <ul>
+        ${dirs
+          .map((dir: string, i: number) => {
+            return `<li><a href="${paths[i]}">${dir}</a></li>`;
+          })
+          .join("\n")}
+          <li>${current}</li>
+        </ul>
+      </nav>
+    </div>`;
 
-    this.ui.addElement("center.elements", "main", element);
+    this.ui.addElement("div", "top.left", element);
   };
 
   style = async () => `
-    [id="center.elements.breadcrumbs.main"] {
-      font-size: 1rem;
-      padding-bottom: 20px;
+    [id="breadcrumbs.div"] {
+      display: grid;
+      grid-auto-flow: column;
+      align-items: center;
+      justify-content: start;
 
       li {
         padding: 0 var(--nav-element-spacing-horizontal);
       }
+    }
+
+    @media (max-width: 575px){
+      [id="breadcrumbs.div"] {
+        font-size: .7rem;
+      }
+    }
+
+    /* PICO OVERIDE  */
+
+    nav[aria-label="breadcrumb"] ul li:not(:last-child) ::after {
+      content: ">";
     }
   `;
 }

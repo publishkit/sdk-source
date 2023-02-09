@@ -4,13 +4,14 @@ import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
 const requiredPlugins = ["dom", "global", "hotkeys"];
-const lastPlugins = ["header", "theme"];
+const lastPlugins = ["header", "theme", "toc"];
 
 export default class Plugins {
   app: App;
   utils;
   load: ObjectAny = {};
   run: ObjectAny = {};
+  depsStatus: ObjectAny = { sucess: [], failed: [] };
 
   // // @ts-ignore
   // on<U extends keyof EE>(event: U, listener: EE[U]): this;
@@ -29,7 +30,7 @@ export default class Plugins {
   }
 
   log = (key: string, ...args: any[]) => {
-    const { $kit} = window
+    const { $kit } = window;
     if (!$kit.debug) return;
     const cond =
       ["plugins", "p", "*", key, `$${key}`].includes($kit.debug) ||
@@ -148,7 +149,11 @@ export default class Plugins {
 
     const { plugins = {} } = app.cache.config;
 
-    const unsortedKeys = utils.a.clean([...CoreKeys, ...Object.keys(plugins)]);
+    const unsortedKeys = utils.a.clean([
+      ...requiredPlugins,
+      ...Object.keys(plugins),
+    ]);
+
     const sorted = unsortedKeys.reduce(
       (acc, key) => {
         if (lastPlugins.includes(key)) acc.last.push(key);
@@ -157,6 +162,7 @@ export default class Plugins {
       },
       { list: [], last: [] }
     );
+
     const keys = [...sorted.list, ...sorted.last];
 
     // https://www.stackfive.io/work/javascript/using-async-await-with-the-array-reduce-method
@@ -256,7 +262,8 @@ export default class Plugins {
   deps = async () => {
     const run = await this.execute("deps");
     this.run.deps = this.utils.a.clean(run);
-    return this.utils.dom.load(this.run.deps);
+    this.depsStatus = await this.utils.dom.load(this.run.deps);
+    return this.depsStatus;
   };
 
   style = async () =>
@@ -306,7 +313,8 @@ export default class Plugins {
         ? dep[1]?.type || dep[0]?.split(".").pop() || "unknown"
         : dep.split(".").pop();
       const path = dep.push ? dep[0] : dep;
-      this.log("*", ` ${type} - ${path}`);
+      const status = this.depsStatus.success.includes(path) ? '✅' : '💥'
+      this.log("*", `${status} - ${path} (${type})`);
     });
   };
 
@@ -358,13 +366,18 @@ export default class Plugins {
   };
 
   private parseOptionValue = (value: string) => {
+    // return value if match http:// pattern
+    if (/[a-z]+:\/\//.test(value)) return value;
+
     const [name, ...rest] = value.split(":");
     const options = rest.join(":");
-    const plugin = this.parsePlugin(name);
+    // const plugin = this.parsePlugin(name);
     const ssp = this.shortSyntaxPlugins;
 
-    value =
-      (options.includes(":") ? this.parseOptionValue(options) : options) || "";
+    const isRecursive = options.includes(":") && !options.includes("://");
+    console.log("pdpod", isRecursive, name, options);
+
+    value = (isRecursive ? this.parseOptionValue(options) : options) || "";
 
     // @ts-ignore
     if (ssp[name]) value = ssp[name](value);

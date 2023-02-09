@@ -14,6 +14,7 @@ import social from "./social";
 import pdf from "./pdf";
 import breadcrumbs from "./breadcrumbs";
 import hero from "./hero";
+import bg from "./bg";
 
 const plugins: ObjectAny = {
   dom,
@@ -31,6 +32,7 @@ const plugins: ObjectAny = {
   pdf,
   breadcrumbs,
   hero,
+  bg,
   css,
 };
 

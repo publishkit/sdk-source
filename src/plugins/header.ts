@@ -18,49 +18,39 @@ export default class Plugin extends BasePlugin {
 
     rx.logo =
       (logo &&
-        `<li >
+        `
           <a class="logo" href="./" >
             <img src="${logo}"></img>
           </a>
-        </li>`) ||
+        `) ||
       "";
 
     rx.name =
       (name !== false &&
-        `<li>
+        `
           <a href="./" class="sitename">
             <strong>${name || app.cfg("site.name", "Sitename")}</strong>
           </a>
-        </li>`) ||
+        `) ||
       "";
 
-    rx.elements = base.getUIElements("header.elements");
-    rx.elements =
-      (rx.elements.length &&
-        `<ul>${base.joinUIElements(
-          rx.elements,
-          (el) => `<li>${el.html}</li>`
-        )}</ul>`) ||
-      "";
+    let left = base.getUIElements("header.left");
+    // @ts-ignore
+    left = (left.length && base.joinUIElements(left)) || "";
 
-    rx.icons = base.getUIElements("header.icons");
-    rx.icons =
-      (rx.icons.length &&
-        `<ul class="ms-3">${base.joinUIElements(
-          rx.icons,
-          (el) => `<li>${el.html}</li>`
-        )}</ul>`) ||
-      "";
+    let right = base.getUIElements("header.right");
+    // @ts-ignore
+    right = (right.length && base.joinUIElements(right)) || "";
 
     const header = this.utils.s
-      .handlebar(`<nav id="header" class="container${classFluid} ${bgContrast}">
-        <ul class="ui-header-left">
+      .handlebar(`<nav id="header" class="ui-header container${classFluid} ${bgContrast}">
+        <div class="ui-header-left">
+          ${left}
           ${rx.logo}
           ${rx.name}
-        </ul>
-        <div class="ui-header-right d-flex">
-          ${rx.elements}
-          ${rx.icons}
+        </div>
+        <div class="ui-header-right">
+          ${right}
         </div>
     </nav>`);
 
@@ -68,27 +58,20 @@ export default class Plugin extends BasePlugin {
   };
 
   style = async () => `
-
-    #header ~ main {
-      padding-top: calc(var(--block-spacing-vertical) + 3rem);
-    }
   
-    #header {
+    .ui-header {
       --nav-link-spacing-vertical: 1rem;
       z-index: 99;
       position: fixed;
       top: 0;
       right: 0;
       left: 0;
-      background: var(--card-background-color);
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       backdrop-filter: saturate(100%) blur(20px);
 
       &:not(.container-fluid){
         border-bottom-left-radius: var(--border-radius);
         border-bottom-right-radius: var(--border-radius);
-        padding-right: var(--spacing);
-        padding-left: var(--spacing);
       }
       
       i {
@@ -99,29 +82,6 @@ export default class Plugin extends BasePlugin {
         font-size: var(--header-icons-fontsize, inherit) !important;
         `) ||
           ""
-        }
-        cursor: pointer;
-
-        &.ham {
-          margin-right: -4px;
-        }
-      }
-      ul {
-        --color: var(--contrast);
-        margin-left: 0;
-        margin-right: 0;
-        li {
-          display: flex;
-          align-items: center;
-          padding-right: 0;
-          &:first-child {
-            padding-left: 0;
-          }
-          &:last-child {
-            padding-right: 0;
-          }
-          font-size: 2.2rem;
-          padding: 0.5rem 0.3rem;
         }
       }
       
@@ -138,6 +98,7 @@ export default class Plugin extends BasePlugin {
           max-height: var(--logo-height, 76px);
         }
       }
+
       .sitename {
         ${
           (this.options.name_fontsize &&
@@ -148,6 +109,19 @@ export default class Plugin extends BasePlugin {
         color: var(--contrast);
         padding: 0;
         margin: 0;
+      }
+    }
+
+    @media (max-width: 767px){
+      .ui-header {
+        &:not(.container-fluid){
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        .sitename {
+          font-size: 1.1rem;
+        }
       }
     }
 

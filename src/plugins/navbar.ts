@@ -6,7 +6,7 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
-    if(this.app.cfg("navbar") === false) return false
+    if (this.app.cfg("navbar") === false) return false;
     // TODO add json parse inside getdata fn
     const data = (await this.utils.w.getData(`navbar.json`, {
       json: true,
@@ -57,10 +57,10 @@ export default class Plugin extends BasePlugin {
       this.options._init
     );
 
-    ui.addElement("left", "main", element);
-    ui.addHeaderIcon("icon", {
-      icon: "bx-menu",
-      className: "ham",
+    ui.addElement("nav", "left", element);
+    ui.addIcon("icon", "header.left", {
+      index: 1000,
+      icon: "bx-menu-alt-left",
     });
   };
 
@@ -85,8 +85,8 @@ export default class Plugin extends BasePlugin {
 
   bind = async () => {
     const self = this;
-    const icon = this.ui.getHeaderIcon("icon");
-    const nav = this.ui.getElement("left", "main").el.find("nav");
+    const icon = this.ui.get("icon");
+    const nav = this.ui.get("nav").el;
 
     this.activeLinks();
 
@@ -100,53 +100,30 @@ export default class Plugin extends BasePlugin {
     nav.find("a").addClass("secondary");
 
     window.documentOnClick.push((event: JQuery.ClickEvent) => {
-      if (!$('[id="left.navbar.main"] nav.open')[0]) return;
+      if (!$('[id="navbar.nav"].open')[0]) return;
       const target: any = event.target;
 
       // close menu if open
-      const isIcon = target.id == "header.icons.navbar.icon";
-      const isNav = $(target).parents('[id="left.navbar.main"]').length;
+      const isIcon = target.id == "navbar.icon";
+      const isNav =
+        $(target).parents('[id="navbar.nav"]').length ||
+        target.id == "navbar.nav";
       if (!(isIcon || isNav)) self.toggle();
     });
   };
 
   toggle = () => {
-    const icon = this.ui.getHeaderIcon("icon").el;
-    const nav = this.ui.getElement("left", "main").el.find("nav");
+    const icon = this.ui.get("icon").el;
+    const nav = this.ui.get("nav").el;
     icon.toggleClass("open");
     nav.toggleClass("open");
   };
 
   style = async () => `
-    [id="left.navbar.main"] nav {
+    [id="navbar.nav"] {
       display: none;
       user-select: none;
       width: 100%;
-      
-      &.open {
-        display: grid;
-        grid-template-columns: auto auto;
-        justify-content: space-around;
-        user-select: none;
-        width: 100%;
-        position: fixed;
-        top: 4.2rem;
-        left: 0;
-        display: grid;
-        grid-column-gap: 10px;
-        grid-row-gap: 3rem;
-        grid-template-columns: 1fr 1fr;
-        justify-content: left;
-        font-size: 1rem;
-        background: var(--bg);
-        border-bottom: 2px solid var(--muted-color);
-        border-top: 2px solid var(--muted-color);
-
-        details {
-          margin-bottom: 0;
-          padding-bottom: 0;
-        }
-      }
 
       ul {
         --color: var(--primary);
@@ -194,36 +171,62 @@ export default class Plugin extends BasePlugin {
       }
     }
 
-    [id="header.icons.navbar.icon"] {
-      // font-size: 2em !important;
+    [id="navbar.icon"] {
+      &.open {
+        color: var(--primary) !important;
+      }
     }
 
-    @media (min-width: 576px) {
-      [id="left.navbar.main"] nav {
+    @media (max-width: 767px) {
+      [id="navbar.nav"] {
         &.open {
-          padding: 50px;
+          display: grid;
+          grid-template-columns: auto auto;
+          justify-content: space-around;
+          user-select: none;
+          width: 100%;
+          position: fixed;
+          top: var(--header-height);
+          left: 0;
+          display: grid;
+          grid-column-gap: 10px;
+          grid-row-gap: 3rem;
           grid-template-columns: 1fr 1fr 1fr;
+          justify-content: left;
+          font-size: 1rem;
+          background: var(--bg);
+          border-bottom: 2px solid var(--muted-border-color);
+          border-top: 2px solid var(--muted-border-color);
+          padding: calc(var(--spacing) * 2);
+          height: 100%;
+    
+          details {
+            margin-bottom: 0;
+            padding-bottom: 0;
+          }
+        }
+      }
+    }
+
+
+    @media (max-width: 575px) {
+      [id="navbar.nav"] {
+        &.open {
+          padding: var(--spacing);
+          grid-template-columns: 1fr 1fr;
         }
       }
     }
     
     @media (min-width: 768px) {
-      [id="left.navbar.main"] nav {
+      [id="navbar.nav"] {
         display: block;
         border: none;
         font-size: 0.8rem;
 
       }
-      #header li:has([id="header.icons.navbar.icon"]) {
+      [id="navbar.icon"] {
         display: none;
-      }
-    }
-
-    @media (min-width: 991px) {
-      [id="left.navbar.main"] nav {
-        &.open {
-          grid-template-columns: 1fr 1fr 1fr 1fr;
-        }
       }
     }
   `;

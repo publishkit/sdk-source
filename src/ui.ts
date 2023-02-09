@@ -1,8 +1,10 @@
 import { put, get } from "./utils/object";
+import Layout from "./lib/layout";
 
 export default class UI {
   app;
   utils;
+  layout: Layout;
 
   cache: ObjectAny = {};
   tpl: ObjectAny;
@@ -11,51 +13,42 @@ export default class UI {
     this.app = app;
     this.utils = app.utils;
     this.tpl = $("template#content");
+    this.layout = new Layout(this);
+    if (typeof this.utils.w.urlParams.get("ui") == "string") this.outline();
   }
 
   set = (key: string, value: any): any => put(this.cache, key, value);
 
-  push = (key: string, value: any) => {
-    const item = get(this.cache, key);
-    item.push(value);
-  };
-
-  pushStart = (key: string, value: any) => {
-    this.cache[key].unshift(value);
-  };
-
-  get = (key: string, fallback?: any) => {
-    const keys = this.utils.a.asArray(key);
-    if (keys.length == 1) return get(this.cache, key) || fallback;
-    return keys.reduce((acc: any, key: string) => {
-      acc[key] = get(this.cache, key);
-      return acc;
-    }, {});
+  get = (id: string): UITypes => {
+    const element = get(this.cache.els, id) || get(this.cache, id);
+    element.el = $(`[id="${id}"]`);
+    return element;
   };
 
   outline = () => $("html").toggleClass("show-ui");
 
   create = async () => {
-    this.set("header", { icons: {}, elements: {} });
+    this.set("els", {}); // elements
+    this.set("header", { left: {}, right: {} });
     this.set("actions", {});
-    this.set("modals", {});
     this.set("left", {});
     this.set("right", {});
+    this.set("top", { hero: "", left: {}, right: {} });
     this.set("footer", { left: {}, right: {} });
-    this.set("center", { hero: "", elements: {} });
+    this.set("modals", {});
     this.set("body", {});
 
     this.addElement(
       "copyright",
-      "footer.left",
       "main",
+      "footer.left",
       `© ${new Date().getFullYear()}`
     );
 
     this.addElement(
       "poweredby",
-      "footer.right",
       "main",
+      "footer.right",
       `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Markdown web apps"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
       { index: 1000 }
     );
@@ -64,112 +57,9 @@ export default class UI {
   };
 
   render = async () => {
+    const layout = this.layout.render();
     const { $dom } = window;
-    const rx: ObjectAny = {};
-
-    rx.header = this.get("header.html", "");
-    rx.hero = this.get("center.hero", "");
-    rx.content = $(`[id="content"]`).html();
-
-    rx.left = this.getUIElements("left");
-    rx.left =
-      (rx.left.length &&
-        `<aside>
-            <div class="ui-left">
-            ${this.joinUIElements(rx.left)}
-            </div>
-        </aside>`) ||
-      "";
-
-    rx.right = this.getUIElements("right");
-    rx.right =
-      (rx.right.length &&
-        `<div>
-          <div class="ui-right">
-            ${this.joinUIElements(rx.right)}
-          </div>
-        </div>`) ||
-      "";
-
-    rx.footerLeft = this.getUIElements("footer.left");
-    rx.footerLeft =
-      (rx.footerLeft.length &&
-        `<div class="d-grid ui-footer-left">
-            ${this.joinUIElements(
-              rx.footerLeft
-              // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
-            )}
-          </div>`) ||
-      "";
-
-    rx.footerRight = this.getUIElements("footer.right");
-    rx.footerRight =
-      (rx.footerRight.length &&
-        `<div class="d-grid ui-footer-right">
-            ${this.joinUIElements(
-              rx.footerRight
-              // (el) => `<div class="mb-2 mb-xl-0">${el.html}</div>`
-            )}
-          </div>`) ||
-      "";
-
-    rx.footer = rx.footerLeft || rx.footerRight;
-    rx.footer =
-      (!!rx.footer &&
-        `<footer id="footer" class="d-grid">
-          ${rx.footerLeft}
-          ${rx.footerRight}
-        </footer>`) ||
-      "";
-
-    rx.elements = this.getUIElements("center.elements");
-    rx.elements = rx.elements.length && `<div class="ui-content-top">${this.joinUIElements(rx.elements)}</div>`;
-
-    rx.actions = this.getUIElements("actions");
-    rx.actions =
-      rx.actions.length &&
-      this.joinUIElements(rx.actions, (el) => `<li>${el.html}</li>`);
-    rx.actions =
-      (rx.actions &&
-        `<details class="ui-actions dropdown-icon right float-end" role="list">
-          <summary aria-haspopup="listbox">
-            <i class="bx bx-dots-vertical-rounded"></i>
-          </summary>
-          <ul role="listbox">
-            ${rx.actions}
-          </ul>
-        </details>`) ||
-      "";
-
-    rx.center =
-      `<div role="document">
-            ${rx.hero}
-            ${rx.actions || ""}
-            ${rx.elements || ""}
-            ${rx.content}
-            ${rx.footer}
-        </div>` || "";
-
-    rx.modals = this.getUIElements("modals");
-    rx.modals =
-      (rx.modals.length &&
-        `<div class="modals">${this.joinUIElements(rx.modals)}</div>`) ||
-      "";
-
-    rx.body = this.getUIElements("body");
-    rx.body = (rx.body.length && this.joinUIElements(rx.body)) || "";
-
-    $dom.body = $dom.create(`
-      ${rx.body}
-      ${rx.header}
-      <main class="ready container${
-        this.app.cfg("layout.fluid") ? "-fluid" : ""
-      }">
-          ${rx.left}
-          ${rx.center}
-          ${rx.right}
-          ${rx.modals}
-      </main>`);
+    $dom.body = $dom.create(layout);
   };
 
   draw = async () => {
@@ -178,8 +68,8 @@ export default class UI {
     return await this.utils.dom.waitForEl("main.ready");
   };
 
-  getUIElements = (ns: UINamespace): UIElement[] => {
-    const object = get(this.cache, ns);
+  getUIElements = (zone: LayoutZone): UIElement[] => {
+    const object = get(this.cache, zone);
     const keys = Object.keys(object);
     if (!keys.length) return [];
 
@@ -215,123 +105,86 @@ export default class UI {
         f(a, ...b);
 
     ui.base = this;
-
+    ui.get = (id: string) => this.get(`${pluginId}.${id}`);
     ui.addElement = curry(this.addElement)(pluginId);
-    ui.getElement = curry(this.getElement)(pluginId);
-
-    ui.addHeaderIcon = curry(this.addHeaderIcon)(pluginId);
-    ui.getHeaderIcon = curry(this.getHeaderIcon)(pluginId);
-
+    ui.addIcon = curry(this.addIcon)(pluginId);
     ui.addAction = curry(this.addAction)(pluginId);
-    ui.getAction = curry(this.getAction)(pluginId);
-
     ui.addModal = curry(this.addModal)(pluginId);
-    ui.getModal = curry(this.getModal)(pluginId);
 
     return ui;
   };
 
-  buildId = (ns: string, pluginId: string, elementId: string) =>
-    `${ns}.${pluginId}.${elementId}`;
+  buildId = (...args: any[]) => args.join(".");
 
   addElement = (
     pluginId: string,
-    ns: UINamespace,
     elementId: string,
-    body: string | Function,
-    options?: Partial<UIElement>
-  ): UIElement => {
-    const id = this.buildId(ns, pluginId, elementId);
-    const className = options?.className ? `class="${options.className}"` : "";
-    const html = `<div id="${id}" ${className}>${body}</div>`;
-    return this.set(id, { id, html, ...options });
-  };
+    zone: LayoutZone,
+    body: string,
+    options?: Partial<UIElement | UIIcon>
+  ): UIElement | UIIcon => {
+    const id = this.buildId(pluginId, elementId);
 
-  getElement = (
-    pluginId: string,
-    ns: UINamespace,
-    elementId: string
-  ): UIElement => {
-    const id = this.buildId(ns, pluginId, elementId);
-    const element = this.get(id);
-    if (!element.el) {
-      element.el = $(`[id="${id}"]`);
-      put(this.cache, id, element);
-    }
+    body = body.trim();
+
+    // if not a tag, wrap in div
+    if (!body.startsWith("<")) body = `<div>${body}</div>`;
+
+    const el = $(body);
+    el.attr("id", id);
+    if (options?.className) el.addClass(options.className);
+
+    const html = el.prop("outerHTML");
+    const element = <UIElement>{ id, html, ...options };
+    this.set(`${zone}.${id}`, element);
+    this.set(`els.${id}`, element);
     return element;
   };
 
-  addHeaderIcon = (
+  addIcon = (
     pluginId: string,
     elementId: string,
-    options: Partial<UIHeaderIcon>
-  ): UIHeaderIcon => {
-    const id = this.buildId("header.icons", pluginId, elementId);
-    let { icon, fn, className = "" } = options;
-    const html = `<i id="${id}" class="bx ${icon} ${className}"></i>`;
-    return this.set(id, { id, icon, fn, html });
-  };
-
-  getHeaderIcon = (pluginId: string, elementId: string): UIHeaderIcon => {
-    const id = this.buildId("header.icons", pluginId, elementId);
-    const icon = this.get(id);
-    if (!icon.el) {
-      icon.el = $(`[id="${id}"]`);
-      put(this.cache, id, icon);
-    }
-    return icon;
+    zone: LayoutZone,
+    options: Partial<UIIcon>
+  ): UIIcon => {
+    const body = `<i class="bx ${options.icon || ""}"></i>`;
+    return <UIIcon>this.addElement(pluginId, elementId, zone, body, options);
   };
 
   addAction = (
     pluginId: string,
     elementId: string,
-    options: Partial<UIAction>
+    options: Partial<UIAction> = {}
   ): UIAction => {
-    const id = this.buildId("actions", pluginId, elementId);
-    let { text, icon, fn } = options;
-    const iconEl = (icon && `<i class="bx-fw bx ${icon}"></i>`) || "";
-    const html = `<a href="#" id="${id}">${iconEl}${text}</a>`;
-    return this.set(id, { id, text, icon, fn, html });
-  };
-
-  getAction = (pluginId: string, elementId: string): UIAction => {
-    const id = this.buildId("actions", pluginId, elementId);
-    const action = this.get(id);
-    if (!action.el) {
-      action.el = $(`[id="${id}"]`);
-      put(this.cache, id, action);
-    }
-    return action;
+    const icon =
+      (options.icon && `<i class="bx-fw bx ${options.icon}"></i>`) || "";
+    const body = `<a href="#">${icon}${options.text || "unamed action"}</a>`;
+    return <UIAction>(
+      this.addElement(pluginId, elementId, "actions", body, options)
+    );
   };
 
   addModal = (
     pluginId: string,
     elementId: string,
     body: string | Function,
-    options?: ObjectAny
+    options: Partial<UIModal> = {}
   ): UIModal => {
-    options = options || {};
-    const id = this.buildId("modals", pluginId, elementId);
-    const modal = this.app.plugins.get("modal") as ModalPlugin;
-    const html = `<dialog id="${id}" ${
-      (options.noesc && `noesc="true"`) || ""
-    }> 
+    const { $modal } = window;
+    const id = this.buildId(pluginId, elementId);
+    const noesc = (options.noesc && `noesc="true"`) || "";
+
+    body = `<dialog ${noesc}> 
       <article>
         ${body}
       </article>
     </dialog>`;
-    const open = (cb: Function | undefined) => modal.open(id, cb);
-    const close = (cb: Function | undefined) => modal.close(cb);
-    return this.set(id, { id, html, open, close });
-  };
 
-  getModal = (pluginId: string, elementId: string): UIModal => {
-    const id = this.buildId("modals", pluginId, elementId);
-    const modal = this.get(id);
-    if (!modal.el) {
-      modal.el = $(`[id="${id}"]`);
-      put(this.cache, id, modal);
-    }
-    return modal;
+    options.open = (cb: Function | undefined) => $modal.open(id, cb);
+    options.close = (cb: Function | undefined) => $modal.close(cb);
+
+    return <UIModal>(
+      this.addElement(pluginId, elementId, "modals", body, options)
+    );
   };
 }

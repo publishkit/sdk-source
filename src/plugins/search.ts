@@ -54,7 +54,7 @@ export default class Plugin extends BasePlugin {
       .replace("control", "✲");
     s2 = s2.toUpperCase();
 
-    const button = `<button type="button" class="contrast outline d-flex justify-content-between align-items-center">
+    const button = `<button type="button" class="contrast outline">
       <span class="d-flex align-items-center">
         <i class="bx bx-search-alt"></i>
         <span class="text">Search</span>
@@ -63,15 +63,15 @@ export default class Plugin extends BasePlugin {
     </button>`;
 
     const open = () =>
-      ui.getModal("main").open((modal) => {
+      ui.get("modal").open((modal) => {
         setTimeout(() => {
           modal.el.find("input").trigger("focus");
         }, 200);
       });
 
-    ui.addModal("main", modal);
-    ui.addElement("header.elements", "btn", button, { fn: open });
-    ui.addHeaderIcon("icon", {
+    ui.addModal("modal", modal);
+    ui.addElement("btn", "header.right", button, { fn: open });
+    ui.addIcon("icon", "header.right", {
       icon: "bx-search-alt",
       fn: open,
     });
@@ -81,9 +81,9 @@ export default class Plugin extends BasePlugin {
     const { $kit } = window;
     const { ui, app, options, utils } = this;
 
-    const icon = ui.getHeaderIcon("icon");
-    const button = ui.getElement("header.elements", "btn");
-    const modal = ui.getModal("main");
+    const icon = ui.get("icon");
+    const button = ui.get("btn");
+    const modal = ui.get("modal");
     const input = modal.el.find("input");
     const list = modal.el.find("article > ul");
     const hotkeys = <HotkeysPlugin>app.plugins.get("hotkeys");
@@ -235,7 +235,7 @@ export default class Plugin extends BasePlugin {
   };
 
   style = async () => `
-    [id="modals.search.main"] {
+    [id="search.modal"] {
       align-items: flex-start;
 
       ul {
@@ -283,8 +283,8 @@ export default class Plugin extends BasePlugin {
       }
 
       .help {
-        padding: 2rem 0.6rem;
-        // border-top: 2px dashed var(--muted-border-color);
+        padding: var(--spacing);
+
         ul {
           grid-template-columns: repeat(3, auto);
           grid-column-gap: 1rem;
@@ -310,13 +310,16 @@ export default class Plugin extends BasePlugin {
       }
     }
     
-    [id="header.elements.search.btn"] {
+    [id="search.btn"] {
       display: none;
+      i {
+        font-size: 1rem !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      margin: 0;
       .text {
         font-size: 0.8rem;
-      }
-      > button {
-        min-width: 130px;
       }
       kbd {
         font-size: 0.6rem;
@@ -330,13 +333,14 @@ export default class Plugin extends BasePlugin {
       }
     }
 
-    @media (max-width: 576px) {
-      [id="modals.search.main"] {
+    @media (max-width: 575px) {
+      [id="search.modal"] {
         padding: 0;
         article {
           padding: 0;
           border-radius: 0;
           max-height: 100vh;
+          height: 100%;
           padding: 0;
 
           &> ul {
@@ -374,21 +378,17 @@ export default class Plugin extends BasePlugin {
     }
     
     @media (min-width: 576px) {
-      [id="modals.search.main"] article {
-        margin: var(--block-spacing-vertical) 0;
+      [id="search.icon"] {
+        display: none;
       }
-      li:has([id="header.icons.search.icon"]) {
-        display: none !important;
-      }
-      [id="header.elements.search.btn"] {
-        display: block;
-      }
-    }
-
-    @media (min-width: 992px) {
-      [id="header.elements.search.btn"] button {
+      [id="search.btn"] {
+        display: grid;
+        grid-auto-flow: column;
+        justify-content: space-between;
+        align-items: center;
         min-width: 200px;
       }
     }
+
   `;
 }

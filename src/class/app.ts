@@ -16,6 +16,7 @@ export default class App {
     this.plugins = window.$plugins = new Plugins(this);
     this.ui = window.$ui = new UI(this);
     this.ee = window.$ee = new EventEmitter();
+    window.$cfg = this.cfg;
   }
 
   cfg = (key: string, fallback: any) => {
@@ -55,6 +56,7 @@ export default class App {
   init = async () => {
     const { plugins } = this;
     const pkrc = window.pkrc || {};
+
     let pkdb: ObjectAny = {};
     let frontmatter = {};
     let tags: string[] = [];
@@ -81,12 +83,13 @@ export default class App {
 
     window.$pkrc = window.pkrc = pkrc;
     window.$pkdb = window.pkdb = pkdb;
+    window.$dirs = window.dirs = dirs;
 
     const ui = await this.ui.create();
     await plugins.init();
     await plugins.deps();
-    await plugins.style();
     await plugins.render();
+    await plugins.style();
     await ui.render();
     await plugins.transform();
     await ui.draw();

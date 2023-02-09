@@ -72,16 +72,16 @@ export default class Kit {
     ).trim();
     this.version = (
       localStorage.getItem("kit.version") ||
-      this.pkrc.pk?.version ||
+      this.pkrc.kit?.version ||
       "latest"
     ).trim();
     this.local = (
       localStorage.getItem("kit.local") ||
-      this.pkrc.pk?.local ||
+      this.pkrc.kit?.local ||
       "pklocal"
     ).trim();
 
-    let dirsValue = localStorage.getItem("kit.dirs") || this.pkrc.pk?.dirs;
+    let dirsValue = localStorage.getItem("kit.dirs") || this.pkrc.kit?.dirs;
 
     if (typeof dirsValue == "undefined" || typeof dirsValue == "object")
       dirsValue = false;

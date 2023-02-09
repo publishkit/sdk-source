@@ -84,7 +84,7 @@ export default class BaseTheme extends BasePlugin {
 
   setup = async () => {
     const { $kit } = window;
-    const { utils, modes, themeOptions: opt } = this;
+    const { utils, modes, themeOptions: opt, options } = this;
 
     modes.init();
 
@@ -146,10 +146,10 @@ export default class BaseTheme extends BasePlugin {
       ${$var("--secondary-lig: %s%;", secondary.l, opt.secondary)}
       ${$var("--headings-color: %s;", opt.headings?.color, opt.headings?.color)}
       
-      ${$var("--font-family: %s, sans-serif;", opt.font, true)}
+      ${$var("--font-family: %s, sans-serif;", options.font, true)}
       ${$var(
         "--headings-font-family: %s, sans-serif;",
-        opt.headings?.font || opt.font,
+        options.headings?.font || options.font,
         true
       )}
       ${$var("--highlight-background-color: var(--bg);", opt.highlight, true)}
@@ -188,13 +188,10 @@ export default class BaseTheme extends BasePlugin {
     },
     render: (): string => {
       const result = [];
-      console.log("iiiiiii", this.modes.cache)
       for (const [key, mode] of Object.entries(this.modes.cache)) {
         const { selector, tokens } = <ThemeMode>mode;
         tokens.length && result.push(`${selector} { ${tokens.join("\n")} }`);
       }
-      console.log("iiiiiii", result.join("\n"))
-
       return result.join("\n");
     },
   };

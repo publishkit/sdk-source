@@ -1,38 +1,30 @@
-type UINamespace =
-  | "body"
-  | "header.elements"
-  | "header.icons"
-  | "left"
-  | "right"
-  | "footer.left"
-  | "footer.right"
-  | "center."
-  | "center.elements"
-  | "modals"
-  | "actions";
+type UITypes = UIElement | UIIcon | UIAction | UIModal;
 
 interface UIBuilder {
   base: import("src/ui").default;
 
+  get(elementId: string): UITypes;
+
   addElement(
-    ns: UINamespace,
     elementId: string,
+    zone: LayoutZone,
     body: string,
     options?: Partial<UIElement>
   ): UIElement;
-  getElement(ns: UINamespace, elementId: string): UIElement;
 
-  addHeaderIcon(
+  addIcon(
     elementId: string,
-    options: Partial<UIHeaderIcon>
-  ): UIHeaderIcon;
-  getHeaderIcon(elementId: string): UIHeaderIcon;
+    zone: LayoutZone,
+    options: Partial<UIIcon>
+  ): UIIcon;
+
+  addModal(
+    elementId: string,
+    body: string,
+    options?: Partial<UIElement>
+  ): UIModal;
 
   addAction(elementId: string, options: Partial<UIAction>): UIAction;
-  getAction(elementId: string): UIAction;
-
-  addModal(elementId: string, body: string, options?: ObjectAny): UIModal;
-  getModal(elementId: string): UIModal;
 }
 
 interface UIElement {
@@ -41,10 +33,10 @@ interface UIElement {
   html: string;
   el: JQuery;
   className?: string;
-  fn(...args: any[]): any;
+  fn?(...args: any[]): any;
 }
 
-interface UIHeaderIcon extends UIElement {
+interface UIIcon extends UIElement {
   icon: string;
 }
 
@@ -54,6 +46,7 @@ interface UIAction extends UIElement {
 }
 
 interface UIModal extends UIElement {
+  noesc?: boolean;
   open(cb?: (modal: UIModal) => void): void;
   close(cb?: Function): void;
 }

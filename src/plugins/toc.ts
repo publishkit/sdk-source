@@ -7,7 +7,11 @@ export default class Plugin extends BasePlugin {
 
   render = async () => {
     const { ui } = this;
-    ui.addElement("right", "main", "<ul></ul>");
+    ui.addElement("nav", "right", "<ul></ul>");
+    ui.addIcon("icon", "top.right", {
+      icon: "bx-book-content",
+      fn: () => {},
+    });
   };
 
   transform = async () => {
@@ -17,21 +21,38 @@ export default class Plugin extends BasePlugin {
     if (headings.length <= 1) return;
 
     headings.each(function () {
-      if($(this).attr("class")?.includes("noprocess")) return
+      if ($(this).attr("class")?.includes("noprocess")) return;
       this.id = "heading-" + $utils.s.slugify($(this).text());
     });
   };
 
   bind = async () => {
+    const self = this;
     const { ui, options } = this;
 
-    const toc = this.ui.getElement("right", "main").el.find("ul");
+    const toc = ui.get("nav").el;
+    const icon = ui.get("icon").el;
     const headings = $('[id^="heading-"]');
     const lastHeading = headings.last();
 
-    if(options.title) $(`<div class="mb-2"><small>${options.title}</small></div>`).insertBefore(
-      toc
-    );
+    icon.on("click", function (e) {
+      e.preventDefault();
+      self.toggle();
+    });
+
+    window.documentOnClick.push((event: JQuery.ClickEvent) => {
+      if (!$('[id="toc.nav"].open')[0]) return;
+      const target: any = event.target;
+
+      // close menu if open
+      const isIcon = target.id == "toc.icon";
+      if (!isIcon) self.toggle();
+    });
+
+    if (options.title)
+      $(`<div class="mb-2"><small>${options.title}</small></div>`).insertBefore(
+        toc
+      );
 
     const links = headings
       .map(function () {
@@ -48,6 +69,7 @@ export default class Plugin extends BasePlugin {
       e.preventDefault();
       scrollTo(this.getAttribute("href"));
       window.location.hash = this.getAttribute("href");
+      self.close();
     });
 
     // scrollspy
@@ -73,8 +95,22 @@ export default class Plugin extends BasePlugin {
       }, 0);
   };
 
+  close = () => {
+    const icon = this.ui.get("icon").el;
+    const nav = this.ui.get("nav").el;
+    icon.removeClass("open");
+    nav.removeClass("open");
+  };
+
+  toggle = () => {
+    const icon = this.ui.get("icon").el;
+    const nav = this.ui.get("nav").el;
+    icon.toggleClass("open");
+    nav.toggleClass("open");
+  };
+
   style = async () => `
-    [id="right.toc.main"] ul {
+    [id="toc.nav"] {
       padding: 0;
       margin: 0;
       width: 100%;
@@ -112,6 +148,50 @@ export default class Plugin extends BasePlugin {
         background: transparent;
         a {
           color: var(--secondary);
+        }
+      }
+    }
+
+    [id="toc.icon"] {
+      display: none;
+    }
+
+    @media (max-width: 1199px){
+      [id="toc.nav"] {
+        &.open {
+          position: fixed;
+          top: calc(var(--header-height) + var(--top-height));
+          padding: var(--spacing);
+          background: var(--bg);
+          bottom: 0;
+
+          a {
+            font-size: 1rem;
+          }
+        }
+      }
+
+      [id="toc.icon"] {
+        display: block;
+        &.open {
+          color: var(--primary);
+        }
+      }
+    }
+
+    @media (min-width: 758px){
+      [id="toc.nav"] {
+        &.open {
+          top: calc(var(--header-height));
+          width: var(--container-md-width);
+        }
+      }
+    }
+
+    @media (min-width: 992px){
+      [id="toc.nav"] {
+        &.open {
+          width: var(--container-lg-width);
         }
       }
     }

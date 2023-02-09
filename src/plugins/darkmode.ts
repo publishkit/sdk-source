@@ -5,38 +5,26 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
-  style = async () => `
-    :root[data-theme="dark"] #header li:has([id="header.icons.darkmode.moon"]) {
-      display: none;
-    }
-    :root[data-theme="light"] #header li:has([id="header.icons.darkmode.sun"]) {
-      display: none;
-    }
-  `;
-
   render = async () => {
     const { $theme } = window;
     const { ui } = this;
 
-    ui.addHeaderIcon("moon", {
-      icon: "bx-moon",
-      className: "moon",
-      fn: () => $theme.switch("dark"),
-    });
+    const icon = $theme.mode() == "light" ? "bx-moon" : "bx-sun";
 
-    ui.addHeaderIcon("sun", {
-      icon: "bx-sun",
-      className: "sun",
-      fn: () => $theme.switch("light"),
+    ui.addIcon("icon", "header.right", {
+      icon,
+      fn: function () {
+        if ($theme.mode() == "light")
+          $(this).removeClass("bx-moon").addClass("bx-sun");
+        else $(this).removeClass("bx-sun").addClass("bx-moon");
+        $theme.switch();
+      },
     });
   };
 
   bind = async () => {
     const { ui } = this;
-    const moon = ui.getHeaderIcon("moon");
-    const sun = ui.getHeaderIcon("sun");
-
-    moon.el.on("click", moon.fn);
-    sun.el.on("click", sun.fn);
+    const icon = ui.get("icon");
+    icon.el.on("click", icon.fn);
   };
 }

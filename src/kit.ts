@@ -9,5 +9,9 @@ const $app = (window.$app = new app());
 console.log(utils.s.banner());
 
 (async function () {
-  await $app.init();
+  try {
+    await $app.init();
+  }catch(e){
+    console.log("top level error", e)
+  }
 })();

@@ -3,7 +3,7 @@
 :root:not([data-theme="dark"]),
 [data-theme="dark"],
 [data-theme="light"] {
-  --container-sm-width: 510px;
+  --container-sm-width: 100%;
   --container-md-width: 700px;
   --container-lg-width: 920px;
   --container-xl-width: 1130px;
@@ -22,12 +22,14 @@
 
   --color: hsl(var(--color-hsl) / 1);
   --bg: hsl(var(--bg-hsl) / 1);
+  --bg-opacity: hsl(var(--bg-hsl) / .95);
   --background-color: var(--bg);
   --primary: hsl(var(--primary-hsl) / 1);
   --secondary: hsl(var(--secondary-hsl) / 1);
 
   --contrast: var(--color);
   --contrast-hover: hsl(var(--color-hs) calc(var(--color-lig) - 20%) / 1);
+  --contrast-hover: var(--primary);
   --contrast-inverse: var(--card-background-color);
 
   --primary-contrast: #fff;

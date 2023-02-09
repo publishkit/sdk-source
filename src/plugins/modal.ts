@@ -13,6 +13,8 @@ export default class Plugin extends BasePlugin {
   };
 
   open = (id: string, options?: Function | ObjectAny, cb?: Function) => {
+    const { $ui } = window 
+
     if (typeof options == "function") {
       cb = options;
       options = {};
@@ -38,14 +40,14 @@ export default class Plugin extends BasePlugin {
     }
 
     this.stack.forEach((m) => m.prop("open", false));
+
     const self = this;
     setTimeout(() => {
       modal.prop("open", true);
       self.modal = modal;
 
       // inject UIModal to callback
-      const [_, pluginId, elementId] = id.split(".");
-      cb && cb(self.app.ui.getModal(pluginId, elementId));
+      cb && cb($ui.get(id));
     }, 0);
 
     // https://stackoverflow.com/a/7056673/1428445
