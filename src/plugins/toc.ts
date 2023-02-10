@@ -8,7 +8,8 @@ export default class Plugin extends BasePlugin {
   render = async () => {
     const { ui } = this;
     ui.addElement("nav", "right", "<ul></ul>");
-    ui.addIcon("icon", "top.right", {
+    ui.addIcon("icon", "header.right", { 
+      index: 100,
       icon: "bx-book-content",
       fn: () => {},
     });
@@ -160,7 +161,7 @@ export default class Plugin extends BasePlugin {
       [id="toc.nav"] {
         &.open {
           position: fixed;
-          top: calc(var(--header-height) + var(--top-height));
+          top: var(--header-height);
           padding: var(--spacing);
           background: var(--bg);
           bottom: 0;

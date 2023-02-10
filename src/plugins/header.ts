@@ -39,6 +39,7 @@ export default class Plugin extends BasePlugin {
     left = (left.length && base.joinUIElements(left)) || "";
 
     let right = base.getUIElements("header.right");
+    console.log("oososs", right, base)
     // @ts-ignore
     right = (right.length && base.joinUIElements(right)) || "";
 

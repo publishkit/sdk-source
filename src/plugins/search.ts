@@ -70,8 +70,9 @@ export default class Plugin extends BasePlugin {
       });
 
     ui.addModal("modal", modal);
-    ui.addElement("btn", "header.right", button, { fn: open });
+    ui.addElement("btn", "header.right", button, { index: -1, fn: open });
     ui.addIcon("icon", "header.right", {
+      index: -1,
       icon: "bx-search-alt",
       fn: open,
     });
@@ -312,12 +313,12 @@ export default class Plugin extends BasePlugin {
     
     [id="search.btn"] {
       display: none;
+      margin: 0 calc(var(--spacing) / 2);
       i {
         font-size: 1rem !important;
         padding: 0 !important;
         margin: 0 !important;
       }
-      margin: 0;
       .text {
         font-size: 0.8rem;
       }

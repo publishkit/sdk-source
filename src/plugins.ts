@@ -4,7 +4,7 @@ import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
 const requiredPlugins = ["dom", "global", "hotkeys"];
-const lastPlugins = ["header", "theme", "toc"];
+const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
   app: App;
