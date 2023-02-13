@@ -5,7 +5,16 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
+  init = async () => {
+    const content = $('[id="content"]').html();
+    const dom = $("<div/>").html(content);
+    const headings = dom.find(">h1, >h2, >h3");
+    if (headings.length <= 1) return;
+    return true
+  }
+
   render = async () => {
+    if(!this.options._init) return
     const { ui } = this;
     ui.addElement("nav", "right", "<ul></ul>");
     ui.addIcon("icon", "header.right", { 
