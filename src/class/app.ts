@@ -55,16 +55,16 @@ export default class App {
 
   init = async () => {
     const { plugins } = this;
-    const pkrc = window.pkrc || {};
+    const kitrc = window.kitrc || {};
 
-    let pkdb: ObjectAny = {};
+    let kitdb: ObjectAny = {};
     let frontmatter = {};
     let tags: string[] = [];
     const dirs = await this.loadDirsConfig();
 
     try {
-      pkdb = <ObjectAny>(
-        await this.utils.w.getData(`pkdb.json`, { nocache: true, json: true })
+      kitdb = <ObjectAny>(
+        await this.utils.w.getData(`kitdb.json`, { nocache: true, json: true })
       );
     } catch (e) {}
     try {
@@ -72,17 +72,17 @@ export default class App {
     } catch (e) {}
 
     this.cache = {
-      config: this.utils.o.merge({}, pkrc, ...dirs, frontmatter),
-      pkrc,
+      config: this.utils.o.merge({}, kitrc, ...dirs, frontmatter),
+      kitrc,
       dirs,
       frontmatter,
       fly: {},
-      pkdb,
+      kitdb,
       tags,
     };
 
-    window.$pkrc = window.pkrc = pkrc;
-    window.$pkdb = window.pkdb = pkdb;
+    window.$kitrc = window.kitrc = kitrc;
+    window.$kitdb = window.kitdb = kitdb;
     window.$dirs = window.dirs = dirs;
 
     const ui = await this.ui.create();

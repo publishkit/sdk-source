@@ -30,6 +30,8 @@ export const pageHeight = () => {
   );
 };
 
+export const pageWidth = () => $(window).width();
+
 type getDataOptions = {
   nocache: Boolean;
   json: Boolean;
@@ -43,7 +45,6 @@ export const getData = async (
   options.nocache = options.nocache || !!urlParams.get("nocache");
   // const base = path.includes("//") ? "" : window.$kit.base;
   let url = `${path}`;
-  // console.log("oooo", base, url)
   if (options.nocache) url += `?v=${Date.now()}`;
   const myRequest = new Request(url);
   const res = await fetch(myRequest);
@@ -79,7 +80,7 @@ export const ls = function (key: string, value?: string) {
 };
 
 export const colorToHsl = (color: string | undefined): ObjectAny => {
-  const hex = colorToHex(color+"");
+  const hex = colorToHex(color + "");
   return hexToHsl(hex);
 };
 

@@ -1,7 +1,7 @@
 import { decrypt } from "../utils/crypto";
 
 export default class Kit {
-  pkrc: ObjectAny;
+  kitrc: ObjectAny;
   url: string; // kit repo
   localhost: boolean;
   base: string;
@@ -45,24 +45,24 @@ export default class Kit {
   init = async () => {
     if (!(await this.uncrypt())) return;
 
-    let pkrc = {};
+    let kitrc = {};
     try {
-      pkrc = JSON.parse(
-        await (await fetch(`${this.base}pkrc.json?v=${Date.now()}`)).text()
+      kitrc = JSON.parse(
+        await (await fetch(`${this.base}kitrc.json?v=${Date.now()}`)).text()
       );
     } catch (e) {
       try {
         this.base = `/${window.location.pathname.split("/")[1]}/`;
-        pkrc = JSON.parse(
-          await (await fetch(`${this.base}pkrc.json?v=${Date.now()}`)).text()
+        kitrc = JSON.parse(
+          await (await fetch(`${this.base}kitrc.json?v=${Date.now()}`)).text()
         );
       } catch (e) {
         this.base = "/";
-        pkrc = {};
+        kitrc = {};
       }
     }
 
-    this.pkrc = window.pkrc = pkrc;
+    this.kitrc = window.kitrc = kitrc;
     this.setBase(this.base);
 
     this.url = (
@@ -72,16 +72,16 @@ export default class Kit {
     ).trim();
     this.version = (
       localStorage.getItem("kit.version") ||
-      this.pkrc.kit?.version ||
+      this.kitrc.kit?.version ||
       "latest"
     ).trim();
     this.local = (
       localStorage.getItem("kit.local") ||
-      this.pkrc.kit?.local ||
-      "pklocal"
+      this.kitrc.kit?.local ||
+      "kit_local"
     ).trim();
 
-    let dirsValue = localStorage.getItem("kit.dirs") || this.pkrc.kit?.dirs;
+    let dirsValue = localStorage.getItem("kit.dirs") || this.kitrc.kit?.dirs;
 
     if (typeof dirsValue == "undefined" || typeof dirsValue == "object")
       dirsValue = false;
@@ -128,7 +128,7 @@ export default class Kit {
     try {
       if (this.localhost) return (this.ready = true);
 
-      const siteID = this.pkrc.site?.id;
+      const siteID = this.kitrc.site?.id;
       if (!siteID)
         throw new Error(
           `💥 setting "site.id" missing. more at https://publishkit.dev`

@@ -64,7 +64,10 @@ export default class Plugin extends BasePlugin {
       .toArray()
       .join("");
 
-    const scrollTo = (el: string) => this.utils.w.scrollTo(el, 120, 600);
+    const scrollTo = (el: string) => {
+      const pageWidth = this.utils.w.pageWidth()
+      this.utils.w.scrollTo(el, pageWidth < 992 ? 100 : 120, 600)
+    }
 
     toc.html(links).on("click", "a", function (e) {
       e.preventDefault();
@@ -155,6 +158,9 @@ export default class Plugin extends BasePlugin {
 
     [id="toc.icon"] {
       display: none;
+      &.open {
+        color: var(--primary) !important;
+      }
     }
 
     @media (max-width: 1199px){
@@ -174,9 +180,6 @@ export default class Plugin extends BasePlugin {
 
       [id="toc.icon"] {
         display: block;
-        &.open {
-          color: var(--primary);
-        }
       }
     }
 

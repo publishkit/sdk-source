@@ -74,7 +74,6 @@ export default class Layout {
       right,
       actions = "";
 
-    actions = this.actions();
 
     left = ui.getUIElements("top.left");
     left = (left.length && ui.joinUIElements(left)) || "";
@@ -82,37 +81,37 @@ export default class Layout {
     right = ui.getUIElements("top.right");
     right = (right?.length && `${ui.joinUIElements(right)}`) || "";
 
-    top = left || right || actions;
+    top = left || right;
     top =
       (!!top &&
         `<div class="ui-top">
           <div class="ui-top-left">${left}</div>
-          <div class="ui-top-right">${right}${actions}</div>
+          <div class="ui-top-right">${right}</div>
         </div>`) ||
       "";
 
     return top;
   };
 
-  actions = () => {
-    const { ui } = this;
-    const data = ui.getUIElements("actions");
-    const actions =
-      data.length && ui.joinUIElements(data, (el) => `<li>${el.html}</li>`);
+  // actions = () => {
+  //   const { ui } = this;
+  //   const data = ui.getUIElements("actions");
+  //   const actions =
+  //     data.length && ui.joinUIElements(data, (el) => `<li>${el.html}</li>`);
 
-    return (
-      (data.length &&
-        `<details class="dropdown-icon right" role="list">
-        <summary aria-haspopup="listbox">
-          <i class="bx bx-dots-vertical-rounded"></i>
-        </summary>
-        <ul role="listbox">
-          ${actions}
-        </ul>
-      </details>`) ||
-      ""
-    );
-  };
+  //   return (
+  //     (data.length &&
+  //       `<details class="dropdown-icon right" role="list">
+  //       <summary aria-haspopup="listbox">
+  //         <i class="bx bx-dots-vertical-rounded"></i>
+  //       </summary>
+  //       <ul role="listbox">
+  //         ${actions}
+  //       </ul>
+  //     </details>`) ||
+  //     ""
+  //   );
+  // };
 
   content = () => {
     const content = $(`[id="content"]`).html();
@@ -126,6 +125,7 @@ export default class Layout {
     const top = this.top();
     const content = this.content();
     const footer = this.footer();
+    
     return `<div class="ui-center">
       ${hero}
       ${top}

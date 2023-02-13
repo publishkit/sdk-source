@@ -1,5 +1,6 @@
 import dom from "./dom";
 import global from "./global";
+import actions from "./actions";
 import header from "./header";
 import css from "./css";
 import hotkeys from "./hotkeys";
@@ -19,6 +20,7 @@ import bg from "./bg";
 const plugins: ObjectAny = {
   dom,
   global,
+  actions,
   hotkeys,
   header,
   modal,

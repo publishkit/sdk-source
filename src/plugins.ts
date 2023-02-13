@@ -3,7 +3,7 @@ import BasePlugin from "./class/basePlugin";
 import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["dom", "global", "hotkeys"];
+const requiredPlugins = ["dom", "global", "hotkeys", "modal", "actions"];
 const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
@@ -121,11 +121,11 @@ export default class Plugins {
     fly.forEach((p: PluginObject) => {
       if (!p.id) return;
 
-      // if pkrc value is string
+      // if kitrc value is string
       // parse plugin & merge
-      const pkrcValue = utils.o.get(cache.config, `plugins.${p.id}`);
-      if (typeof pkrcValue == "string") {
-        const plugin = this.parsePlugin(pkrcValue);
+      const kitrcValue = utils.o.get(cache.config, `plugins.${p.id}`);
+      if (typeof kitrcValue == "string") {
+        const plugin = this.parsePlugin(kitrcValue);
         if (plugin.type == p.type)
           p.options = { ...(plugin.options || {}), ...p.options };
       }

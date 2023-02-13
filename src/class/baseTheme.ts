@@ -56,7 +56,7 @@ export default class BaseTheme extends BasePlugin {
   };
 
   parseOptions = async () => {
-    const { $pkrc } = window;
+    const { $kitrc } = window;
     const { options, utils } = this;
     const parsed: Partial<ThemeOptions> = {};
 
@@ -77,7 +77,7 @@ export default class BaseTheme extends BasePlugin {
 
     // merge other options in themeOptions
     this.themeOptions = <ThemeOptions>(
-      utils.o.merge({}, $pkrc.theme, options, parsed)
+      utils.o.merge({}, $kitrc.theme, options, parsed)
     );
     return this.themeOptions;
   };

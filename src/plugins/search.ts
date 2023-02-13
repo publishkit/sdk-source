@@ -17,7 +17,7 @@ export default class Plugin extends BasePlugin {
   }
 
   init = async () => {
-    const { notes = {} } = this.app.cache.pkdb || {};
+    const { notes = {} } = this.app.cache.kitdb || {};
     return Object.keys(notes).length;
   };
 
@@ -99,7 +99,7 @@ export default class Plugin extends BasePlugin {
       storeFields: ["title", "text", "url"], // fields to return with search results
     });
 
-    const db = Object.values(app.cache.pkdb.notes);
+    const db = Object.values(app.cache.kitdb.notes);
 
     // add id to dataset
     // @ts-ignore

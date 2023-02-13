@@ -13,7 +13,7 @@ export default class Plugin extends BasePlugin {
 
     options.data = {
       frontmatter: yaml(cache.frontmatter),
-      pkrc: yaml(cache.pkrc),
+      kitrc: yaml(cache.kitrc),
       config: yaml(cache.config),
     };
 
@@ -21,7 +21,7 @@ export default class Plugin extends BasePlugin {
       <a href="#" class="close" onclick="return $modal.close()"></a>
       <select required>
         <option value="frontmatter" selected>frontmatter</option>
-        <option value="pkrc">pkrc</option>
+        <option value="kitrc">kitrc</option>
         <option value="config">config</option>
       </select>
       <pre class="m-0"><code class="language-yaml">${options.data.frontmatter}</code></pre>

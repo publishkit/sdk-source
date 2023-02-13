@@ -7,11 +7,11 @@ interface App {
 }
 
 interface AppCache {
-  pkrc: ObjectAny;
+  kitrc: ObjectAny;
   dirs: ObjectAny[];
   frontmatter: ObjectAny;
   fly: ObjectAny;
   config: ObjectAny;
-  pkdb: ObjectAny;
+  kitdb: ObjectAny;
   tags: string[];
 }
