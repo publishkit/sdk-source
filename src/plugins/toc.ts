@@ -8,7 +8,7 @@ export default class Plugin extends BasePlugin {
   init = async () => {
     const content = $('[id="content"]').html();
     const dom = $("<div/>").html(content);
-    const headings = dom.find(">h1, >h2, >h3");
+    const headings = dom.find("h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess), h4:not(.noprocess), h5:not(.noprocess), h6:not(.noprocess)");
     if (headings.length <= 1) return;
     return true
   }
@@ -26,7 +26,7 @@ export default class Plugin extends BasePlugin {
 
   transform = async () => {
     const { $dom, $utils } = window;
-    const headings = $dom.body.find("h1, h2, h3");
+    const headings = $dom.body.find("h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess)");
 
     if (headings.length <= 1) return;
 
