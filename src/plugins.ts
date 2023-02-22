@@ -3,7 +3,7 @@ import BasePlugin from "./class/basePlugin";
 import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["dom", "global", "hotkeys", "modal", "actions"];
+const requiredPlugins = ["dom", "global", "hotkeys", "modal", "props", "render", "actions"];
 const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
@@ -121,18 +121,16 @@ export default class Plugins {
     fly.forEach((p: PluginObject) => {
       if (!p.id) return;
 
-      // if kitrc value is string
-      // parse plugin & merge
-      const kitrcValue = utils.o.get(cache.config, `plugins.${p.id}`);
-      if (typeof kitrcValue == "string") {
-        const plugin = this.parsePlugin(kitrcValue);
-        if (plugin.type == p.type)
-          p.options = { ...(plugin.options || {}), ...p.options };
-      }
+      // override existing configurtion
+      const stringPlugin = utils.o.get(cache.config, `plugins.${p.id}`);
+      const shortSyntaxOptions = typeof stringPlugin == "string" ? this.parsePlugin(stringPlugin).options : {}
+      const pluginOptions = utils.o.get(cache.config, p.id);
 
+      p.options = { ...pluginOptions, ...shortSyntaxOptions, ...p.options };
+      
       // merge in cache config
       utils.o.put(cache.config, `plugins.${p.id}`, p.value);
-      if (Object.keys(p.options || {}).length)
+      if (Object.keys(p.options).length)
         utils.o.put(cache.config, p.id, p.options);
     });
 

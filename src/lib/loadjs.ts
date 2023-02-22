@@ -104,19 +104,21 @@ export default (function () {
       pathname = path.replace(/[\?|#].*$/, ""),
       pathStripped = path.replace(/^(css|img)!/, ""),
       isLegacyIECss,
-      e;
+      props = args.props || {},
+    e;
 
+    
     numTries = numTries || 0;
-
+    
     if (args.type == "css" || /(^css!|\.css$)/.test(pathname)) {
       // css
       e = doc.createElement("link");
       e.rel = "stylesheet";
       e.href = pathStripped;
-
+      
       // tag IE9+
       isLegacyIECss = "hideFocus" in e;
-
+      
       // use preload in IE Edge (to detect load errors)
       if (isLegacyIECss && e.relList) {
         isLegacyIECss = 0;
@@ -132,6 +134,11 @@ export default (function () {
       e = doc.createElement("script");
       e.src = path;
       e.async = async === undefined ? true : async;
+    }
+
+    // add data attribute to tag
+    for (const [k, v] of Object.entries(props)){
+      e.setAttribute(k, v);
     }
 
     e.onload =
@@ -222,7 +229,7 @@ export default (function () {
     var bundleId, args;
     // bundleId (if string)
     if (arg1 && arg1.trim) bundleId = arg1;
-    
+
     // args (default is {})
     args = (bundleId ? arg2 : arg1) || {};
 

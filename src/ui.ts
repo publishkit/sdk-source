@@ -49,7 +49,7 @@ export default class UI {
       "poweredby",
       "main",
       "footer.right",
-      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" data-tooltip="Markdown web apps"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
+      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" style="text-decoration: none;" data-tooltip="Content driven apps"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
       { index: 1000 }
     );
 

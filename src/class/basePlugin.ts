@@ -26,15 +26,15 @@ export default class BasePlugin {
   };
 
   log = (...args: any[]) => {
-    console.log(`plugins ➔ ℹ️ ${this.id}`, ...args);
+    console.log(`➔ ℹ️ ${this.id}`, ...args);
   };
 
   error = (err: any) => {
-    console.log(`plugins ➔ 💥 ${this.id}`, err.message || err);
+    console.log(`➔ 💥 ${this.id}`, err.message || err);
   };
 
   warning = (...args: any[]) => {
-    console.log(`plugins ➔ ⚠️ ${this.id}`, ...args);
+    console.log(`➔ ⚠️ ${this.id}`, ...args);
   };
 
   init?(): Promise<any>;

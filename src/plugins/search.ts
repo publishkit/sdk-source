@@ -141,7 +141,7 @@ export default class Plugin extends BasePlugin {
 
         searchResults.splice(options.results);
 
-        console.log("search", value, searchResults);
+        this.log(value, searchResults);
         searchResults.map((r: ObjectAny, i: number) => {
           const titleTerms = getsTerms(r.terms, r.match, "title");
           const textTerms = getsTerms(r.terms, r.match, "text");

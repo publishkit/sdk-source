@@ -3,7 +3,7 @@ export const asArray = (
   { delim = ",", trim = true, uniq = true, compact = true } = {}
 ): string[] => {
   if (!input) return [];
-  let output = typeof input == "string" ? input.split(delim) : input || [];
+  let output = typeof input == "string" ? input.split(input.includes(delim) ? delim : " ") : input || [];
 
   if (trim) output = output.map((v) => v?.trim?.() || v);
   if (compact) output = output.filter(Boolean);

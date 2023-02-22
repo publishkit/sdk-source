@@ -17,7 +17,8 @@ export default class Plugin extends BasePlugin {
       .unwrapOnlyChild("h1,h2,h3,h4,h5,h6")
       // onclick is not rendered in html in obsidian, so we use custom binding name instead.
       .renameProp("data-click", "onclick")
-      .renameProp("data-onclick", "onclick");
+      .renameProp("data-onclick", "onclick")
+      .processContentBindings()
 
     return $dom;
   };

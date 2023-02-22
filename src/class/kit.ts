@@ -128,16 +128,15 @@ export default class Kit {
     try {
       if (this.localhost) return (this.ready = true);
 
-      const siteID = this.kitrc.site?.id;
-      if (!siteID)
+      const kitID = this.kitrc.site?.id;
+      if (!kitID)
         throw new Error(
           `💥 setting "site.id" missing. more at https://publishkit.dev`
         );
-      const r = await (await fetch(`${this.api}/site?id=${siteID}`)).json();
-      const sites = r.site.split("|").slice(0, 2).filter(Boolean);
-
+      const kit = await (await fetch(`${this.api}/site?id=${kitID}`)).json();
+      kit.hostname = new URL(kit.url).hostname
       const hostname = window.location.hostname;
-      if (!sites.includes(hostname))
+      if (hostname != kit.hostname)
         throw new Error(
           `💥 "${hostname}" is unregistered. more at https://publishkit.dev`
         );

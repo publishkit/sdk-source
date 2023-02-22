@@ -115,8 +115,10 @@ export default class Plugin extends BasePlugin {
   toggle = () => {
     const icon = this.ui.get("icon").el;
     const nav = this.ui.get("nav").el;
-    icon.toggleClass("open");
-    nav.toggleClass("open");
+    setTimeout(() => {
+      icon.toggleClass("open");
+      nav.toggleClass("open");
+    }, 0);
   };
 
   style = async () => `
