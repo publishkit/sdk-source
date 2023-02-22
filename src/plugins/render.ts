@@ -15,6 +15,7 @@ export default class Plugin extends BasePlugin {
       const value = el.attr("data-ui");
       const target = el.next();
 
+        // @ts-ignore
       const tranformer = self[value];
       if (tranformer) tranformer(el, target);
     });
@@ -22,7 +23,7 @@ export default class Plugin extends BasePlugin {
     return $dom;
   };
 
-  switch = (tx, target) => {
+  switch = (tx: any, target: any) => {
     const { $, $props, $utils, $ee } = window;
 
     const db = tx.attr("data-bind");

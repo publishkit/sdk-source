@@ -5,6 +5,7 @@ export default class Plugin extends BasePlugin {
 
   _syntax = (str: string) => {
     str = str
+      .replace(/^return /gi, "")
       .replace(/~([a-z-\.-_]+)/gi, '$props.get("$1")')
       .replace(/\~/gi, "$props.get");
     return $("<textarea />").html(str).text(); // html decode
@@ -21,16 +22,17 @@ export default class Plugin extends BasePlugin {
       get: function (target, key: string) {
         const value = utils.o.get(target, key);
         if (value?.trim && value.startsWith("(")) {
-          let fn;
-          eval("fn=" + _syntax(value));
-          return fn;
+          return new Function(`return ${_syntax(value)}`)();
         } else {
           return value;
         }
       },
       set: function (target, key, value) {
+        // @ts-ignore
         const old = target[key];
+        // @ts-ignore
         target[key] = value;
+        // @ts-ignore
         $ee.emit(`props:${key}`, { value, old });
         return true;
       },
@@ -98,6 +100,7 @@ export default class Plugin extends BasePlugin {
         // log(code, props);
         $(this).html(fn());
       } catch (e) {
+        // @ts-ignore
         error(e, this);
       }
     });
