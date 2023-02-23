@@ -1,5 +1,13 @@
 export const urlParams = new URLSearchParams(window.location.search);
 
+export const copyToClipboard = async (text: string) => {
+  try {
+    return await navigator.clipboard.writeText(text);
+  } catch (err) {
+    return false;
+  }
+};
+
 export const isDark = () =>
   (window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches) ||

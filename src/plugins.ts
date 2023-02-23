@@ -232,7 +232,7 @@ export default class Plugins {
 
     const { utils, load, cache } = this;
 
-    this.log("*", (" " + sequence + "()").padStart(40, "-"));
+    this.log("*", (" " + sequence + "()").padStart(30, "-"));
 
     const fn = async ([id, fn, options]: [string, Function, ObjectAny]) => {
       const plugin = cache[id];
@@ -240,7 +240,7 @@ export default class Plugins {
         if (this.active.indexOf(id) == -1) return;
         const result = typeof fn == "function" ? await fn(options) : fn;
         cb && (await cb(id, result));
-        this.log(id, `✅ ${id}`, `post:${sequence}`);
+        this.log(id, `✅ ${id}`);
         $ee.emit(`post:${sequence}:${plugin.id}`, plugin);
         $ee.emit(`post:${sequence}`, plugin);
         return result;
@@ -285,7 +285,7 @@ export default class Plugins {
     const { cache, utils } = this;
     const plugins = this.getActive();
 
-    this.log("*", ` summary`.padStart(40, "-"));
+    this.log("*", ` summary`.padStart(30, "-"));
 
     this.active.map((id) => {
       const p = cache[id];
@@ -305,7 +305,7 @@ export default class Plugins {
       );
     });
 
-    this.log("*", ` dependencies (${this.run.deps.length})`.padStart(40, "-"));
+    this.log("*", ` dependencies (${this.run.deps.length})`.padStart(30, "-"));
     this.run.deps.map((dep: any) => {
       const type = dep.push
         ? dep[1]?.type || dep[0]?.split(".").pop() || "unknown"
@@ -373,7 +373,6 @@ export default class Plugins {
     const ssp = this.shortSyntaxPlugins;
 
     const isRecursive = options.includes(":") && !options.includes("://");
-    console.log("pdpod", isRecursive, name, options);
 
     value = (isRecursive ? this.parseOptionValue(options) : options) || "";
 

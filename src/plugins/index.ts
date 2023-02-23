@@ -12,6 +12,7 @@ import darkmode from "./darkmode";
 import navbar from "./navbar";
 import toc from "./toc";
 import cards from "./cards";
+import codeblocks from "./codeblocks";
 import frontmatter from "./frontmatter";
 import highlight from "./highlight";
 import social from "./social";
@@ -34,6 +35,7 @@ const plugins: ObjectAny = {
   navbar,
   toc,
   cards,
+  codeblocks,
   frontmatter,
   highlight,
   social,

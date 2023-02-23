@@ -78,4 +78,5 @@ export const decrypt = async (plaintext: string, password: string) => {
   return aesGcmDecrypt(window.crypto, plaintext, password);
 };
 
-export const shortId = () => Math.round(Date.now()).toString(36);
+export const shortId = () => Math.random().toString(36).slice(-6)
+//Math.round(Date.now()).toString(36);

@@ -49,6 +49,7 @@ export default class Plugin extends BasePlugin {
   };
 
   deSugar = (str: string) => {
+    if (!str) return { props: [] };
     const props: string[] = [];
     const sugar = str
       .replace(/^return /gi, "")

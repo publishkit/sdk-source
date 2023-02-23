@@ -15,20 +15,26 @@ export default class Plugin extends BasePlugin {
       const value = el.attr("data-ui");
       const target = el.next();
 
-        // @ts-ignore
-      const tranformer = self[value];
+      // @ts-ignore
+      const tranformer = self[value] || self.basic;
       if (tranformer) tranformer(el, target);
     });
 
     return $dom;
   };
 
+  basic = (tx: any, target: any) => {
+    const classes = tx[0].classList.value;
+    target.addClass(classes)
+    tx.remove()
+  }
+
   switch = (tx: any, target: any) => {
     const { $, $props, $utils, $ee } = window;
 
     const db = tx.attr("data-bind");
-    const { fn, sugar, props } = $props.deSugar(db);
-    const initialValue = fn();
+    const binding = $props.deSugar(db);
+    const initialValue = (binding.fn && binding.fn()) || "";
     const id = $utils.c.shortId();
     const classes = tx[0].classList.value;
     const data = this.listToData(window, target[0]);
@@ -41,16 +47,17 @@ export default class Plugin extends BasePlugin {
         : $(this);
       const value = item.key;
       const label = item.label || item.key;
-      const onclick = item.onclick || `${sugar}='${value}'`;
+
+      const onclick = item.onclick || (db && `${binding.sugar}='${value}'`);
       const checked = initialValue == value ? "checked" : "";
-      str += `<input type="radio" name="foo" id="${id}-${i}" ${checked}><label onclick="${onclick}" for="${id}-${i}">${label}</label>`;
+      str += `<input type="radio" name="${id}" id="${id}-${i}" ${checked}><label onclick="${onclick}" for="${id}-${i}">${label}</label>`;
     });
 
-    props.map((prop: string) => {
+    binding.props.map((prop: string) => {
       // @ts-ignore
       $ee.on(`props:${prop}`, ({ value, old }) => {
         if (old != value)
-          $(`input[name="${name}"][id="${value}"]`).prop("checked", "on");
+          $(`input[name="${id}"][id="${value}"]`).prop("checked", "on");
       });
     });
 
