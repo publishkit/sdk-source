@@ -18,7 +18,6 @@ export default class Plugin extends BasePlugin {
       // onclick is not rendered in html in obsidian, so we use custom binding name instead.
       .renameProp("data-click", "onclick")
       .renameProp("data-onclick", "onclick")
-      .processContentBindings()
 
     return $dom;
   };

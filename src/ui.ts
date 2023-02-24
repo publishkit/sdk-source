@@ -49,7 +49,9 @@ export default class UI {
       "poweredby",
       "main",
       "footer.right",
-      `powered by <a href="https://publishkit.dev" target="_new" class="contrast outline" style="text-decoration: none;" data-tooltip="Content driven apps"><i class='bx bx-paper-plane bx-xs'></i> PublishKit</a>`,
+      `powered by <a href="https://publishkit.dev" target="_new" style="text-decoration: none;" data-tooltip="Markdown driven apps">
+        <span class="logo-svg" style="-webkit-mask: url(https://publishkit.dev/attachements/logo/logo.svg) no-repeat center;"><img src="https://publishkit.dev/attachements/logo/logo.svg" style="opacity:0" /></span>
+      </a>`,
       { index: 1000 }
     );
 

@@ -20,10 +20,11 @@ export default class Plugin extends BasePlugin {
       (logo &&
         `
           <a class="logo" href="./" >
-            <img src="${logo}"></img>
+            <div class="logo-svg"><img src="${logo}" style="opacity:0" /></div>
           </a>
-        `) ||
+          `) ||
       "";
+    // <img src="${logo}"></img>
 
     rx.name =
       (name !== false &&
@@ -57,7 +58,18 @@ export default class Plugin extends BasePlugin {
     base.set("header.html", header);
   };
 
-  style = async () => `
+  style = async () => {
+    const { app } = this;
+    const logo = app.cfg("header.logo") || app.cfg("site.logo");
+    return `
+
+    :root[data-theme="dark"] {
+      .ui-header {
+        .logo img {
+          // filter: invert(0.2);
+        }
+      }
+    }
   
     .ui-header {
       --nav-link-spacing-vertical: 1rem;
@@ -84,6 +96,7 @@ export default class Plugin extends BasePlugin {
           ""
         }
       }
+
       
       .logo {
         padding: 0;
@@ -95,7 +108,8 @@ export default class Plugin extends BasePlugin {
           ""
         }
         img {
-          max-height: var(--logo-height, 76px);
+          max-height: var(--logo-height, 2rem);
+          // filter: invert(.8);
         }
       }
 
@@ -126,4 +140,5 @@ export default class Plugin extends BasePlugin {
     }
 
   `;
+  };
 }

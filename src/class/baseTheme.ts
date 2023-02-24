@@ -84,7 +84,7 @@ export default class BaseTheme extends BasePlugin {
 
   setup = async () => {
     const { $kit } = window;
-    const { utils, modes, themeOptions: opt, options } = this;
+    const { utils, modes, themeOptions: opt, options, app } = this;
 
     modes.init();
 
@@ -127,6 +127,7 @@ export default class BaseTheme extends BasePlugin {
     const primary = utils.w.colorToHsl(opt.primary);
     const secondary = utils.w.colorToHsl(opt.secondary);
     const hexicon = primary.hex.replace("#", "%23");
+    const logo = app.cfg("site.logo");
 
     // @ts-ignore
     modes.css(
@@ -159,7 +160,21 @@ export default class BaseTheme extends BasePlugin {
       --icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
       --icon-time: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
       --icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
-    `
+    
+    
+      .logo-svg, .logo-svg:hover {
+        background-color: var(--contrast);
+        -webkit-mask: url(${logo}) no-repeat center;
+        -webkit-mask-size: contain;
+        mask: url(${logo}) no-repeat center;
+        mask-size: contain;
+      }
+
+      .logo-svg:hover {
+        background-color: var(--primary);
+      }
+
+      `
     );
   };
 

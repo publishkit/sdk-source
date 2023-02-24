@@ -3,7 +3,7 @@ import BasePlugin from "./class/basePlugin";
 import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["dom", "global", "hotkeys", "modal", "props", "render", "actions"];
+const requiredPlugins = ["dom", "global", "hotkeys", "modal", "props", "render", "actions", "css"];
 const lastPlugins = ["header", "theme"];
 
 export default class Plugins {

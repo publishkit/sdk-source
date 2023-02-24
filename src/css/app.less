@@ -19,6 +19,8 @@ html {
 
 [data-kit] {
   display: none;
+  padding: 0;
+  margin: 0;
 }
 
 * {
@@ -41,6 +43,18 @@ html {
 }
 progress:indeterminate {
   animation: progress-indeterminate 0.8s linear infinite;
+}
+
+.logo-svg, .logo-svg:hover {
+  background-color: var(--contrast);
+  -webkit-mask: url(${logo}) no-repeat center;
+  -webkit-mask-size: contain;
+  mask: url(${logo}) no-repeat center;
+  mask-size: contain;
+}
+
+.logo-svg:hover {
+  background-color: var(--primary);
 }
 
 /* BACKGROUNDS */
@@ -588,6 +602,9 @@ details[open] > summary:not([role]):not(:focus) {
     font-size: calc(var(--font-size) - 0.3rem);
     a {
       font-size: var(--font-size);
+    }
+    img {
+      width: 74px;
     }
   }
 

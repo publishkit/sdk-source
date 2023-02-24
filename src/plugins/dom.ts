@@ -110,24 +110,4 @@ export default class Plugin extends BasePlugin {
 
     return this;
   };
-
-  processContentBindings = () => {
-    const { $dom, $utils } = window;
-
-    $dom.body.find("[data-kit]").each(function () {
-      const el = $(this);
-      const value = el.attr("data-kit");
-      const target = el.next();
-
-      if (value?.startsWith(".")) {
-        const classes = $utils.a.asArray(value);
-        // @ts-ignore
-        classes.map((c) => target.addClass(c.replace(".", "")));
-      } else {
-        // implement
-      }
-    });
-
-    return this;
-  };
 }
