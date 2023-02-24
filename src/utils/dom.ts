@@ -9,6 +9,7 @@ export const load = async (paths: any, options?: any) => {
 
   await serie(paths, async (path: any) => {
     try {
+      // @ts-ignore
       if (path.push) await LoadJS(...path);
       else if (path.trim) await LoadJS(path, options);
       else throw "load: invalid path";
@@ -19,11 +20,13 @@ export const load = async (paths: any, options?: any) => {
   });
 
   failed = failed.reduce((acc, v) => {
+    // @ts-ignore
     if (typeof v == "string") acc.push(v);
     return acc;
   }, []);
 
   success = success.reduce((acc, v) => {
+    // @ts-ignore
     if (typeof v == "string") acc.push(v);
     return acc;
   }, []);

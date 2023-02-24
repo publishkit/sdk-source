@@ -90,15 +90,17 @@ export default class Plugin extends BasePlugin {
         props.map((prop) => {
           $ee.on(`props:${prop}`, () => {
             const oldValue = $(this).html();
+            // @ts-ignore
             const newValue = fn() + ""; // cast to string
             if (oldValue != newValue) {
               $(this).html(newValue);
-              log(prop, oldValue, "=>", newValue);
+              // log(prop, oldValue, "=>", newValue);
             }
           });
         });
 
         // log(code, props);
+        // @ts-ignore
         $(this).html(fn());
       } catch (e) {
         // @ts-ignore
@@ -123,12 +125,14 @@ export default class Plugin extends BasePlugin {
 
       props.map((prop) => {
         $ee.on(`props:${prop}`, () => {
+          // @ts-ignore
           const condition = fn();
           if (condition) el.removeClass("d-none");
           else el.addClass("d-none");
         });
       });
 
+      // @ts-ignore
       const condition = fn();
       if (condition) el.removeClass("d-none");
       else el.addClass("d-none");

@@ -8,16 +8,18 @@ export default class Plugin extends BasePlugin {
   init = async () => {
     const content = $('[id="content"]').html();
     const dom = $("<div/>").html(content);
-    const headings = dom.find("h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess), h4:not(.noprocess), h5:not(.noprocess), h6:not(.noprocess)");
+    const headings = dom.find(
+      "h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess), h4:not(.noprocess), h5:not(.noprocess), h6:not(.noprocess)"
+    );
     if (headings.length <= 1) return;
-    return true
-  }
+    return true;
+  };
 
   render = async () => {
-    if(!this.options._init) return
+    if (!this.options._init) return;
     const { ui } = this;
     ui.addElement("nav", "right", "<ul></ul>");
-    ui.addIcon("icon", "header.right", { 
+    ui.addIcon("icon", "header.right", {
       index: 100,
       icon: "bx-book-content",
       fn: () => {},
@@ -26,7 +28,9 @@ export default class Plugin extends BasePlugin {
 
   transform = async () => {
     const { $dom, $utils } = window;
-    const headings = $dom.body.find("h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess)");
+    const headings = $dom.body.find(
+      "h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess)"
+    );
 
     if (headings.length <= 1) return;
 
@@ -74,9 +78,9 @@ export default class Plugin extends BasePlugin {
       .join("");
 
     const scrollTo = (el: string) => {
-      const pageWidth = this.utils.w.pageWidth()
-      this.utils.w.scrollTo(el, pageWidth < 992 ? 100 : 120, 600)
-    }
+      const pageWidth = this.utils.w.pageWidth();
+      this.utils.w.scrollTo(el, (pageWidth || 0) < 992 ? 100 : 120, 600);
+    };
 
     toc.html(links).on("click", "a", function (e) {
       e.preventDefault();
