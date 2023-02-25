@@ -99,7 +99,8 @@ export default class Plugin extends BasePlugin {
 
       if (isKV(key)) {
         const [k, ...rest] = key.split(":");
-        item.value = rest.join(":").trim();
+        item.value =
+          rest.join(":").trim() || $(el).html().replace(`${item.key}:`, "");
       }
 
       $(el)
