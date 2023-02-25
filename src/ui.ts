@@ -49,9 +49,14 @@ export default class UI {
       "poweredby",
       "main",
       "footer.right",
-      `powered by <a href="https://publishkit.dev" target="_new" style="text-decoration: none;" data-tooltip="Markdown driven apps">
-        <span class="logo-svg" style="-webkit-mask: url(https://publishkit.dev/attachements/logo/logo.svg) no-repeat center;-webkit-mask-size: contain;mask: url(https://publishkit.dev/attachements/logo/logo.svg) no-repeat center;mask-size: contain;"><img src="https://publishkit.dev/attachements/logo/logo.svg" style="opacity:0" /></span>
-      </a>`,
+      `<div class="poweredby">
+        <span class="prefix">powered by</span>
+        <a href="https://publishkit.dev" target="_new" style="text-decoration: none;margin-left: 4px;" data-tooltip="Markdown driven apps">
+          <span class="logo-svg" style="-webkit-mask: url(https://publishkit.dev/attachements/logo/logo.svg) no-repeat center;-webkit-mask-size: contain;mask: url(https://publishkit.dev/attachements/logo/logo.svg) no-repeat center;mask-size: contain;">
+            <img src="https://publishkit.dev/attachements/logo/logo.svg" style="opacity:0;"></img>
+          </span>
+        </a>
+      </div>`,
       { index: 1000 }
     );
 

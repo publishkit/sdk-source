@@ -598,13 +598,20 @@ details[open] > summary:not([role]):not(:focus) {
     font-size: var(--icon-size);
   }
 
-  [id="poweredby.main"] {
-    font-size: calc(var(--font-size) - 0.3rem);
-    a {
-      font-size: var(--font-size);
+  .poweredby {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+
+    .prefix {
+      font-size: 9px;
     }
-    img {
-      width: 74px;
+    
+    a {
+      display: grid;
+      img {
+        width: 58px;
+      }
     }
   }
 
