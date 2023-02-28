@@ -45,17 +45,7 @@ progress:indeterminate {
   animation: progress-indeterminate 0.8s linear infinite;
 }
 
-.logo-svg, .logo-svg:hover {
-  background-color: var(--contrast);
-  -webkit-mask: url(${logo}) no-repeat center;
-  -webkit-mask-size: contain;
-  mask: url(${logo}) no-repeat center;
-  mask-size: contain;
-}
 
-.logo-svg:hover {
-  background-color: var(--primary);
-}
 
 /* BACKGROUNDS */
 
@@ -354,6 +344,35 @@ pre code {
 
 #header ~ main {
   padding-top: var(--header-height);
+  padding-bottom: 0;
+  
+  &.stacked {
+    padding-top: var(--header-height) !important;
+    grid-column-gap: 0;
+
+    .ui-center {
+      min-height: calc(100vh - var(--header-height));
+    }
+  }
+}
+
+@media (min-width: 768px){
+  #header ~ main {
+    &.stacked {
+      .ui-left {
+        min-height: calc(100vh - var(--header-height));
+      }
+    }
+  }
+}
+
+
+
+.ui-center {
+  height: calc(100%);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .ui-header {
@@ -469,6 +488,7 @@ pre code {
     padding-left: calc(var(--spacing) / 2) !important;
   }
 
+
   .ui-top {
     padding: 0 1rem;
     padding-right: calc(var(--spacing) / 2);
@@ -484,6 +504,10 @@ pre code {
     padding-top: calc(var(--header-height));
   }
 
+  .ui-center {
+    border-radius: 0;
+  }
+
   .ui-content {
     padding: var(--spacing);
   }
@@ -491,7 +515,7 @@ pre code {
 }
 @media (min-width: 768px) {
   .ui-content {
-    padding: var(--spacing);
+    padding: var(--spacing) calc(var(--spacing) * 2);
   }
   .ui-left {
     width: var(--leftbar-width);
@@ -609,10 +633,22 @@ details[open] > summary:not([role]):not(:focus) {
     
     a {
       display: grid;
-      img {
+      span {
         width: 58px;
+        background: var(--contrast);
+        img {
+          width: 58px;
+        }
+
+      }
+      &:hover {
+        span {
+        background: var(--primary);
+        }
       }
     }
+
+
   }
 
   .ui-footer-left,

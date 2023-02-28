@@ -9,6 +9,7 @@ interface ThemeOptions {
   font?: string;
   color?: string;
   headings?: ThemeHeadingOptions;
+  layout?: ThemeLayoutOptions;
   highlight?: string;
   primary?: string;
   secondary?: string;
@@ -17,4 +18,9 @@ interface ThemeOptions {
 interface ThemeHeadingOptions {
   font?: string;
   color?: string;
+}
+
+interface ThemeLayoutOptions {
+  className?: string;
+  maxWidth?: string;
 }

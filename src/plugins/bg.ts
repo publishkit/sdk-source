@@ -5,7 +5,7 @@ export default class Plugin extends BasePlugin {
     super(id, options, {
       image:
         "https://images.unsplash.com/photo-1539035104074-dee66086b5e3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjI0MX0&auto=format&fit=crop&w=2550&q=80",
-      parralax: false,
+      parallax: false,
     });
   }
 
@@ -16,7 +16,7 @@ export default class Plugin extends BasePlugin {
 
   bind = async () => {
     const { options, ui } = this;
-    if (!options.image || !options.parralax) return;
+    if (!options.image || !options.parallax) return;
 
     const wrapper = ui.get("wrapper").el.get(0);
 
@@ -41,7 +41,7 @@ export default class Plugin extends BasePlugin {
   };
 
   style = async () => {
-    if (!this.options.parralax)
+    if (!this.options.parallax)
       return `
         body {
             background: url("${this.options.image}") no-repeat center center fixed;

@@ -17,50 +17,47 @@ export default class Plugin extends BasePlugin {
   };
 
   render = async () => {
-    const { ui, utils } = this;
+    const { ui, utils, options } = this;
+    const { _init } = options;
+
+    const items = `{{#each items}} 
+      <li class="d-flex align-items-center">
+        {{#if this.[1]}}
+        <i class='bx {{this.[1]}} me-2'></i>
+        {{else}}
+        <i class='bx bx-chevron-right me-2'></i>
+        {{/if}}
+        {{{this.[0]}}}
+      </li>
+    {{/each}}`;
 
     const element = utils.s.handlebar(
       `<nav>
-        {{#if nested}}
-          {{#each items}} 
-          <details {{#if isOpen}}open="true"{{/if}}>
-            <summary>{{this.label}}</summary>
-            <ul>
-            {{#each items}} 
-              <li class="d-flex align-items-center">
-                {{#if this.[1]}}
-                <i class='bx {{this.[1]}} me-2'></i>
-                {{else}}
-                <i class='bx bx-chevron-right me-2'></i>
-                {{/if}}
-                {{{this.[0]}}}
-              </li>
-            {{/each}}
-            </ul>
-          </details>
-          {{/each}}
-        {{else}}
-          <ul>
-          {{#each items}} 
-            <li class="d-flex align-items-center">
-            {{#if this.[1]}}
-            <i class='bx {{this.[1]}} me-2'></i>
-            {{else}}
-            <i class='bx bx-chevron-right me-2'></i>
-            {{/if}}
-            {{{this.[0]}}}
-            </li>
-          {{/each}}
-          </ul>
-        {{/if}}
+        ${
+          _init.nested
+            ? `
+        {{#each items}} 
+        <details {{#if isOpen}}open="true"{{/if}}>
+          <summary>{{this.label}}</summary>
+          <ul>${items}</ul>
+        </details>
+        {{/each}}
+        `
+            : `
+        <ul>${items}</ul>
+        `
+        }
       </nav>`,
       this.options._init
     );
 
-    ui.addElement("nav", "left", element);
-    ui.addIcon("icon", "header.left", {
+    const rightLeft = (options.ui || "").split(".")[1] || "left";
+
+    ui.addElement("nav", options.ui || "left", element, { index: -10 });
+    // @ts-ignore
+    ui.addIcon("icon", `header.${rightLeft}`, {
       index: 1000,
-      icon: "bx-menu-alt-left",
+      icon: `bx-menu-alt-${rightLeft}`,
     });
   };
 
@@ -121,7 +118,10 @@ export default class Plugin extends BasePlugin {
     }, 0);
   };
 
-  style = async () => `
+  style = async () => {
+    const { options } = this;
+
+    return ` 
     [id="navbar.nav"] {
       display: none;
       user-select: none;
@@ -129,6 +129,7 @@ export default class Plugin extends BasePlugin {
 
       ul {
         --color: var(--primary);
+        display: block;
       }
       
       a:focus {
@@ -163,19 +164,48 @@ export default class Plugin extends BasePlugin {
       li, summary {
         padding-top: 0;
         padding-bottom: 0;
-        
       }
+      
+      ${
+        !options.ui || options.ui == "left"
+          ? `
       li {
         padding-bottom: 10px;
       }
+
       &> ul li:last-child {
-        padding-bottom: 00px;
+        padding-bottom: 0px;
+      }
+      `
+          : ""
+      }
+
+      ${
+        options.ui == "header.right"
+          ? `
+      &> ul li:last-child {
+        padding-right: var(--spacing);
+      }
+      `
+          : ""
       }
     }
 
     [id="navbar.icon"] {
       &.open {
         color: var(--primary) !important;
+      }
+    }
+
+    .ui-header-right {
+      [id="navbar.nav"] ul {
+        display: flex;
+      }
+    }
+
+    .ui-right {
+      [id="navbar.nav"] {
+        padding: var(--spacing);
       }
     }
 
@@ -199,7 +229,7 @@ export default class Plugin extends BasePlugin {
           background: var(--bg);
           border-bottom: 2px solid var(--muted-border-color);
           border-top: 2px solid var(--muted-border-color);
-          padding: calc(var(--spacing) * 2);
+          padding: calc(var(--spacing) * 1);
           height: 100%;
     
           details {
@@ -217,6 +247,10 @@ export default class Plugin extends BasePlugin {
           padding: var(--spacing);
           grid-template-columns: 1fr 1fr;
         }
+
+        i {
+          font-size: 1rem !important;
+        }
       }
     }
     
@@ -225,11 +259,11 @@ export default class Plugin extends BasePlugin {
         display: block;
         border: none;
         font-size: 0.8rem;
-
       }
       [id="navbar.icon"] {
         display: none;
       }
     }
   `;
+  };
 }

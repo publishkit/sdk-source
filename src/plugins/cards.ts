@@ -32,6 +32,7 @@ export default class Plugin extends BasePlugin {
         &> li {
             list-style: none;
             background: var(--card-background-color);
+            margin: 0;
             padding: 1.5rem;
             border-radius: var(--border-radius);
             display: flex;
@@ -59,7 +60,16 @@ export default class Plugin extends BasePlugin {
                 }
             }
         }
+
+        &.v-center {
+            &> li {
+                justify-content: center;
+            }
+        }
+        
     }
+
+
 
 
     @media (max-width: 577px){
@@ -70,6 +80,22 @@ export default class Plugin extends BasePlugin {
     @media (min-width: 992px){
         ul.cards {
             grid-auto-flow: column;
+
+            &.grid-2,&.grid-3,&.grid-4,&.grid-5 {
+                grid-auto-flow: unset;
+            }
+            &.grid-2 {
+                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr);
+            }
+            &.grid-3 {
+                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
+            }
+            &.grid-4 {
+                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
+            }
+            &.grid-5 {
+                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
+            }
         }
     }
   `;

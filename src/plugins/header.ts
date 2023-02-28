@@ -27,7 +27,7 @@ export default class Plugin extends BasePlugin {
     // <img src="${logo}"></img>
 
     rx.name =
-      (name !== false &&
+      (name !== false && !rx.logo &&
         `
           <a href="./" class="sitename">
             <strong>${name || app.cfg("site.name", "Sitename")}</strong>
@@ -61,6 +61,7 @@ export default class Plugin extends BasePlugin {
   style = async () => {
     const { app } = this;
     const logo = app.cfg("header.logo") || app.cfg("site.logo");
+
     return `
 
     :root[data-theme="dark"] {
@@ -78,6 +79,7 @@ export default class Plugin extends BasePlugin {
       top: 0;
       right: 0;
       left: 0;
+      margin: auto;
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       backdrop-filter: saturate(100%) blur(20px);
 
@@ -97,6 +99,22 @@ export default class Plugin extends BasePlugin {
         }
       }
 
+      .logo-svg img {
+        min-height: 2rem;
+      }
+
+      .logo-svg, .logo-svg:hover {
+        background-color: var(--contrast);
+        -webkit-mask: url(${logo}) no-repeat center;
+        -webkit-mask-size: contain;
+        mask: url(${logo}) no-repeat center;
+        mask-size: contain;
+      }
+      
+      .logo-svg:hover {
+        background-color: var(--primary);
+      }
+
       
       .logo {
         padding: 0;
@@ -109,7 +127,6 @@ export default class Plugin extends BasePlugin {
         }
         img {
           max-height: var(--logo-height, 2rem);
-          // filter: invert(.8);
         }
       }
 

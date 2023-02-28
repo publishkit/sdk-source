@@ -8,8 +8,8 @@ export default class Layout {
   }
 
   render = () => {
-    const { $cfg } = window;
-    const fluid = $cfg("layout.fluid") ? "-fluid" : "";
+    const { $cfg, $theme } = window;
+    // const fluid = $cfg("layout.fluid") ? "-fluid" : "";
 
     const body = this.body();
     const header = this.header();
@@ -18,10 +18,12 @@ export default class Layout {
     const center = this.center();
     const modals = this.modals();
 
+    const opt = $theme.options.layout || {}
+
     return `
       ${body}
       ${header}
-      <main class="ready container${fluid}">
+      <main class="ready container${opt.fluid||""} ${opt.mode||""}">
         ${left}
         ${center}
         ${right}
@@ -127,9 +129,11 @@ export default class Layout {
     const footer = this.footer();
     
     return `<div class="ui-center">
+      <div>
       ${hero}
       ${top}
       ${content}
+      </div>
       ${footer}
     </div>`;
   };

@@ -84,7 +84,8 @@ export default class BaseTheme extends BasePlugin {
 
   setup = async () => {
     const { $kit } = window;
-    const { utils, modes, themeOptions: opt, options, app } = this;
+    const { utils, modes, themeOptions: Theme, options, app } = this;
+    const { layout, headings } = Theme
 
     modes.init();
 
@@ -104,48 +105,47 @@ export default class BaseTheme extends BasePlugin {
     load(`${$kit.url}/kit.css`);
 
     // fonts
-    if (opt.font)
-      load(`https://fonts.cdnfonts.com/css/${opt.font}`, {
+    if (Theme.font)
+      load(`https://fonts.cdnfonts.com/css/${Theme.font}`, {
         type: "css",
       });
 
-    if (opt.headings?.font && opt.headings?.font != opt.font)
-      load(`https://fonts.cdnfonts.com/css/${opt.headings.font}`, {
+    if (headings?.font && headings?.font != Theme.font)
+      load(`https://fonts.cdnfonts.com/css/${headings.font}`, {
         type: "css",
       });
 
     // highlight
-    if (opt.highlight) {
+    if (Theme.highlight) {
       const highlighRepo =
         "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/";
       load(`${highlighRepo}/highlight.min.js`);
-      load(`${highlighRepo}/styles/${opt.highlight}.min.css`);
+      load(`${highlighRepo}/styles/${Theme.highlight}.min.css`);
     }
 
-    const bg = utils.w.colorToHsl(opt.bg);
-    const color = utils.w.colorToHsl(opt.color);
-    const primary = utils.w.colorToHsl(opt.primary);
-    const secondary = utils.w.colorToHsl(opt.secondary);
+    const bg = utils.w.colorToHsl(Theme.bg);
+    const color = utils.w.colorToHsl(Theme.color);
+    const primary = utils.w.colorToHsl(Theme.primary);
+    const secondary = utils.w.colorToHsl(Theme.secondary);
     const hexicon = primary.hex.replace("#", "%23");
-    const logo = app.cfg("site.logo");
 
     // @ts-ignore
     modes.css(
       "all",
       `
-      ${$var("--color-hue: %s;", color.h, opt.color)}
-      ${$var("--color-sat: %s%;", color.s, opt.color)}
-      ${$var("--color-lig: %s%;", color.l, opt.color)}
-      ${$var("--bg-hue: %s;", bg.h, opt.bg)}
-      ${$var("--bg-sat: %s%;", bg.s, opt.bg)}
-      ${$var("--bg-lig: %s%;", bg.l, opt.bg)}
-      ${$var("--primary-hue: %s;", primary.h, opt.primary)}
-      ${$var("--primary-sat: %s%;", primary.s, opt.primary)}
-      ${$var("--primary-lig: %s%;", primary.l, opt.primary)}
-      ${$var("--secondary-hue: %s;", secondary.h, opt.secondary)}
-      ${$var("--secondary-sat: %s%;", secondary.s, opt.secondary)}
-      ${$var("--secondary-lig: %s%;", secondary.l, opt.secondary)}
-      ${$var("--headings-color: %s;", opt.headings?.color, opt.headings?.color)}
+      ${$var("--color-hue: %s;", color.h, Theme.color)}
+      ${$var("--color-sat: %s%;", color.s, Theme.color)}
+      ${$var("--color-lig: %s%;", color.l, Theme.color)}
+      ${$var("--bg-hue: %s;", bg.h, Theme.bg)}
+      ${$var("--bg-sat: %s%;", bg.s, Theme.bg)}
+      ${$var("--bg-lig: %s%;", bg.l, Theme.bg)}
+      ${$var("--primary-hue: %s;", primary.h, Theme.primary)}
+      ${$var("--primary-sat: %s%;", primary.s, Theme.primary)}
+      ${$var("--primary-lig: %s%;", primary.l, Theme.primary)}
+      ${$var("--secondary-hue: %s;", secondary.h, Theme.secondary)}
+      ${$var("--secondary-sat: %s%;", secondary.s, Theme.secondary)}
+      ${$var("--secondary-lig: %s%;", secondary.l, Theme.secondary)}
+      ${$var("--headings-color: %s;", headings?.color, headings?.color)}
       
       ${$var("--font-family: %s, sans-serif;", options.font, true)}
       ${$var(
@@ -153,7 +153,7 @@ export default class BaseTheme extends BasePlugin {
         options.headings?.font || options.font,
         true
       )}
-      ${$var("--highlight-background-color: var(--bg);", opt.highlight, true)}
+      ${$var("--highlight-background-color: var(--bg);", Theme.highlight, true)}
 
       --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
       --icon-date: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
@@ -162,17 +162,15 @@ export default class BaseTheme extends BasePlugin {
       --icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='${hexicon}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
     
     
-      .logo-svg, .logo-svg:hover {
-        background-color: var(--contrast);
-        -webkit-mask: url(${logo}) no-repeat center;
-        -webkit-mask-size: contain;
-        mask: url(${logo}) no-repeat center;
-        mask-size: contain;
+      ${layout?.width ? `
+      body > nav, body > main {
+        max-width: ${layout.width};
       }
+      ` : ""}
 
-      .logo-svg:hover {
-        background-color: var(--primary);
-      }
+      ${Theme.radius ? `
+      --border-radius: ${Theme.radius};
+      ` : ""}
 
       `
     );
