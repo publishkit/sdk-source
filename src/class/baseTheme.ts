@@ -73,7 +73,7 @@ export default class BaseTheme extends BasePlugin {
     parsed.headings.font = parseCdnfonts(options.headings?.font) || parsed.font;
 
     // highlight
-    parsed.highlight = parseHighlightjs(options.highlight);
+    parsed.highlight = options.highlight !== false && parseHighlightjs(options.highlight);
 
     // merge other options in themeOptions
     this.themeOptions = <ThemeOptions>(

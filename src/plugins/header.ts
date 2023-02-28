@@ -101,6 +101,7 @@ export default class Plugin extends BasePlugin {
 
       .logo-svg img {
         min-height: 2rem;
+        height: 0px;
       }
 
       .logo-svg, .logo-svg:hover {

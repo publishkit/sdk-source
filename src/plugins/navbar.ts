@@ -225,6 +225,7 @@ export default class Plugin extends BasePlugin {
           grid-row-gap: 3rem;
           grid-template-columns: 1fr 1fr 1fr;
           justify-content: left;
+          align-items: start;
           font-size: 1rem;
           background: var(--bg);
           border-bottom: 2px solid var(--muted-border-color);
