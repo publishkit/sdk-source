@@ -10,7 +10,7 @@ export default class Plugin extends BasePlugin {
   }
 
   transform = async () => {
-    const { $dom } = window;
+    const { $dom, $app } = window;
 
     $dom
       .reduceHeadings()
@@ -18,6 +18,10 @@ export default class Plugin extends BasePlugin {
       // onclick is not rendered in html in obsidian, so we use custom binding name instead.
       .renameProp("data-click", "onclick")
       .renameProp("data-onclick", "onclick")
+
+    
+    const layout = $app.cfg("layout") || {}
+    // if(layout.fluid) $("body").addClass("layout-fluid")
 
     return $dom;
   };

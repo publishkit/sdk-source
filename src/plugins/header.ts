@@ -11,23 +11,29 @@ export default class Plugin extends BasePlugin {
 
     const name = app.cfg("header.name");
     const logo = app.cfg("header.logo") || app.cfg("site.logo");
-    const classFluid = options.fluid ? "-fluid" : "";
+    const layout = app.cfg("layout") || {}
+    const containerClass = layout.fluid || options.fluid ? "container-fluid" : "container";
     const bgContrast = options.contrast ? "bg-contrast" : "";
 
     const rx: ObjectAny = {};
+
+    const svgClass =
+      (logo.split(".")?.pop()?.toLowerCase() == "svg" && "logo-svg") || "";
+    const svgStyle = svgClass ? "opacity:0" : "";
 
     rx.logo =
       (logo &&
         `
           <a class="logo" href="./" >
-            <div class="logo-svg"><img src="${logo}" style="opacity:0" /></div>
+            <div class="${svgClass}"><img src="${logo}" style="${svgStyle}" /></div>
           </a>
           `) ||
       "";
     // <img src="${logo}"></img>
 
     rx.name =
-      (name !== false && !rx.logo &&
+      (name !== false &&
+        !rx.logo &&
         `
           <a href="./" class="sitename">
             <strong>${name || app.cfg("site.name", "Sitename")}</strong>
@@ -44,7 +50,7 @@ export default class Plugin extends BasePlugin {
     right = (right.length && base.joinUIElements(right)) || "";
 
     const header = this.utils.s
-      .handlebar(`<nav id="header" class="ui-header container${classFluid} ${bgContrast}">
+      .handlebar(`<nav id="header" class="ui-header ${containerClass} ${bgContrast}">
         <div class="ui-header-left">
           ${left}
           ${rx.logo}
@@ -100,7 +106,7 @@ export default class Plugin extends BasePlugin {
       }
 
       .logo-svg img {
-        min-height: 2rem;
+        min-height: var(--logo-height, 1rem);
         height: 0px;
       }
 

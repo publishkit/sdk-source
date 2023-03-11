@@ -11,7 +11,7 @@ export default class Plugin extends BasePlugin {
 
   render = async () => {
     const element = `<div><img /></div>`;
-    this.ui.addElement("wrapper", "body", element);
+    if (this.options.parallax) this.ui.addElement("wrapper", "body", element);
   };
 
   bind = async () => {

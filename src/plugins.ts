@@ -3,7 +3,16 @@ import BasePlugin from "./class/basePlugin";
 import BaseTheme from "./class/baseTheme";
 
 const CoreKeys = Object.keys(CorePlugins);
-const requiredPlugins = ["dom", "global", "hotkeys", "modal", "props", "render", "actions", "css"];
+const requiredPlugins = [
+  "dom",
+  "global",
+  "hotkeys",
+  "modal",
+  "props",
+  "render",
+  "actions",
+  "css",
+];
 const lastPlugins = ["header", "theme"];
 
 export default class Plugins {
@@ -97,8 +106,17 @@ export default class Plugins {
     return !!this.cache[key];
   };
 
-  parseFromUrlKey = (urlKey: string): PluginObject[] => {
-    const values = this.utils.w.urlParams.getAll(urlKey);
+  parseFromUrlKey = (urlKey: string, base?: boolean): PluginObject[] => {
+    const params = this.utils.w.urlParams;
+    const values = params.getAll(urlKey);
+
+    if(base){
+      for (const key of params.keys()) {
+        const value = params.get(key);
+        if (key != urlKey) values.push(`${key}|${value}`);
+      }
+    }
+
     return values.filter(Boolean).map((p) => {
       const parsed = this.parsePlugin(p, p);
       return parsed;
@@ -109,7 +127,7 @@ export default class Plugins {
     const { utils } = this;
     const { cache } = this.app;
 
-    const plugins = this.parseFromUrlKey("p");
+    const plugins = this.parseFromUrlKey("p", true);
     const themes = this.parseFromUrlKey("theme");
 
     themes.map((theme) => {
@@ -123,11 +141,14 @@ export default class Plugins {
 
       // override existing configurtion
       const stringPlugin = utils.o.get(cache.config, `plugins.${p.id}`);
-      const shortSyntaxOptions = typeof stringPlugin == "string" ? this.parsePlugin(stringPlugin).options : {}
+      const shortSyntaxOptions =
+        typeof stringPlugin == "string"
+          ? this.parsePlugin(stringPlugin).options
+          : {};
       const pluginOptions = utils.o.get(cache.config, p.id);
 
       p.options = { ...pluginOptions, ...shortSyntaxOptions, ...p.options };
-      
+
       // merge in cache config
       utils.o.put(cache.config, `plugins.${p.id}`, p.value);
       if (Object.keys(p.options).length)
@@ -311,7 +332,7 @@ export default class Plugins {
         ? dep[1]?.type || dep[0]?.split(".").pop() || "unknown"
         : dep.split(".").pop();
       const path = dep.push ? dep[0] : dep;
-      const status = this.depsStatus.success.includes(path) ? '✅' : '💥'
+      const status = this.depsStatus.success.includes(path) ? "✅" : "💥";
       this.log("*", `${status} - ${path} (${type})`);
     });
   };

@@ -89,9 +89,9 @@ export default class App {
     await plugins.init();
     await plugins.deps();
     await plugins.render();
-    await plugins.style();
     await ui.render();
     await plugins.transform();
+    await plugins.style();
     await ui.draw();
     await plugins.bind();
     plugins.summary();

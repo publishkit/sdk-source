@@ -10,6 +10,7 @@ export default class Plugin extends BasePlugin {
     const dirs = location.pathname
       .replace($kit.base, "")
       .split("/")
+      .map(decodeURIComponent)
       .filter(Boolean);
 
     const last = dirs[dirs.length - 1] || "";

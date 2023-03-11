@@ -24,9 +24,59 @@ export default class Plugin extends BasePlugin {
   };
 
   basic = (tx: any, target: any) => {
+    const onlyChild = target.find("> ul:only-child")
+    if(onlyChild.length) target = onlyChild
     tx.attr("class") && target.addClass(tx.attr("class"));
     tx.attr("style") && target.prop("style", tx.attr("style"));
     tx.remove();
+  };
+
+  section = (tx: any, target: any) => {
+    const wrap = $("<section />");
+    tx.attr("class") && wrap.addClass(tx.attr("class"));
+    tx.attr("style") && wrap.prop("style", tx.attr("style"));
+
+    const stack = [];
+    let current = tx;
+    let next = target.next().length;
+
+    while (next) {
+      current = current.next();
+      const end = current.attr("data-ui") == "end";
+
+      if (end) {
+        next = false;
+      } else {
+        wrap.append(current.clone());
+        stack.push(current);
+      }
+    }
+    stack.map(el => el.remove());
+    tx.replaceWith(wrap);
+  };
+
+  wrap = (tx: any, target: any) => {
+    const wrap = $("<div/>");
+    tx.attr("class") && wrap.addClass(tx.attr("class"));
+    tx.attr("style") && wrap.prop("style", tx.attr("style"));
+
+    const stack = [];
+    let current = tx;
+    let next = target.next().length;
+
+    while (next) {
+      current = current.next();
+      const end = current.attr("data-ui") == "end";
+
+      if (end) {
+        next = false;
+      } else {
+        wrap.append(current.clone());
+        stack.push(current);
+      }
+    }
+    stack.map(el => el.remove());
+    tx.replaceWith(wrap);
   };
 
   hero_title = (tx: any, target: any) => {
@@ -137,7 +187,7 @@ export default class Plugin extends BasePlugin {
         align-items: start;
         width: fit-content;
         background-color: var(--form-element-background-color);
-        border-radius: var(--border-radius);
+        border-radius: calc(var(--border-radius) + 2px);
         border: var(--border-width) solid var(--form-element-border-color);
         margin-bottom: var(--spacing);
         
@@ -231,7 +281,7 @@ export default class Plugin extends BasePlugin {
 
     @media (min-width: 768px){
       .hero_title {
-        border-radius: var(--border-radius);
+        // border-radius: var(--border-radius);
       }
     }
 

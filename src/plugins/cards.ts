@@ -14,7 +14,7 @@ export default class Plugin extends BasePlugin {
         padding: 0;
         margin: auto;
         margin-bottom: 4rem;
-        width: fit-content;
+        // width: fit-content;
 
         &.center {
             text-align: center;
@@ -22,18 +22,23 @@ export default class Plugin extends BasePlugin {
 
         ul {
             padding: 0;
+            margin-top: 0;
         }
 
         hr {
             border-top: 1px solid var(--muted-border-color);
-            width: 100%;
+            width: 30%;
+        }
+
+        a {
+            text-decoration: none;
         }
 
         &> li {
             list-style: none;
             background: var(--card-background-color);
             margin: 0;
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: var(--border-radius);
             display: flex;
             flex-direction: column;
@@ -50,14 +55,15 @@ export default class Plugin extends BasePlugin {
             }
 
             li:last-child {
-                a, button {
-                    margin: 0 auto;
-                    margin-top: 2rem;
-                    list-style: none;
-                    width: auto;
-                    display: flex;
-                    align-items: center;
-                }
+                margin-bottom: 0;
+                // a, button {
+                //     margin: 0 auto;
+                //     margin-top: 2rem;
+                //     list-style: none;
+                //     width: auto;
+                //     display: flex;
+                //     align-items: center;
+                // }
             }
         }
 

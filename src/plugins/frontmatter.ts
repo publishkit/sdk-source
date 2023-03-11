@@ -24,7 +24,7 @@ export default class Plugin extends BasePlugin {
         <option value="kitrc">kitrc</option>
         <option value="config">config</option>
       </select>
-      <pre class="m-0"><code class="language-yaml">${options.data.frontmatter}</code></pre>
+      <pre class="language-yaml m-0"><code>${options.data.frontmatter}</code></pre>
     `;
 
     ui.addModal("modal", modal);

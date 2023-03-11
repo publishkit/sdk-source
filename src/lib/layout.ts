@@ -9,7 +9,7 @@ export default class Layout {
 
   render = () => {
     const { $cfg, $theme } = window;
-    // const fluid = $cfg("layout.fluid") ? "-fluid" : "";
+    const layout = $cfg("layout") || {}
 
     const body = this.body();
     const header = this.header();
@@ -18,12 +18,10 @@ export default class Layout {
     const center = this.center();
     const modals = this.modals();
 
-    const opt = $theme.options.layout || {}
-
     return `
       ${body}
       ${header}
-      <main class="ready container${opt.fluid||""} ${opt.mode||""}">
+      <main class="ready ${layout.fluid?"":"container"} ${layout.mode||""}">
         ${left}
         ${center}
         ${right}

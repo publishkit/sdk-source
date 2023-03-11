@@ -313,7 +313,7 @@ kbd {
   padding: 0.2rem 0.3rem;
   font-size: 0.8rem;
   --code-color: var(--bg);
-  --code-background-color: var(--color);
+  --code-background-color: var(--primary);
   color: var(--code-color);
 }
 
@@ -366,18 +366,10 @@ pre code {
   }
 }
 
-
-
-.ui-center {
-  height: calc(100%);
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-}
-
 .ui-header {
   padding-right: var(--spacing) !important;
   padding-left: var(--spacing) !important;
+  background: var(--header-background-color, var(--bg-opacity));
 
   .ui-header-left,
   .ui-header-right {
@@ -392,17 +384,6 @@ pre code {
   }
 }
 
-.ui-header,
-.ui-left {
-  background: var(--card-background-color);
-}
-
-.ui-center,
-.ui-left,
-.ui-right {
-  background: var(--bg-opacity);
-}
-
 .ui-left,
 .ui-right {
   width: calc(100% - var(--spacing) * 2);
@@ -415,10 +396,12 @@ pre code {
   position: fixed;
   border-radius: var(--border-radius);
   z-index: 1;
+  background: var(--left-background-color, var(--bg-opacity));
 }
 .ui-right {
   position: fixed;
   z-index: 1;
+  background: var(--right-background-color, var(--bg-opacity));
 }
 
 .ui-top {
@@ -449,10 +432,16 @@ pre code {
 }
 
 .ui-center {
+  min-height: calc(100vh - var(--header-height) - 2rem);
   border-radius: var(--border-radius);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  background: var(--center-background-color, var(--bg-opacity));
 }
 
 .ui-content {
+  background: var(--content-background-color, inherit);
   a {
     text-decoration: underline;
 
@@ -468,6 +457,7 @@ pre code {
 
 .ui-footer {
   padding: 1rem;
+  background: var(--footer-background-color, inherit);
 }
 
 /* sm */
@@ -514,9 +504,6 @@ pre code {
 
 }
 @media (min-width: 768px) {
-  .ui-content {
-    padding: var(--spacing) calc(var(--spacing) * 2);
-  }
   .ui-left {
     width: var(--leftbar-width);
     padding: var(--spacing);
@@ -830,5 +817,27 @@ details[open] > summary:not([role]):not(:focus) {
 @media (min-width: 1200px) {
   html {
     --header-height: 80px;
+  }
+}
+
+
+
+
+
+
+
+.layout-fluid {
+
+  main {
+    padding-top: var(--header-height) !important;
+    grid-column-gap: 0 !important;
+  }
+
+  .ui-center {
+    border-radius: 0;
+
+    .ui-content {
+      padding: 0;
+    }
   }
 }

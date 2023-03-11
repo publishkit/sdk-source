@@ -5,16 +5,37 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
+  transform = async () => {
+    const self = this;
+    const { $dom } = window;
+    $dom.body.find("pre > code > span").each(function () {
+      const t = $(this).text();
+      const isConfig = t.startsWith("# @file=");
+      if (isConfig) {
+        const file = t.replace("# @file=", "");
+        $(this).parent().attr("data-file", file);
+        this.remove();
+      }
+    });
+  };
+
   bind = async () => {
+    const { $theme } = window;
     const { utils, options } = this;
+
     $("pre:has(code)").each(function () {
       const pre = $(this);
       const code = pre.find("> code");
       const items = [];
 
+      if (code.attr("data-file"))
+        items.push(`<span>${code.attr("data-file")}</span>`);
+
       if (options.lang)
         items.push(
-          `<span>${this.classList.value.replace("language-", "")}</span>`
+          `<span>${
+            this.classList.value.replace("language-", "").split(" ")[0]
+          }</span>`
         );
 
       if (options.copy) {
@@ -47,7 +68,13 @@ export default class Plugin extends BasePlugin {
 
   style = async () => {
     return `
-    pre:has(code) {
+      pre > code[data-file] {
+        &:first-line {
+            line-height: 0;
+        }
+      }
+
+      pre:has(code) {
         position: relative;
         color: var(--primary);
         overflow: unset;
@@ -56,7 +83,7 @@ export default class Plugin extends BasePlugin {
             position: absolute;
             top: 0;
             right: 0;
-            background: #00000070;
+            background: #00000026;
             font-size: 10px;
             padding: 0.3rem 1rem;
             display: grid;
