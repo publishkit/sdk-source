@@ -96,4 +96,9 @@ export default class App {
     await plugins.bind();
     plugins.summary();
   };
+
+  goto = (relativePath: string) => {
+    // @ts-ignore
+    window.location = `${window.$kit.base}${relativePath}`;
+  };
 }

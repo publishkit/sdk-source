@@ -4,6 +4,7 @@ interface App {
   plugins: import("../plugins").default;
   ui: import("../ui").default;
   cfg: Function;
+  goto: Function;
 }
 
 interface AppCache {

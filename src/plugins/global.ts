@@ -21,7 +21,7 @@ export default class Plugin extends BasePlugin {
 
     
     const layout = $app.cfg("layout") || {}
-    // if(layout.fluid) $("body").addClass("layout-fluid")
+    if(layout.fluid) $("body").addClass("layout-fluid")
 
     return $dom;
   };

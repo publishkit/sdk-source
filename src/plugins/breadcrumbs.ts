@@ -16,10 +16,10 @@ export default class Plugin extends BasePlugin {
     const last = dirs[dirs.length - 1] || "";
     if (last == "index" || last == "index.html") dirs.pop();
 
+    let path = dirs[0]
     const paths = dirs.map((dir, i) => {
       if (i == 0) return dir;
-      const prev = dirs[i - 1];
-      return [prev, dir].join("/");
+      return path = [path, dirs[i]].join("/");
     });
 
     return dirs.length > 1 && { dirs, paths };

@@ -6,7 +6,7 @@ export default class Plugin extends BasePlugin {
   _syntax = (str: string) => {
     str = str
       .replace(/^return /gi, "")
-      .replace(/~([a-z-\.-_]+)/gi, '$props.get("$1")')
+      .replace(/~([a-z-\.-_]+)/gi, "$props.options.$1")
       .replace(/\~/gi, "$props.get");
     return $("<textarea />").html(str).text(); // html decode
   };
@@ -27,12 +27,9 @@ export default class Plugin extends BasePlugin {
           return value;
         }
       },
-      set: function (target, key, value) {
-        // @ts-ignore
-        const old = target[key];
-        // @ts-ignore
-        target[key] = value;
-        // @ts-ignore
+      set: function (target, key: string, value) {
+        const old = utils.o.get(target, key);
+        utils.o.put(target, key, value);
         $ee.emit(`props:${key}`, { value, old });
         return true;
       },
@@ -44,35 +41,27 @@ export default class Plugin extends BasePlugin {
   };
 
   set = (key: string, value: any) => {
-    this.options[key] = value;
-    return value;
+    return (this.options[key] = value);
   };
 
   deSugar = (str: string) => {
     if (!str) return { props: [] };
     const props: string[] = [];
     const sugar = str
-      .replace(/^return /gi, "")
+      .replace(/^return /, "")
       .replace(/~([a-z_.]+[:]?)/gi, function (match) {
         const colon = match[match.length - 1] == ":" ? "." : "";
         const prop = colon ? match.slice(1, -1) : match.slice(1);
         props.push(prop);
-        return `$props.options.${prop}${colon}`;
+        return `$props.options.${prop}`;
       });
     const fn = new Function(`return ${sugar}`);
     return { fn, sugar, props };
-
-    // const getSugar = (str: string) => {
-    //     str = str
-    //       .replace(/~([a-z-\.-_]+)/gi, '$props.options.$1')
-    //       .replace(/\~/gi, "$props.get");
-    //     return $("<textarea />").html(str).text() // html decode
-    //   };
   };
 
   bind = async () => {
     const { _prefixes, log, error, deSugar } = this;
-    const { $ee, $ } = window;
+    const { $ee, $, $props } = window;
 
     const bindings = $(":contains(~)").filter(function () {
       const onlyChild = $(this).children().length === 0;
@@ -136,6 +125,36 @@ export default class Plugin extends BasePlugin {
       const condition = fn();
       if (condition) el.removeClass("d-none");
       else el.addClass("d-none");
+    });
+
+    // input text data-bind
+    $("input[data-bind]").each(function () {
+      try {
+        const el = $(this);
+        const debounce = parseInt(el.attr("data-debounce") || 10);
+        const bindVariable = el.attr("data-bind");
+        const { fn, props } = deSugar(bindVariable);
+
+        el.on(
+          "input",
+          $.debounce(debounce, () => {
+            $props.set(props[0], el.val());
+          })
+        );
+
+        props.map((prop) => {
+          $ee.on(`props:${prop}`, ({ value, old }) => {
+            if (value == old) return;
+            el.val(value);
+          });
+        });
+
+        // @ts-ignore
+        const value = fn();
+        el.val(value);
+      } catch (e) {
+        console.log("errrr", e);
+      }
     });
   };
 }

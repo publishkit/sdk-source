@@ -48,10 +48,10 @@ export default class Plugin extends BasePlugin {
 
       // inject UIModal to callback
       cb && cb($ui.get(id));
-    }, 0);
+    }, 10);
 
     // https://stackoverflow.com/a/7056673/1428445
-    // we return false so we can use <a href="#" onclick="return $modal.open('')" /> to prevent default
+    // we return false so we can use <a href="#" onclick="return $modal.open('')" /> to prevent default click handler
     return false
   };
 
@@ -95,4 +95,46 @@ export default class Plugin extends BasePlugin {
       if (!self.modal.attr("noesc")) self.close();
     });
   };
+
+  style = async () => `
+    dialog:not([open]), dialog[open=false] {
+      display: flex;
+    }
+
+    dialog {
+      padding: var(--block-spacing-vertical) 0;
+      -webkit-transform: translateY(101%);
+      transform: translateY(101%);
+      transition: all 400ms ease;
+
+      article {
+        max-height: calc(100vh - var(--block-spacing-vertical) * 2);
+        background: var(--bg);
+      }
+    }
+    
+    dialog[open] {
+      -webkit-transform: translateY(0%);
+      transform: translateY(0%);
+    }
+    
+    @media (max-width: 575px) {
+      dialog {
+        align-items: flex-start;
+        padding: 0;
+        article {
+          width: -webkit-fill-available;
+          max-height: fit-content;
+          max-height: -webkit-fill-available;
+          margin: 0;
+        }
+      }
+    }
+    
+    @media (max-width: 767px) {
+      dialog {
+        align-items: flex-start;
+      }
+    }
+  `
 }

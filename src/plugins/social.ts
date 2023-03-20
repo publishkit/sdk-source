@@ -42,7 +42,7 @@ export default class Plugin extends BasePlugin {
 
     @media (max-width: 767px) {
       [id="social.main"] {
-        --icon-size: 2rem;
+        --icon-size: 1.4rem;
       }
     }
   `;

@@ -6,99 +6,209 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
+  types = ["switch", "hero-title", "div", "preview", "section", "card"];
+
   transform = async () => {
     const self = this;
     const { $dom, $utils } = window;
+    const dry = false; // toggle for debug
 
-    $dom.body.find("[data-ui]").each(function () {
-      const el = $(this);
-      const value = el.attr("data-ui");
-      const target = el.next();
+    const runUI = () =>
+      this.types.map((type) => {
+        $dom.body.find(`[data-${type}]`).each(function () {
+          const start = $(this);
+          const nodes = self.getNodes(start);
+          let box = $("<div />");
 
-      // @ts-ignore
-      const tranformer = self[value] || self.basic;
-      if (tranformer) tranformer(el, target);
-    });
+          // @ts-ignore
+          self.passProps(start, box);
+
+          nodes.map((el) => {
+            box.append(el.clone());
+            !dry && el.remove();
+          });
+
+          // @ts-ignore
+          const tranformer = self[type.replaceAll("-", "_")];
+          if (tranformer) box = tranformer(box) || box;
+
+          !dry && start.replaceWith(box);
+        });
+      });
+
+    runUI();
+    // runUI();
+    // runUI();
 
     return $dom;
   };
 
-  basic = (tx: any, target: any) => {
-    const onlyChild = target.find("> ul:only-child")
-    if(onlyChild.length) target = onlyChild
-    tx.attr("class") && target.addClass(tx.attr("class"));
-    tx.attr("style") && target.prop("style", tx.attr("style"));
-    tx.remove();
+  passProps = (source: JQuery, target: JQuery) => {
+    $.each(source.prop("attributes"), function () {
+      if (this.name == "class") return;
+      target.attr(this.name, this.value);
+    });
+
+    // @ts-ignore
+    source.attr("class") && target.addClass(source.attr("class"));
   };
 
-  section = (tx: any, target: any) => {
-    const wrap = $("<section />");
-    tx.attr("class") && wrap.addClass(tx.attr("class"));
-    tx.attr("style") && wrap.prop("style", tx.attr("style"));
+  isStartTag = (el: JQuery) => {
+    for (const type of this.types)
+      if (typeof el.attr(`data-${type}`) == "string") return true;
+    return false;
+  };
 
-    const stack = [];
-    let current = tx;
-    let next = target.next().length;
+  isEndTag = (el: JQuery) => {
+    return [typeof el.attr(`data-end`), typeof el.attr(`data-close`)].includes(
+      "string"
+    );
+  };
 
-    while (next) {
+  getNodes = (start: JQuery) => {
+    const nodes = [];
+    let current = start;
+    let next = start.next().length;
+    let level = 0;
+    let i = 0;
+
+    while (next && i < 1000) {
+      i++;
       current = current.next();
-      const end = current.attr("data-ui") == "end";
+      const isStartTag = this.isStartTag(current);
+      if (isStartTag) level++;
 
-      if (end) {
-        next = false;
+      const isEndTag = this.isEndTag(current);
+      const isFinalTag = isEndTag && !level;
+      if (level && isEndTag) level--;
+
+      if (isFinalTag) {
+        next = 0;
+        current.remove();
       } else {
-        wrap.append(current.clone());
-        stack.push(current);
+        nodes.push(current);
       }
     }
-    stack.map(el => el.remove());
-    tx.replaceWith(wrap);
+
+    return nodes;
   };
 
-  wrap = (tx: any, target: any) => {
-    const wrap = $("<div/>");
-    tx.attr("class") && wrap.addClass(tx.attr("class"));
-    tx.attr("style") && wrap.prop("style", tx.attr("style"));
+  // basic = (tx: any, target: any) => {
+  //   const onlyChild = target.find("> ul:only-child");
+  //   if (onlyChild.length) target = onlyChild;
+  //   tx.attr("class") && target.addClass(tx.attr("class"));
+  //   tx.attr("style") && target.prop("style", tx.attr("style"));
+  //   tx.remove();
+  // };
 
-    const stack = [];
-    let current = tx;
-    let next = target.next().length;
+  card = (box: JQuery, className = "") => {
+    const { app, passProps } = this;
+    const children = box.children();
+    const onlyChild = children.length == 1;
+    box.addClass("cards");
+    className && box.addClass(className);
 
-    while (next) {
-      current = current.next();
-      const end = current.attr("data-ui") == "end";
+    const bg = box.attr("data-bg");
+    if (bg) box[0].style.setProperty("--card-bg", bg);
 
-      if (end) {
-        next = false;
-      } else {
-        wrap.append(current.clone());
-        stack.push(current);
+    if (onlyChild) {
+      let child = children.first();
+      if (child[0]?.tagName != "UL") {
+        child = child.children().first();
+        if (child[0]?.tagName != "UL") return box;
       }
+
+      const data = this.listToData(window, <HTMLUListElement>child[0]);
+      const elClass = box.attr("data-item-class");
+      const elStyle = box.attr("data-item-style");
+      const elClick = box.attr("data-item-click");
+      const elHref = typeof box.attr("data-item-href") == "string";
+
+      const wrapClick = (fnBody, items, index) => {
+        const a = JSON.stringify(items[index]);
+        const b = JSON.stringify(items);
+        const fn = `((item, index, items) => { ${fnBody} })(${a}, ${index}, ${b});`;
+        // console.log("wrapClick", fn);
+        return fn;
+      };
+
+      const getHref = (href) => {
+        if(href.startsWith("<a")) href = $(href).prop("href")
+        return href;
+      };
+
+      if (elClass || elStyle || elClick || elHref)
+        child.children().each(function (index) {
+          const li = $(this);
+
+          // remove key value list item
+          li.find("ul li").map(function () {
+            const li = $(this)
+            if (li.attr("is-kv")) li.remove();
+          });
+
+          elClass && li.addClass(elClass);
+          elStyle && li.prop("style", elStyle);
+          elClick && li.attr("onclick", wrapClick(elClick, data, index));
+          if (elHref) {
+            const html = li.html()
+            const href = getHref(data[index]?.href || "")
+            const a = $("<a>", { href }).append(html);
+            li.html(a.prop("outerHTML"));
+          }
+        });
+
+      passProps(box, child);
+      box = child;
     }
-    stack.map(el => el.remove());
-    tx.replaceWith(wrap);
+    return box;
   };
 
-  hero_title = (tx: any, target: any) => {
-    tx.attr("class") && target.addClass(tx.attr("class"));
-    tx.attr("style") && target.prop("style", tx.attr("style"));
-    const data = this.listToData(window, target[0]);
+  preview = (box: JQuery) => {
+    return this.card(box, "preview");
+  };
+
+  section = (box: JQuery) => {
+    const section = $("<section />");
+    const wrapper = $('<div class="wrapper">');
+    this.passProps(box, section);
+
+    const bg = box.attr("data-bg");
+    if (bg) section[0].style.setProperty("--section-bg", bg);
+
+    wrapper.append(box.html());
+    section.html(wrapper.prop("outerHTML"));
+    return section;
+  };
+
+  hero_title = (box: JQuery) => {
+    const child = box.children().first();
+    if (child[0].tagName != "UL") return box;
+    const data = this.listToData(window, <HTMLUListElement>child[0]);
     const title = data.getValue("title");
     const label = data.getValue("label");
-    target.replaceWith(
-      `<div class="hero_title"><div class="title">${title}</div><span class="label bottom">${label}</span></div>`
+    return $(
+      `<div class="hero_title">
+        <div class="title">${title}</div>
+        <span class="label bottom">${label}</span>
+      </div>`
     );
-    tx.remove();
   };
 
-  switch = (tx: any, target: any) => {
+  switch = (box: JQuery) => {
+    let child = box.children().first();
+    if (child[0].tagName != "UL") {
+      child = child.children().first();
+      if (child[0].tagName != "UL") return box;
+    }
+
     const { $, $props, $utils, $ee } = window;
 
-    const db = tx.attr("data-bind");
+    const db = box.attr("data-bind");
     const binding = $props.deSugar(db);
     const initialValue = (binding.fn && binding.fn()) || "";
     const id = $utils.c.shortId();
-    const data = this.listToData(window, target[0]);
+    const data = this.listToData(window, <HTMLUListElement>child[0]);
 
     let str = ``;
     // @ts-ignore
@@ -111,23 +221,20 @@ export default class Plugin extends BasePlugin {
 
       const onclick = item.onclick || (db && `${binding.sugar}='${value}'`);
       const checked = initialValue == value ? "checked" : "";
-      str += `<input type="radio" name="${id}" id="${id}-${i}" ${checked}><label onclick="${onclick}" for="${id}-${i}">${label}</label>`;
+      str += `<input type="radio" name="${id}" id="${id}-${value}" ${checked}><label onclick="${onclick}" for="${id}-${i}">${label}</label>`;
     });
 
     binding.props.map((prop: string) => {
       // @ts-ignore
       $ee.on(`props:${prop}`, ({ value, old }) => {
-        if (old != value)
-          $(`input[name="${id}"][id="${value}"]`).prop("checked", "on");
+        if (old != value) $(`input[id="${id}-${value}"]`).prop("checked", "on");
       });
     });
 
     const el = $(`<div class="switch" />`).html(str);
-    tx.attr("class") && el.addClass(tx.attr("class"));
-    tx.attr("style") && el.prop("style", tx.attr("style"));
+    this.passProps(box, el);
 
-    target.replaceWith(el);
-    tx.remove();
+    return el;
   };
 
   listToData = (win: Window, rootUl: HTMLUListElement | null) => {
@@ -160,7 +267,8 @@ export default class Plugin extends BasePlugin {
           if (isKV(html)) {
             const [key, ...values] = html.split(":");
             item[key] = values.join("").trim();
-            item._tokens.push(item[key]);
+            $(this).attr("is-kv", true);
+            // item._tokens.push(item[key]);
           } else {
             item._tokens.push(html);
           }

@@ -170,11 +170,7 @@ export default class Plugin extends BasePlugin {
         !options.ui || options.ui == "left"
           ? `
       li {
-        padding-bottom: 10px;
-      }
-
-      &> ul li:last-child {
-        padding-bottom: 0px;
+        padding-block: 10px;
       }
       `
           : ""
@@ -263,6 +259,27 @@ export default class Plugin extends BasePlugin {
       }
       [id="navbar.icon"] {
         display: none;
+      }
+    }
+
+    .layout-fluid {
+      [id="navbar.nav"] {
+        details {
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+        summary {
+          display: none;
+        }
+        ul {
+          font-weight: bold;
+        }
+      }
+      
+      @media (min-width: 768px) {
+        [id="navbar.nav"] ul {
+          display: flex;
+        }
       }
     }
   `;

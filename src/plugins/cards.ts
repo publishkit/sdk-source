@@ -7,14 +7,38 @@ export default class Plugin extends BasePlugin {
 
   style = async () => {
     return `
+
+    div.cards {
+        padding: var(--spacing);
+        background: var(--card-bg, var(--card-background-color));
+        border-radius: var(--border-radius);
+
+
+        > :first-child {
+            margin-top: 0;
+        }
+        > :last-child {
+            margin-bottom: 0;
+        }
+
+        &:has(ul:only-child) {
+            padding: 0;
+            background: transparent;
+        }
+
+        &.preview {
+            margin-top: calc(var(--spacing) * -1);
+            margin-bottom: calc(var(--spacing) * 2)
+        }
+    }
+
     ul.cards {
         display: grid;
-        grid-auto-columns: minmax(0, 1fr);
         grid-gap: 1rem;
+        grid-auto-columns: minmax(0, 1fr);
         padding: 0;
         margin: auto;
-        margin-bottom: 4rem;
-        // width: fit-content;
+        margin-bottom: var(--spacing);
 
         &.center {
             text-align: center;
@@ -46,7 +70,6 @@ export default class Plugin extends BasePlugin {
             
             h1, h2, h3, h4, h5, h6 {
                 margin-top: 0;
-                text-align: center;
             }
 
             li {
@@ -65,12 +88,33 @@ export default class Plugin extends BasePlugin {
                 //     align-items: center;
                 // }
             }
+
+            a:only-child
         }
 
         &.v-center {
             &> li {
                 justify-content: center;
             }
+        }
+
+        &.grid-auto {
+            grid-auto-flow: column;
+        }
+        &.grid-2,&.grid-3,&.grid-4,&.grid-5 {
+            grid-auto-flow: unset;
+        }
+        &.grid-2 {
+            grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr);
+        }
+        &.grid-3 {
+            grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
+        }
+        &.grid-4 {
+            grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
+        }
+        &.grid-5 {
+            grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
         }
         
     }
@@ -83,29 +127,11 @@ export default class Plugin extends BasePlugin {
             width: auto;
         }
     }
-    @media (min-width: 992px){
-        ul.cards {
-            grid-auto-flow: column;
-
-            &.grid-2,&.grid-3,&.grid-4,&.grid-5 {
-                grid-auto-flow: unset;
-            }
-            &.grid-2 {
-                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr);
-            }
-            &.grid-3 {
-                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
-            }
-            &.grid-4 {
-                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
-            }
-            &.grid-5 {
-                grid-template-columns: minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr);
-            }
+    @media (max-width: 991px){
+        ul.cards:not(.fixed) {
+            grid-template-columns: minmax(0, 1fr);
         }
     }
   `;
   };
 }
-
-

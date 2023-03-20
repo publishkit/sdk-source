@@ -21,7 +21,7 @@ export default class Layout {
     return `
       ${body}
       ${header}
-      <main class="ready ${layout.fluid?"":"container"} ${layout.mode||""}">
+      <main class="ready ${layout.fluid?"":"container"}">
         ${left}
         ${center}
         ${right}
@@ -121,10 +121,14 @@ export default class Layout {
   };
 
   center = () => {
+    const { $cfg } = window;
+    const layout = $cfg("layout") || {}
+
     const hero = this.hero();
     const top = this.top();
     const content = this.content();
     const footer = this.footer();
+
     
     return `<div class="ui-center">
       <div>
