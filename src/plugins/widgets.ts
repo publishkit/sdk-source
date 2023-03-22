@@ -180,8 +180,8 @@ export default class Plugin extends BasePlugin {
 
         if (item.href) {
           const html = li.html();
-          const { href } = item;
-          const a = $("<a>", { href: item.href }).append(html);
+          const href = data[index].href
+          const a = $("<a>", { href }).append(html);
           li.html(a.prop("outerHTML"));
         }
       });
