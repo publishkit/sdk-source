@@ -162,11 +162,6 @@ export default class Plugin extends BasePlugin {
         return fn;
       };
 
-      const getHref = (href) => {
-        if (href.startsWith("<a")) href = $(href).prop("href");
-        return href;
-      };
-
       child.children().each(function (index) {
         const li = $(this);
 
@@ -185,8 +180,8 @@ export default class Plugin extends BasePlugin {
 
         if (item.href) {
           const html = li.html();
-          const href = getHref(data[index]?.href || "");
-          const a = $("<a>", { href }).append(html);
+          const { href } = item;
+          const a = $("<a>", { href: item.href }).append(html);
           li.html(a.prop("outerHTML"));
         }
       });
@@ -316,6 +311,13 @@ export default class Plugin extends BasePlugin {
           if (isKV(html)) {
             const [key, ...values] = html.split(":");
             item[key] = values.join("").trim();
+
+            // if special key href and link tag present, parse & return href only
+            if (key == "href" && item[key].startsWith("<a"))
+              item[key] = $(item[key])
+                .prop("href")
+                .replace(window.location.origin + "/", "");
+
             $(this).attr("is-kv", true);
             // item._tokens.push(item[key]);
           } else {
