@@ -56,7 +56,7 @@ export default class Plugin extends BasePlugin {
 
     const button = `<button type="button" class="contrast outline">
       <span class="d-flex align-items-center">
-        <i class="bx bx-search-alt"></i>
+        <!--<i class="bx bx-search-alt"></i>-->
         <span class="text">Search</span>
       </span>
       <span><kbd><span class="symbol">${s1}</span>${s2}</kbd></span>

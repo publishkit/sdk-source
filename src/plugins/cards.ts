@@ -8,11 +8,13 @@ export default class Plugin extends BasePlugin {
   style = async () => {
     return `
 
-    div.cards {
-        padding: var(--spacing);
-        background: var(--card-bg, var(--card-background-color));
+    div.cards, ul.cards {
         border-radius: var(--border-radius);
-
+    }
+    
+    div.cards {
+        background: var(--card-background-color);
+        padding: var(--spacing);
 
         > :first-child {
             margin-top: 0;
@@ -27,7 +29,7 @@ export default class Plugin extends BasePlugin {
         }
 
         &.preview {
-            margin-top: calc(var(--spacing) * -1);
+            margin-top: calc(var(--spacing) * 1);
             margin-bottom: calc(var(--spacing) * 2)
         }
     }
@@ -47,6 +49,9 @@ export default class Plugin extends BasePlugin {
         ul {
             padding: 0;
             margin-top: 0;
+            display: grid;
+            justify-content: inherit;
+            align-items: center;
         }
 
         hr {
@@ -58,15 +63,21 @@ export default class Plugin extends BasePlugin {
             text-decoration: none;
         }
 
+        &:has(li.shadow){
+            box-shadow: none;
+        }
+
         &> li {
             list-style: none;
             background: var(--card-background-color);
+            
             margin: 0;
-            padding: 1rem;
+            padding: var(--spacing);
             border-radius: var(--border-radius);
-            display: flex;
+            border: 3px solid transparent;
+            display: grid;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: stretch;
             
             h1, h2, h3, h4, h5, h6 {
                 margin-top: 0;
@@ -74,7 +85,6 @@ export default class Plugin extends BasePlugin {
 
             li {
                 list-style: none;
-                font-size: 16px;
             }
 
             li:last-child {
@@ -89,7 +99,14 @@ export default class Plugin extends BasePlugin {
                 // }
             }
 
-            a:only-child
+            &:hover {
+                border-color: var(--primary);
+            }
+
+            a:only-child {
+                margin: calc(var(--spacing) * -1);
+                padding: var(--spacing);
+            }
         }
 
         &.v-center {
@@ -127,9 +144,11 @@ export default class Plugin extends BasePlugin {
             width: auto;
         }
     }
-    @media (max-width: 991px){
+    @media (max-width: 1199px){
         ul.cards:not(.fixed) {
-            grid-template-columns: minmax(0, 1fr);
+            grid-template-columns: max-content;
+            grid-auto-flow: unset;
+            justify-content: center;
         }
     }
   `;

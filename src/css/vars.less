@@ -20,6 +20,7 @@
   --secondary-hs: var(--secondary-hue) var(--secondary-sat, 90%);
   --secondary-hsl: var(--secondary-hs) var(--secondary-lig, 40%);
 
+  --color-text: hsl(var(--color-hsl) / 1);
   --color: hsl(var(--color-hsl) / 1);
   --bg: hsl(var(--bg-hsl) / 1);
   --bg-opacity: hsl(var(--bg-hsl) / .95);
@@ -33,12 +34,12 @@
   --contrast-inverse: var(--bg);
 
   --primary-contrast: #fff;
-  --primary-hover: hsl(var(--primary-hs) calc(var(--primary-lig) + 10%));
+  --primary-hover: hsl(var(--primary-hs) calc(var(--primary-lig) - 5%));
   --primary-focus: hsl(var(--primary-hsl) / 0.1);
   --primary-inverse: var(--bg);
 
   --secondary-contrast: #fff;
-  --secondary-hover: hsl(var(--secondary-hs) calc(var(--secondary-lig) + 10%));
+  --secondary-hover: hsl(var(--secondary-hs) calc(var(--secondary-lig) - 5%));
   --secondary-focus: hsl(var(--secondary-hsl) / 0.1);
   --secondary-focus: hsl(var(--secondary-hs) 50%);
   --secondary-inverse: var(--bg);
@@ -47,41 +48,42 @@
   --outline-width: 1px;
   --muted-color: hsl(var(--color-hsl) / 0.5);
   --muted-border-color: hsl(var(--color-hsl) / 0.1);
-  --form-element-background-color: transparent;
-  --form-element-active-background-color: var(--bg);
+  --form-element-background-color: var(--card-background-color);
+  --form-element-active-background-color: var(--card-background-color);
   --form-element-placeholder-color: hsl(var(--color-hsl) / .8);
   --form-element-border-color: hsl(var(--color-hsl) / 0.2);
   --form-element-disabled-background-color: var(--muted-border-color);
   --form-element-disabled-border-color: var(--muted-border-color);
   --form-element-focus-color: var(--primary-focus);
-
+  
   --input-height: 2.2rem;
   --input-padding-x: 0.4rem;
   --input-padding: 0 var(--input-padding-x);
   --input-fs: 0.9rem;
-
+  
   --switch-color: var(--primary-inverse);
   --switch-background-color: var(--form-element-disabled-border-color);
   --switch-checked-background-color: var(--primary);
-
-  --dropdown-background-color: var(--bg);
+  
+  --dropdown-background-color: var(--card-background-color);
   --dropdown-border-color: var(--muted-border-color);
   --dropdown-hover-background-color: var(--card-background-color);
-
+  
   --mark-background-color: var(--primary);
   --mark-color: #fff;
-
+  
   --code-color: var(--bg);
   --code-background-color: var(--highlight-background-color, var(--color));
-
+  
   --modal-overlay-background-color: hsl(0 0% 0% / 0.5);
-
+  
   --table-row-stripped-background-color: var(--card-background-color);
-
+  
   --card-background-color: hsl(var(--bg-hs) calc(var(--bg-lig) - 5%) / .7);
   --card-sectionning-background-color: var(--card-background-color);
   // --card-sectionning-color: var(--bg);
-  --card-box-shadow: 0 0 0 var(--outline-width) var(--muted-border-color);
+  --card-box-shadow: 0 0px 6px hsl(var(--color-hsl) / 0.25);
+  
 
   --callout-bg: var(--blockquote-border-color);
   --callout-color: var(--color);
@@ -134,9 +136,10 @@
 /* light theme */
 :root:not([data-theme="dark"]),
 [data-theme="light"] {
+  // --card-background-color: #fff;
   --bg-hue: 0;
   --bg-sat: 0%;
-  --bg-lig: 97%;
+  --bg-lig: 100%;
   --color-hue: 0;
   --color-sat: 0%;
   --color-lig: 30%;

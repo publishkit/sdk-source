@@ -6,14 +6,16 @@ export default class Plugin extends BasePlugin {
   }
 
   render = async () => {
-    const { ui, app, options } = this;
+    const { ui, app, options, utils } = this;
     const { base } = ui;
 
     const name = app.cfg("header.name");
     const logo = app.cfg("header.logo") || app.cfg("site.logo");
+    const settings = app.cfg("header") || {}
     const layout = app.cfg("layout") || {}
     const containerClass = layout.fluid || options.fluid ? "container-fluid" : "container";
     const bgContrast = options.contrast ? "bg-contrast" : "";
+    const className = utils.s.join(settings.class, containerClass, bgContrast)
 
     const rx: ObjectAny = {};
 
@@ -50,7 +52,7 @@ export default class Plugin extends BasePlugin {
     right = (right.length && base.joinUIElements(right)) || "";
 
     const header = this.utils.s
-      .handlebar(`<nav id="header" class="ui-header ${containerClass} ${bgContrast}">
+      .handlebar(`<nav id="header" class="ui-header ${className}">
         <div class="ui-header-left">
           ${left}
           ${rx.logo}
@@ -66,8 +68,8 @@ export default class Plugin extends BasePlugin {
 
   style = async () => {
     const { app } = this;
+    const css = app.cfg("css") || {};
     const logo = app.cfg("header.logo") || app.cfg("site.logo");
-
     return `
 
     :root[data-theme="dark"] {
@@ -90,8 +92,8 @@ export default class Plugin extends BasePlugin {
       backdrop-filter: saturate(100%) blur(20px);
 
       &:not(.container-fluid){
-        border-bottom-left-radius: var(--border-radius);
-        border-bottom-right-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-bl-radius, var(--border-radius));
+        border-bottom-right-radius: var(--border-br-radius, var(--border-radius));
       }
       
       i {
@@ -121,7 +123,6 @@ export default class Plugin extends BasePlugin {
       .logo-svg:hover {
         background-color: var(--primary);
       }
-
       
       .logo {
         padding: 0;
@@ -148,6 +149,11 @@ export default class Plugin extends BasePlugin {
         padding: 0;
         margin: 0;
       }
+
+      &:has(details[open]){
+        --border-br-radius: 0;
+      }
+
     }
 
     @media (max-width: 767px){
@@ -162,6 +168,45 @@ export default class Plugin extends BasePlugin {
         }
       }
     }
+
+    .ui-header {
+      ${css["header-background-color"] && `
+        --contrast: var(--color);
+        --contrast-hover: var(--color);
+        --code-kbd-background-color: var(--header-background-color);
+        --code-kbd-color: var(--color);
+        --form-element-background-color: var(--header-background-color);
+        --form-element-active-background-color: var(--header-background-color);
+        --dropdown-background-color: var(--header-background-color);
+        --dropdown-color: var(--color);
+        .logo-svg:hover {
+          background-color: var(--header-color, var(--primary));
+        }
+      `}
+      &.bg-primary, &.bg-secondary, &.text-white {
+        --contrast: var(--color);
+        --contrast-hover: var(--color);
+        --code-kbd-background-color: var(--header-background-color);
+        --code-kbd-color: var(--color);
+        --form-element-background-color: var(--header-background-color);
+        --form-element-active-background-color: var(--header-background-color);
+        --dropdown-background-color: var(--header-background-color);
+        --dropdown-color: var(--color);
+        .logo-svg:hover {
+          background-color: var(--header-color, var(--primary));
+        }
+      }
+      &.bg-primary {
+        --header-background-color: var(--primary);
+      }
+      &.bg-secondary {
+        --header-background-color: var(--secondary);
+      }
+      &.text-white {
+        --header-color: #fff;
+        --header-background-color: inherit;
+      }
+  }
 
   `;
   };

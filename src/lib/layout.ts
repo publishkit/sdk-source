@@ -8,8 +8,8 @@ export default class Layout {
   }
 
   render = () => {
-    const { $cfg, $theme } = window;
-    const layout = $cfg("layout") || {}
+    const { $cfg } = window;
+    const layout = $cfg("layout") || {};
 
     const body = this.body();
     const header = this.header();
@@ -21,7 +21,7 @@ export default class Layout {
     return `
       ${body}
       ${header}
-      <main class="ready ${layout.fluid?"":"container"}">
+      <main class="ready ${layout.fluid ? "" : "container"}">
         ${left}
         ${center}
         ${right}
@@ -68,12 +68,14 @@ export default class Layout {
 
   top = () => {
     const { ui } = this;
+    const { $cfg } = window;
+    const layout = $cfg("layout") || {};
+
     const rx: ObjectAny = {};
     let top,
       left,
       right,
       actions = "";
-
 
     left = ui.getUIElements("top.left");
     left = (left.length && ui.joinUIElements(left)) || "";
@@ -84,7 +86,7 @@ export default class Layout {
     top = left || right;
     top =
       (!!top &&
-        `<div class="ui-top">
+        `<div class="ui-top ${layout.fluid ? "wrapper" : ""}">
           <div class="ui-top-left">${left}</div>
           <div class="ui-top-right">${right}</div>
         </div>`) ||
@@ -122,14 +124,13 @@ export default class Layout {
 
   center = () => {
     const { $cfg } = window;
-    const layout = $cfg("layout") || {}
+    const layout = $cfg("layout") || {};
 
     const hero = this.hero();
     const top = this.top();
     const content = this.content();
     const footer = this.footer();
 
-    
     return `<div class="ui-center">
       <div>
       ${hero}
@@ -169,7 +170,7 @@ export default class Layout {
     rx.footer = rx.left || rx.right;
     rx.footer =
       (!!rx.footer &&
-        `<footer id="footer" class="ui-footer d-grid">
+        `<footer id="footer" class="ui-footer d-grid pb-5">
           ${rx.left}
           ${rx.right}
         </footer>`) ||

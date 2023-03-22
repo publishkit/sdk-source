@@ -7,6 +7,11 @@ export default class Plugin extends BasePlugin {
       "https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js",
       "https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css",
     ];
+
+    window.$ee.on(`post:transforms`, () => {
+      // remove empty paragraph
+      window.$dom.body.find("p:empty").remove()
+    });
   }
 
   transform = async () => {
@@ -56,5 +61,6 @@ export default class Plugin extends BasePlugin {
     $(".callout-title:has(.callout-fold)").on("click", function () {
       $(this).next().toggle();
     });
+    
   };
 }

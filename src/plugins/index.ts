@@ -2,7 +2,7 @@ import dom from "./dom";
 import global from "./global";
 import props from "./props";
 import actions from "./actions";
-import render from "./render";
+import widgets from "./widgets";
 import header from "./header";
 import css from "./css";
 import hotkeys from "./hotkeys";
@@ -26,7 +26,7 @@ const plugins: ObjectAny = {
   global,
   props,
   actions,
-  render,
+  widgets,
   hotkeys,
   header,
   modal,

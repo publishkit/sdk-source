@@ -18,8 +18,15 @@ export const slugify = (text: string) => {
     .replace(/\-$/g, ""); // Remove trailing -
 };
 
-
 export const handlebar = (str: string, data?: any): string => {
-    try { return window.Handlebars.compile(str)(data) }
-    catch(e){ console.log('handlebar:error', e); return '' }
+  try {
+    return window.Handlebars.compile(str)(data);
+  } catch (e) {
+    console.log("handlebar:error", e);
+    return "";
   }
+};
+
+export const join = (...strs: any[]) => {
+  return strs.reduce((a, v) => (a += `${v || ""} `), "").trim().replace(/  +/g, ' ');
+};

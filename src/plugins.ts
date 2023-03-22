@@ -9,7 +9,7 @@ const requiredPlugins = [
   "hotkeys",
   "modal",
   "props",
-  "render",
+  "widgets",
   "actions",
   "css",
 ];
@@ -275,6 +275,7 @@ export default class Plugins {
     // @ts-ignore
     const run = await utils.a[options.run](load[sequence], fn);
     $ee.emit(`post:${sequence}s`, run.filter(Boolean));
+
     return run;
   };
 

@@ -6,16 +6,24 @@ export default class Plugin extends BasePlugin {
     super(id, options);
   }
 
-  types = ["switch", "hero-title", "div", "preview", "section", "card"];
+  types = [
+    "switch",
+    "hero-title",
+    "div",
+    "wrapper",
+    "preview",
+    "section",
+    "card",
+  ];
 
   transform = async () => {
     const self = this;
     const { $dom, $utils } = window;
     const dry = false; // toggle for debug
 
-    const runUI = () =>
+    const renderWidgets = () => {
       this.types.map((type) => {
-        $dom.body.find(`[data-${type}]`).each(function () {
+        $dom.body.find(`[data-${type}]:not([data-rendered])`).each(function () {
           const start = $(this);
           const nodes = self.getNodes(start);
           let box = $("<div />");
@@ -35,22 +43,31 @@ export default class Plugin extends BasePlugin {
           !dry && start.replaceWith(box);
         });
       });
+    };
 
-    runUI();
-    // runUI();
-    // runUI();
+    // 2 level render
+    renderWidgets();
+    renderWidgets();
 
     return $dom;
   };
 
   passProps = (source: JQuery, target: JQuery) => {
+    const { utils } = this;
+    target.attr("data-rendered", "true");
+
     $.each(source.prop("attributes"), function () {
-      if (this.name == "class") return;
+      if (["class", "style"].includes(this.name)) return;
       target.attr(this.name, this.value);
     });
 
     // @ts-ignore
     source.attr("class") && target.addClass(source.attr("class"));
+    source.attr("style") &&
+      target.attr(
+        "style",
+        utils.s.join(source.attr("style"), target.attr("style"))
+      );
   };
 
   isStartTag = (el: JQuery) => {
@@ -101,15 +118,26 @@ export default class Plugin extends BasePlugin {
   //   tx.remove();
   // };
 
+  wrapper = (box: JQuery) => {
+    box.addClass("wrapper py-5");
+    return box;
+  };
+
   card = (box: JQuery, className = "") => {
-    const { app, passProps } = this;
+    const { app, passProps, utils } = this;
+    const settings = app.cfg("cards") || {};
+
     const children = box.children();
     const onlyChild = children.length == 1;
+
     box.addClass("cards");
+    settings.class && box.addClass(settings.class);
+    settings.style &&
+      box.attr("style", utils.s.join(settings.style, box.attr("style")));
     className && box.addClass(className);
 
     const bg = box.attr("data-bg");
-    if (bg) box[0].style.setProperty("--card-bg", bg);
+    bg && box[0].style.setProperty("--cards-bg", bg);
 
     if (onlyChild) {
       let child = children.first();
@@ -119,10 +147,12 @@ export default class Plugin extends BasePlugin {
       }
 
       const data = this.listToData(window, <HTMLUListElement>child[0]);
-      const elClass = box.attr("data-item-class");
-      const elStyle = box.attr("data-item-style");
-      const elClick = box.attr("data-item-click");
-      const elHref = typeof box.attr("data-item-href") == "string";
+      const item = {
+        class: box.attr("data-item-class"),
+        style: box.attr("data-item-style"),
+        click: box.attr("data-item-click"),
+        href: typeof box.attr("data-item-href") == "string",
+      };
 
       const wrapClick = (fnBody, items, index) => {
         const a = JSON.stringify(items[index]);
@@ -133,30 +163,33 @@ export default class Plugin extends BasePlugin {
       };
 
       const getHref = (href) => {
-        if(href.startsWith("<a")) href = $(href).prop("href")
+        if (href.startsWith("<a")) href = $(href).prop("href");
         return href;
       };
 
-      if (elClass || elStyle || elClick || elHref)
-        child.children().each(function (index) {
+      child.children().each(function (index) {
+        const li = $(this);
+
+        // remove key value list item
+        li.find("ul li").map(function () {
           const li = $(this);
-
-          // remove key value list item
-          li.find("ul li").map(function () {
-            const li = $(this)
-            if (li.attr("is-kv")) li.remove();
-          });
-
-          elClass && li.addClass(elClass);
-          elStyle && li.prop("style", elStyle);
-          elClick && li.attr("onclick", wrapClick(elClick, data, index));
-          if (elHref) {
-            const html = li.html()
-            const href = getHref(data[index]?.href || "")
-            const a = $("<a>", { href }).append(html);
-            li.html(a.prop("outerHTML"));
-          }
+          if (li.attr("is-kv")) li.remove();
         });
+
+        // pass item props
+        (settings.item?.class || item.class) &&
+          li.addClass(`${settings.item?.class || ""} ${item.class || ""}`);
+        (settings.item?.style || item.style) &&
+          li.attr("style", utils.s.join(settings.item?.style, item.style));
+        item.click && li.attr("onclick", wrapClick(item.click, data, index));
+
+        if (item.href) {
+          const html = li.html();
+          const href = getHref(data[index]?.href || "");
+          const a = $("<a>", { href }).append(html);
+          li.html(a.prop("outerHTML"));
+        }
+      });
 
       passProps(box, child);
       box = child;
@@ -169,8 +202,24 @@ export default class Plugin extends BasePlugin {
   };
 
   section = (box: JQuery) => {
+    const { app, utils } = this;
+    const settings = app.cfg("sections") || {};
+
     const section = $("<section />");
     const wrapper = $('<div class="wrapper">');
+
+    if (
+      (settings.class && box.hasClass("text-start")) ||
+      box.hasClass("text-end")
+    )
+      settings.class = settings.class.replace("text-center", "");
+
+    settings.class && section.addClass(settings.class);
+    settings.style &&
+      section.attr(
+        "style",
+        utils.s.join(settings.style, section.attr("style"))
+      );
     this.passProps(box, section);
 
     const bg = box.attr("data-bg");

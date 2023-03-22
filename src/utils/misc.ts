@@ -27,3 +27,8 @@ export const truncateBetweenPattern = (
         )
         .join("");
 };
+
+
+export const timeout = async (to=1000) => new Promise(solve => {
+  setTimeout(solve, to)
+})

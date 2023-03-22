@@ -127,33 +127,33 @@ h6 {
 }
 
 h1 {
-  --font-size: 1.8rem;
+  --font-size: var(--h1-font-size, 1.8rem);
   --typography-spacing-vertical: 2rem;
 }
 h2 {
-  --font-size: 1.4rem;
+  --font-size: var(--h2-font-size, 1.4rem);
   --color: hsl(var(--color-hs) calc(var(--color-lig) + 10%));
   --muted-border-color: hsl(var(--color-hs) calc(var(--color-lig) + 10%) / 0.1);
 }
 
 h3 {
-  --font-size: 1.1rem;
+  --font-size: var(--h3-font-size, 1.1rem);
   --color: hsl(var(--color-hs) calc(var(--color-lig) + 12%));
   --muted-border-color: hsl(var(--color-hs) calc(var(--color-lig) + 12%) / 0.1);
 }
 
 h4 {
-  --font-size: 1rem;
+  --font-size: var(--h4-font-size, 1rem);
   --color: hsl(var(--color-hs) calc(var(--color-lig) + 14%));
   --muted-border-color: hsl(var(--color-hs) calc(var(--color-lig) + 14%) / 0.1);
 }
 h5 {
-  --font-size: 0.9rem;
+  --font-size: var(--h5-font-size, 0.9rem);
   --color: hsl(var(--color-hs) calc(var(--color-lig) + 16%));
   --muted-border-color: hsl(var(--color-hs) calc(var(--color-lig) + 16%) / 0.1);
 }
 h6 {
-  --font-size: 0.8rem;
+  --font-size: var(--h6-font-size, 0.8rem);
   --color: hsl(var(--color-hs) calc(var(--color-lig) + 18%));
   --muted-border-color: hsl(var(--color-hs) calc(var(--color-lig) + 18%) / 0.1);
 }
@@ -280,9 +280,8 @@ kbd {
   // display: inline-block;
   padding: 0.2rem 0.3rem;
   font-size: 0.8rem;
-  --code-color: var(--bg);
   --code-background-color: var(--primary);
-  color: var(--code-color);
+  color: var(--code-kbd-color);
 }
 
 pre code {
@@ -841,22 +840,25 @@ section {
   &.lg {
     --padding-block: 10rem;
   }
+  &.md {
+    --padding-block: 5rem;
+  }
   /* backgrounds */
 
-  &.gradient-bg, &.primary-bg, &.secondary-bg {
-    &::before {
-      background-color: var(--section-bg, var(--background-color));
-    }
-  }
-
+  
   &.gradient-bg {
-    --background-color: linear-gradient(to bottom, var(--c1), var(--c2));
+    --section-bg: var(--gradient);
   }
   &.primary-bg {
-    --background-color: var(--primary);
+    --section-bg: var(--primary);
   }
   &.secondary-bg {
-    --background-color: var(--secondary);
+    --section-bg: var(--secondary);
+  }
+  &.gradient-bg, &.primary-bg, &.secondary-bg {
+    &::before {
+      background-color: var(--section-bg);
+    }
   }
 
   /* effect */
@@ -937,13 +939,6 @@ section {
   }
 }
 
-.gradient::before,
-.gradient.bottom::before {
-  background: linear-gradient(to bottom, var(--c1), var(--c2));
-}
-.gradient.left::before {
-  background: linear-gradient(to left, var(--c1), var(--c2));
-}
 
 .layout-fluid {
   #header,
