@@ -10,7 +10,7 @@ export default class Plugin extends BasePlugin {
     const { base } = ui;
 
     const name = app.cfg("header.name");
-    const logo = app.cfg("header.logo") || app.cfg("site.logo");
+    const logo = app.cfg("header.logo") || app.cfg("site.logo") || "";
     const settings = app.cfg("header") || {}
     const layout = app.cfg("layout") || {}
     const containerClass = layout.fluid || options.fluid ? "container-fluid" : "container";
