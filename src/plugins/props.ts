@@ -55,16 +55,19 @@ export default class Plugin extends BasePlugin {
         let prop = hasColon ? match.slice(1, -1) : match.slice(1);
         let rest = "";
 
+        // handle parenthesis
         if (prop.endsWith("(")) {
+          // ex: ~colors.join(", ")
           if (prop.includes(".")) {
             const a = prop.split(".");
             const method = a[a.length - 1];
             a.pop();
             prop = a.join(".");
             rest = `.${method}`;
+          // ex: ~pricefn(2, 10)
           } else {
-            // TODO check this condition
-            prop = prop.slice(-1)
+            prop = prop.slice(0, -1);
+            rest = `(`;
           }
         }
 
@@ -92,7 +95,6 @@ export default class Plugin extends BasePlugin {
       try {
         const code = $(this).html();
         const { fn, props, sugar } = deSugar(code);
-
 
         props.map((prop) => {
           $ee.on(`props:${prop}`, () => {
