@@ -2,11 +2,18 @@ import { text } from "stream/consumers";
 import BasePlugin from "../class/basePlugin";
 
 export default class Plugin extends BasePlugin {
+  cache: ObjectAny = {};
+
   constructor(id: string, options: ObjectAny = {}) {
     super(id, options);
+    this.deps = [
+      "https://unpkg.com/slim-select@latest/dist/slimselect.min.js",
+      "https://unpkg.com/slim-select@latest/dist/slimselect.css",
+    ];
   }
 
   types = [
+    "select",
     "switch",
     "hero-title",
     "div",
@@ -25,16 +32,21 @@ export default class Plugin extends BasePlugin {
       this.types.map((type) => {
         $dom.body.find(`[data-${type}]:not([data-rendered])`).each(function () {
           const start = $(this);
-          const nodes = self.getNodes(start);
           let box = $("<div />");
 
-          // @ts-ignore
-          self.passProps(start, box);
+          if (["SELECT", "INPUT"].includes(start[0].tagName)) {
+            box = start;
+          } else {
+            const nodes = self.getNodes(start);
 
-          nodes.map((el) => {
-            box.append(el.clone());
-            !dry && el.remove();
-          });
+            // @ts-ignore
+            self.passProps(start, box);
+
+            nodes.map((el) => {
+              box.append(el.clone());
+              !dry && el.remove();
+            });
+          }
 
           // @ts-ignore
           const tranformer = self[type.replaceAll("-", "_")];
@@ -89,15 +101,15 @@ export default class Plugin extends BasePlugin {
     let level = 0;
     let i = 0;
 
-    while (next && i < 1000) {
+    while (next && i < 5) {
       i++;
       current = current.next();
       const isStartTag = this.isStartTag(current);
       if (isStartTag) level++;
 
       const isEndTag = this.isEndTag(current);
-      const isFinalTag = isEndTag && !level;
       if (level && isEndTag) level--;
+      const isFinalTag = isEndTag && !level;
 
       if (isFinalTag) {
         next = 0;
@@ -108,6 +120,23 @@ export default class Plugin extends BasePlugin {
     }
 
     return nodes;
+  };
+
+  getNode = (el: JQuery) => {
+    if (el.children().length > 1) return false;
+    const dataTags = ["SELECT", "UL"];
+    if (dataTags.includes(el[0].tagName)) return el;
+
+    let node = el.children().first();
+    if (!node[0]) return false;
+
+    if (!dataTags.includes(node[0].tagName)) {
+      node = node.children().first();
+      if (!node[0]) return false;
+      return dataTags.includes(node[0].tagName) ? node : false;
+    } else {
+      return node;
+    }
   };
 
   // basic = (tx: any, target: any) => {
@@ -126,9 +155,7 @@ export default class Plugin extends BasePlugin {
   card = (box: JQuery, className = "") => {
     const { app, passProps, utils } = this;
     const settings = app.cfg("cards") || {};
-
-    const children = box.children();
-    const onlyChild = children.length == 1;
+    const node = this.getNode(box);
 
     box.addClass("cards");
     settings.class && box.addClass(settings.class);
@@ -137,16 +164,10 @@ export default class Plugin extends BasePlugin {
     className && box.addClass(className);
 
     const bg = box.attr("data-bg");
-    bg && box[0].style.setProperty("--cards-bg", bg);
+    bg && box[0].style.setProperty("--card-background-color", bg);
 
-    if (onlyChild) {
-      let child = children.first();
-      if (child[0]?.tagName != "UL") {
-        child = child.children().first();
-        if (child[0]?.tagName != "UL") return box;
-      }
-
-      const data = this.listToData(window, <HTMLUListElement>child[0]);
+    if (node) {
+      const data = this.listToData(window, node);
       const item = {
         class: box.attr("data-item-class"),
         style: box.attr("data-item-style"),
@@ -162,7 +183,7 @@ export default class Plugin extends BasePlugin {
         return fn;
       };
 
-      child.children().each(function (index) {
+      node.children().each(function (index) {
         const li = $(this);
 
         // remove key value list item
@@ -180,15 +201,16 @@ export default class Plugin extends BasePlugin {
 
         if (item.href) {
           const html = li.html();
-          const href = data[index].href
+          const href = data[index].href;
           const a = $("<a>", { href }).append(html);
           li.html(a.prop("outerHTML"));
         }
       });
 
-      passProps(box, child);
-      box = child;
+      passProps(box, node);
+      box = node;
     }
+    
     return box;
   };
 
@@ -226,9 +248,10 @@ export default class Plugin extends BasePlugin {
   };
 
   hero_title = (box: JQuery) => {
-    const child = box.children().first();
-    if (child[0].tagName != "UL") return box;
-    const data = this.listToData(window, <HTMLUListElement>child[0]);
+    const node = this.getNode(box);
+    if (!node) return box;
+
+    const data = this.listToData(window, node);
     const title = data.getValue("title");
     const label = data.getValue("label");
     return $(
@@ -239,12 +262,27 @@ export default class Plugin extends BasePlugin {
     );
   };
 
+  select = (box: JQuery) => {
+    const node = this.getNode(box);
+    if (!node) return box;
+
+    const { $, $utils } = window;
+    const id = $utils.c.shortId();
+    const data = this.listToData(window, node);
+    this.cache[id] = {
+      id,
+      data,
+    };
+
+    const el = $(`<select id="${id}"></select>`);
+    this.passProps(box, el);
+
+    return el;
+  };
+
   switch = (box: JQuery) => {
-    let child = box.children().first();
-    if (child[0].tagName != "UL") {
-      child = child.children().first();
-      if (child[0].tagName != "UL") return box;
-    }
+    const node = this.getNode(box);
+    if (!node) return box;
 
     const { $, $props, $utils, $ee } = window;
 
@@ -252,7 +290,7 @@ export default class Plugin extends BasePlugin {
     const binding = $props.deSugar(db);
     const initialValue = (binding.fn && binding.fn()) || "";
     const id = $utils.c.shortId();
-    const data = this.listToData(window, <HTMLUListElement>child[0]);
+    const data = this.listToData(window, node);
 
     let str = ``;
     // @ts-ignore
@@ -281,10 +319,12 @@ export default class Plugin extends BasePlugin {
     return el;
   };
 
-  listToData = (win: Window, rootUl: HTMLUListElement | null) => {
+  listToData = (win: Window, root: JQuery | null) => {
     const { $ } = win;
-    if (!rootUl) return [];
+    if (!root) return [];
     const array = [] as any;
+    const tag = root[0].tagName;
+    const subTag = tag == "SELECT" ? "option" : "li";
 
     const parseItem = (el: Element) => {
       let key =
@@ -310,14 +350,17 @@ export default class Plugin extends BasePlugin {
           const html = $(this).html();
           if (isKV(html)) {
             const [key, ...values] = html.split(":");
-            item[key] = values.join("").trim();
+            let value = values.join("").trim();
+            if (value == "true") value = true;
+            if (value == "false") value = false;
 
-            // if special key href and link tag present, parse & return href only
-            if (key == "href" && item[key].startsWith("<a"))
-              item[key] = $(item[key])
+            // if special key "href" & link tag present, parse & return href only
+            if (key == "href" && value.startsWith("<a"))
+              value = $(value)
                 .prop("href")
                 .replace(window.location.origin + "/", "");
 
+            item[key] = value;
             $(this).attr("is-kv", true);
             // item._tokens.push(item[key]);
           } else {
@@ -328,7 +371,7 @@ export default class Plugin extends BasePlugin {
       return item;
     };
 
-    for (const el of $(rootUl).find("> li")) {
+    for (const el of root.find(`> ${subTag}`)) {
       array.push(parseItem(el));
     }
 
@@ -338,8 +381,155 @@ export default class Plugin extends BasePlugin {
     return array;
   };
 
+  bind = async () => {
+    const { $, $props, $utils, $ee, SlimSelect } = window;
+    const self = this;
+
+    $("select[data-select]").each(function () {
+      const select = $(this);
+      const cache = self.cache[select.attr("id")] || false;
+      if (!cache) return;
+
+      const db = select.attr("data-bind");
+      const binding = $props.deSugar(db);
+      const initialValues = (binding.fn && binding.fn()) || "";
+
+      const placeholder = select.attr("placeholder") || " ";
+      const multi =
+        typeof select.attr("data-multi") == "string" ||
+        typeof select.attr("data-multiple") == "string" ||
+        typeof select.attr("multiple") == "string";
+
+      if (multi) {
+        select.attr("multiple", true);
+      }
+
+      // all select options available here https://slimselectjs.com/data#types
+      const toSelect = (data: ObjectAny[] = []) =>
+        data.reduce((acc, item) => {
+          item.value = item.value || item.key;
+          item.text = item.text || item.key;
+          if (initialValues.includes(item.value)) item.selected = true;
+          acc.push(item);
+          return acc;
+        }, []);
+
+      const slimSelect = new SlimSelect({
+        select: this,
+        data: [
+          { placeholder: true, text: placeholder },
+          ...toSelect(cache.data),
+        ],
+        events: {
+          afterChange: (items: string[]) => {
+            binding.sugar &&
+              $utils.o.put(
+                window,
+                binding.sugar,
+                // @ts-ignore
+                items.map((item) => item.value)
+              );
+          },
+        },
+        settings: {
+          placeholderText: placeholder,
+          // showSearch: false,
+          // searchText: 'Sorry nothing to see here',
+          // searchPlaceholder: 'Search for the good stuff!',
+          // searchHighlight: true
+        },
+      });
+
+      // update component on external change
+      binding.props.map((prop: string) => {
+        // @ts-ignore
+        $ee.on(`props:${prop}`, ({ value: v, old: o }) => {
+          const value = (v.join && v.join("")) || v;
+          const old = (o.join && o.join("")) || o;
+          if (value != old && value != placeholder) slimSelect.setSelected(v);
+        });
+      });
+    });
+  };
+
   style = async () => {
     return `
+
+    /* SELECT */
+
+    .ss-main {
+      --ss-font-placeholder-color: var(--form-element-placeholder-color);
+      height: var(--input-height);
+      font-size: var(--input-fs);
+      --background-color: var(--form-element-background-color);
+      --border-color: var(--form-element-border-color);
+      --color: var(--form-element-color);
+      --box-shadow: none;
+      border: var(--border-width) solid var(--border-color);
+      border-radius: var(--border-radius);
+      outline: 0;
+      background-color: var(--background-color);
+      box-shadow: none;
+      color: var(--color);
+      font-weight: var(--font-weight);
+      margin-bottom: var(--spacing);
+  
+      &:focus {
+        box-shadow: none;
+        --border-color: var(--form-element-active-border-color);
+      }
+  
+      .ss-arrow {
+        margin-right: 15px;
+        path {
+          fill: none;
+          stroke: var(--primary);
+          stroke-width: 14px;
+        }
+      }
+  
+    }
+  
+    .ss-content {
+      --ss-primary-color: var(--primary);
+      --ss-border-color: var(--form-element-border-color);
+      --ss-bg-color: var(--form-element-background-color);
+      
+      .ss-search {
+        font-size: var(--input-fs);
+        input {
+          color: --ss-font-placeholder-color
+        }
+      }
+      .ss-search input:focus {
+        box-shadow: none;
+      }
+      .ss-list {
+        .ss-option {
+          --ss-font-color: var(--color);
+          font-size: var(--input-fs);
+          padding: 10px var(--spacing);
+  
+          &:hover {
+            color: var(--bg);
+            background-color: var(--primary);
+          }
+        }
+        .ss-option.ss-highlighted, .ss-option:not(.ss-disabled).ss-selected {
+          color: var(--ss-bg-color);
+          background-color: var(--ss-primary-color);
+        }
+      }
+    }
+
+    .ss-value {
+      --ss-primary-color: var(--primary);
+      --ss-border-radius: var(--border-radius);
+    }
+
+
+    /* SWITCH */
+
     .switch {
         display: flex;
         justify-content: start;

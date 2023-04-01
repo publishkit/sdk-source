@@ -311,6 +311,12 @@ pre code {
   --muted-border-color: hsl(0 0% 100% / 0.3);
 }
 
+/* align chevron same as select input */
+details[role=list] summary::after, li[role=list]>a::after {
+  margin-right: 6px;
+  margin-top: 5px;
+}
+
 /* UI BLOCKS */
 
 #header ~ main {

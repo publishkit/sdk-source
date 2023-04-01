@@ -10,7 +10,7 @@ export default class Plugin extends BasePlugin {
 
     window.$ee.on(`post:transforms`, () => {
       // remove empty paragraph
-      window.$dom.body.find("p:empty").remove()
+      // window.$dom.body.find("p:empty").remove();
     });
   }
 
@@ -22,11 +22,10 @@ export default class Plugin extends BasePlugin {
       .unwrapOnlyChild("h1,h2,h3,h4,h5,h6")
       // onclick is not rendered in html in obsidian, so we use custom binding name instead.
       .renameProp("data-click", "onclick")
-      .renameProp("data-onclick", "onclick")
+      .renameProp("data-onclick", "onclick");
 
-    
-    const layout = $app.cfg("layout") || {}
-    if(layout.fluid) $("body").addClass("layout-fluid")
+    const layout = $app.cfg("layout") || {};
+    if (layout.fluid) $("body").addClass("layout-fluid");
 
     return $dom;
   };
@@ -61,6 +60,8 @@ export default class Plugin extends BasePlugin {
     $(".callout-title:has(.callout-fold)").on("click", function () {
       $(this).next().toggle();
     });
-    
+
+
   };
+
 }

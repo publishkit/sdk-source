@@ -112,6 +112,8 @@ export default class Plugins {
 
     if(base){
       for (const key of params.keys()) {
+        // must be 2 chars long minimum to be considered as a url plugin key
+        if(key.length < 2) continue;
         const value = params.get(key);
         if (key != urlKey) values.push(`${key}|${value}`);
       }
@@ -322,7 +324,7 @@ export default class Plugins {
       const p = cache[id];
       this.log(
         id,
-        `💥 ${p.base?.type || "register:fail"} - ${id}.${sequence}() - err:`,
+        `💥 ${p?.base?.type || "register:fail"} - ${id}.${sequence}() - err:`,
         err.message || err
       );
     });

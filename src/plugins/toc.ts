@@ -29,7 +29,7 @@ export default class Plugin extends BasePlugin {
   transform = async () => {
     const { $dom, $utils } = window;
     const headings = $dom.body.find(
-      "h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess)"
+      "h1:not(.noprocess), h2:not(.noprocess), h3:not(.noprocess), h4:not(.noprocess), h5:not(.noprocess), h6:not(.noprocess)"
     );
 
     if (headings.length <= 1) return;
@@ -136,10 +136,10 @@ export default class Plugin extends BasePlugin {
         margin: 0;
         border-left: 2px solid var(--muted-border-color);
         a {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           color: var(--secondary);
           display: block;
-          padding: 0.3rem 0;
+          padding: calc(var(--spacing) / 2) 0;
           text-decoration: none;
           margin-left: 10px;
           &:focus {

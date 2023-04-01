@@ -49,12 +49,29 @@ export default class Plugin extends BasePlugin {
     const props: string[] = [];
     const sugar = str
       .replace(/^return /, "")
-      .replace(/~([a-z_.]+[:]?)/gi, function (match) {
-        const colon = match[match.length - 1] == ":" ? "." : "";
-        const prop = colon ? match.slice(1, -1) : match.slice(1);
+      .replace(/~([a-z_.]+[\(:]?)/gi, function (match) {
+        const hasColon = match[match.length - 1] == ":" ? "." : "";
+        // we slice 1 to remove the ~, and remove the : if present
+        let prop = hasColon ? match.slice(1, -1) : match.slice(1);
+        let rest = "";
+
+        if (prop.endsWith("(")) {
+          if (prop.includes(".")) {
+            const a = prop.split(".");
+            const method = a[a.length - 1];
+            a.pop();
+            prop = a.join(".");
+            rest = `.${method}`;
+          } else {
+            // TODO check this condition
+            prop = prop.slice(-1)
+          }
+        }
+
         props.push(prop);
-        return `$props.options.${prop}`;
+        return `$props.options.${prop}${rest}`;
       });
+
     const fn = new Function(`return ${sugar}`);
     return { fn, sugar, props };
   };
@@ -74,7 +91,8 @@ export default class Plugin extends BasePlugin {
     bindings.each(function () {
       try {
         const code = $(this).html();
-        const { fn, props } = deSugar(code);
+        const { fn, props, sugar } = deSugar(code);
+
 
         props.map((prop) => {
           $ee.on(`props:${prop}`, () => {

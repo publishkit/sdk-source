@@ -8,6 +8,7 @@ import css from "./css";
 import hotkeys from "./hotkeys";
 import modal from "./modal";
 import search from "./search";
+import tags from "./tags";
 import darkmode from "./darkmode";
 import navbar from "./navbar";
 import toc from "./toc";
@@ -31,6 +32,7 @@ const plugins: ObjectAny = {
   header,
   modal,
   search,
+  tags,
   darkmode,
   navbar,
   toc,
