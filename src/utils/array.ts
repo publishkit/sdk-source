@@ -3,13 +3,32 @@ export const asArray = (
   { delim = ",", trim = true, uniq = true, compact = true } = {}
 ): string[] => {
   if (!input) return [];
-  let output = typeof input == "string" ? input.split(input.includes(delim) ? delim : " ") : input || [];
+  let output =
+    typeof input == "string"
+      ? input.split(input.includes(delim) ? delim : " ")
+      : input || [];
 
   if (trim) output = output.map((v) => v?.trim?.() || v);
   if (compact) output = output.filter(Boolean);
   if (uniq) output = [...new Set(output)];
 
   return output;
+};
+
+export const intersectStrings = (arr1 = [], arr2 = []) => {
+  const res: any = [];
+  const { length: len1 } = arr1;
+  const { length: len2 } = arr2;
+  const smaller = (len1 < len2 ? arr1 : arr2).slice();
+  const bigger = (len1 >= len2 ? arr1 : arr2).slice();
+  for (let i = 0; i < smaller.length; i++) {
+    if (bigger.indexOf(smaller[i]) !== -1) {
+      res.push(smaller[i]);
+      // @ts-ignore
+      bigger.splice(bigger.indexOf(smaller[i]), 1, undefined);
+    }
+  }
+  return res;
 };
 
 export const map = async (arr: any[], fn: Function) => {

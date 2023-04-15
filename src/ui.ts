@@ -19,8 +19,9 @@ export default class UI {
 
   set = (key: string, value: any): any => put(this.cache, key, value);
 
-  get = (id: string): UITypes => {
+  get = (id: string): UITypes|boolean => {
     const element = get(this.cache.els, id) || get(this.cache, id);
+    if(!element) return false
     element.el = $(`[id="${id}"]`);
     return element;
   };

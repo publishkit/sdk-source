@@ -64,7 +64,7 @@ export default class Plugin extends BasePlugin {
             a.pop();
             prop = a.join(".");
             rest = `.${method}`;
-          // ex: ~pricefn(2, 10)
+            // ex: ~pricefn(2, 10)
           } else {
             prop = prop.slice(0, -1);
             rest = `(`;
@@ -145,36 +145,6 @@ export default class Plugin extends BasePlugin {
       const condition = fn();
       if (condition) el.removeClass("d-none");
       else el.addClass("d-none");
-    });
-
-    // input text data-bind
-    $("input[data-bind]").each(function () {
-      try {
-        const el = $(this);
-        const debounce = parseInt(el.attr("data-debounce") || 10);
-        const bindVariable = el.attr("data-bind");
-        const { fn, props } = deSugar(bindVariable);
-
-        el.on(
-          "input",
-          $.debounce(debounce, () => {
-            $props.set(props[0], el.val());
-          })
-        );
-
-        props.map((prop) => {
-          $ee.on(`props:${prop}`, ({ value, old }) => {
-            if (value == old) return;
-            el.val(value);
-          });
-        });
-
-        // @ts-ignore
-        const value = fn();
-        el.val(value);
-      } catch (e) {
-        console.log("errrr", e);
-      }
     });
   };
 }

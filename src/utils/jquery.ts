@@ -51,3 +51,7 @@ $.debounce = function (delay, at_begin, callback) {
     ? $.throttle(delay, at_begin, false)
     : $.throttle(delay, callback, at_begin !== false);
 };
+
+$.fn.hasAttr = function (name) {
+  return this.attr(name) !== undefined;
+};

@@ -142,3 +142,8 @@ export const hexToHsl = (hex: string) => {
   const data = { h, l, s, hex };
   return data;
 };
+
+export const encodeToHtml = (str = "") =>
+  str.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+    return "&#" + i.charCodeAt(0) + ";";
+  });

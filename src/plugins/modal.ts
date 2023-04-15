@@ -13,7 +13,7 @@ export default class Plugin extends BasePlugin {
   };
 
   open = (id: string, options?: Function | ObjectAny, cb?: Function) => {
-    const { $ui } = window 
+    const { $ui } = window;
 
     if (typeof options == "function") {
       cb = options;
@@ -46,13 +46,16 @@ export default class Plugin extends BasePlugin {
       modal.prop("open", true);
       self.modal = modal;
 
+      // auto focus input if found
+      $(modal).find("input,select ~ div").first().trigger("focus");
+
       // inject UIModal to callback
       cb && cb($ui.get(id));
     }, 10);
 
     // https://stackoverflow.com/a/7056673/1428445
     // we return false so we can use <a href="#" onclick="return $modal.open('')" /> to prevent default click handler
-    return false
+    return false;
   };
 
   close = (cb?: Function) => {
@@ -136,5 +139,5 @@ export default class Plugin extends BasePlugin {
         align-items: flex-start;
       }
     }
-  `
+  `;
 }

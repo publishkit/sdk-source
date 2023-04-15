@@ -11,6 +11,7 @@ const requiredPlugins = [
   "props",
   "widgets",
   "actions",
+  "tags",
   "css",
 ];
 const lastPlugins = ["header", "theme"];
@@ -270,7 +271,7 @@ export default class Plugins {
       } catch (e) {
         this.active.splice(this.active.indexOf(id), 1);
         this.failed.push([id, sequence, e]);
-        this.log(id, `💥 ${id} - err:`, e.message);
+        this.log(id, `💥 ${id} - err:`, e);
       }
     };
 

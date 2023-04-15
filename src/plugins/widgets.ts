@@ -1,5 +1,6 @@
 import { text } from "stream/consumers";
 import BasePlugin from "../class/basePlugin";
+import utils from "src/utils";
 
 export default class Plugin extends BasePlugin {
   cache: ObjectAny = {};
@@ -31,28 +32,27 @@ export default class Plugin extends BasePlugin {
     const renderWidgets = () => {
       this.types.map((type) => {
         $dom.body.find(`[data-${type}]:not([data-rendered])`).each(function () {
-          const start = $(this);
-          let box = $("<div />");
+          const tag = $(this);
+          const rawTag = self.isRawTag(tag);
+          let widget = rawTag ? tag : $("<div />");
 
-          if (["SELECT", "INPUT"].includes(start[0].tagName)) {
-            box = start;
-          } else {
-            const nodes = self.getNodes(start);
+          if (!rawTag) {
+            const nodes = self.getNodes(tag);
 
             // @ts-ignore
-            self.passProps(start, box);
+            self.passProps(tag, widget);
 
             nodes.map((el) => {
-              box.append(el.clone());
+              widget.append(el.clone());
               !dry && el.remove();
             });
           }
 
           // @ts-ignore
           const tranformer = self[type.replaceAll("-", "_")];
-          if (tranformer) box = tranformer(box) || box;
+          if (tranformer) widget = tranformer(widget) || widget;
 
-          !dry && start.replaceWith(box);
+          !dry && tag.replaceWith(widget);
         });
       });
     };
@@ -63,28 +63,13 @@ export default class Plugin extends BasePlugin {
 
     return $dom;
   };
-
-  passProps = (source: JQuery, target: JQuery) => {
-    const { utils } = this;
-    target.attr("data-rendered", "true");
-
-    $.each(source.prop("attributes"), function () {
-      if (["class", "style"].includes(this.name)) return;
-      target.attr(this.name, this.value);
-    });
-
-    // @ts-ignore
-    source.attr("class") && target.addClass(source.attr("class"));
-    source.attr("style") &&
-      target.attr(
-        "style",
-        utils.s.join(source.attr("style"), target.attr("style"))
-      );
+  isRawTag = (el: JQuery) => {
+    const dataTags = ["SELECT", "UL"];
+    return dataTags.includes(el[0].tagName) && el;
   };
 
   isStartTag = (el: JQuery) => {
-    for (const type of this.types)
-      if (typeof el.attr(`data-${type}`) == "string") return true;
+    for (const type of this.types) if (el.hasAttr(`data-${type}`)) return true;
     return false;
   };
 
@@ -122,30 +107,44 @@ export default class Plugin extends BasePlugin {
     return nodes;
   };
 
-  getNode = (el: JQuery) => {
+  findDataNode = (el: JQuery) => {
+    if (this.isRawTag(el)) return el;
+
     if (el.children().length > 1) return false;
-    const dataTags = ["SELECT", "UL"];
-    if (dataTags.includes(el[0].tagName)) return el;
 
     let node = el.children().first();
     if (!node[0]) return false;
 
-    if (!dataTags.includes(node[0].tagName)) {
+    if (!this.isRawTag(node)) {
       node = node.children().first();
       if (!node[0]) return false;
-      return dataTags.includes(node[0].tagName) ? node : false;
+      return this.isRawTag(node) ? node : false;
     } else {
       return node;
     }
   };
 
-  // basic = (tx: any, target: any) => {
-  //   const onlyChild = target.find("> ul:only-child");
-  //   if (onlyChild.length) target = onlyChild;
-  //   tx.attr("class") && target.addClass(tx.attr("class"));
-  //   tx.attr("style") && target.prop("style", tx.attr("style"));
-  //   tx.remove();
-  // };
+  passProps = (source: JQuery, target: JQuery) => {
+    const { utils } = this;
+    target.attr("data-rendered", "true");
+
+    $.each(source.prop("attributes"), function () {
+      if (["class", "style"].includes(this.name)) return;
+      target.attr(this.name, this.value);
+    });
+
+    // @ts-ignore
+    source.attr("class") && target.addClass(source.attr("class"));
+    source.attr("style") &&
+      target.attr(
+        "style",
+        utils.s.join(source.attr("style"), target.attr("style"))
+      );
+  };
+
+  //*  -------   *//
+  //*  WIDGETS   *//
+  //*  -------   *//
 
   wrapper = (box: JQuery) => {
     box.addClass("wrapper py-5");
@@ -155,7 +154,7 @@ export default class Plugin extends BasePlugin {
   card = (box: JQuery, className = "") => {
     const { app, passProps, utils } = this;
     const settings = app.cfg("cards") || {};
-    const node = this.getNode(box);
+    const node = this.findDataNode(box);
 
     box.addClass("cards");
     settings.class && box.addClass(settings.class);
@@ -210,7 +209,7 @@ export default class Plugin extends BasePlugin {
       passProps(box, node);
       box = node;
     }
-    
+
     return box;
   };
 
@@ -248,7 +247,7 @@ export default class Plugin extends BasePlugin {
   };
 
   hero_title = (box: JQuery) => {
-    const node = this.getNode(box);
+    const node = this.findDataNode(box);
     if (!node) return box;
 
     const data = this.listToData(window, node);
@@ -263,7 +262,7 @@ export default class Plugin extends BasePlugin {
   };
 
   select = (box: JQuery) => {
-    const node = this.getNode(box);
+    const node = this.findDataNode(box);
     if (!node) return box;
 
     const { $, $utils } = window;
@@ -274,14 +273,13 @@ export default class Plugin extends BasePlugin {
       data,
     };
 
-    const el = $(`<select id="${id}"></select>`);
-    this.passProps(box, el);
-
-    return el;
+    const select = $(`<select id="${id}"></select>`);
+    this.passProps(box, select);
+    return select;
   };
 
   switch = (box: JQuery) => {
-    const node = this.getNode(box);
+    const node = this.findDataNode(box);
     if (!node) return box;
 
     const { $, $props, $utils, $ee } = window;
@@ -319,60 +317,68 @@ export default class Plugin extends BasePlugin {
     return el;
   };
 
+  parseLI = (el: Element) => {
+    let key =
+      $(el).find("label")[0]?.innerHTML ||
+      $(el).clone().children().remove().end().text().trim();
+
+    const isKV = (k: string) => /^[a-zA-Z]+:/gi.test(k); // keyvalue mode
+
+    const item: ObjectAny = { _tokens: [] };
+    item.key = isKV(key) ? key.split(":")[0] : key;
+    item._active = !$(el).find('[type="checkbox"][checked=""]')[0];
+    item.onclick = $(el).attr("onclick") || "";
+
+    if (isKV(key)) {
+      const [k, ...rest] = key.split(":");
+      item.value =
+        rest.join(":").trim() || $(el).html().replace(`${item.key}:`, "");
+    }
+
+    $(el)
+      .find("ul li")
+      .map(function () {
+        const html = $(this).html();
+        if (isKV(html)) {
+          const [key, ...values] = html.split(":");
+          let value = values.join("").trim();
+          if (value == "true") value = true;
+          if (value == "false") value = false;
+
+          // if special key "href" & link tag present, parse & return href only
+          if (key == "href" && value.startsWith("<a"))
+            value = $(value)
+              .prop("href")
+              .replace(window.location.origin + "/", "");
+
+          item[key] = value;
+          $(this).attr("is-kv", true);
+          // item._tokens.push(item[key]);
+        } else {
+          item._tokens.push(html);
+        }
+      });
+
+    return item;
+  };
+
+  parseOPTION = (el: Element) => {
+    const item: ObjectAny = { _tokens: [] };
+    item.key = $(el).val() || "";
+    item.onclick = $(el).attr("onclick") || "";
+    item.selected = !!$(el).attr("selected") || false;
+    return item;
+  };
+
   listToData = (win: Window, root: JQuery | null) => {
     const { $ } = win;
     if (!root) return [];
     const array = [] as any;
-    const tag = root[0].tagName;
-    const subTag = tag == "SELECT" ? "option" : "li";
-
-    const parseItem = (el: Element) => {
-      let key =
-        $(el).find("label")[0]?.innerHTML ||
-        $(el).clone().children().remove().end().text().trim();
-
-      const isKV = (k: string) => /^[a-zA-Z]+:/gi.test(k); // keyvalue mode
-
-      const item: ObjectAny = { _tokens: [] };
-      item.key = isKV(key) ? key.split(":")[0] : key;
-      item._active = !$(el).find('[type="checkbox"][checked=""]')[0];
-      item.onclick = $(el).attr("onclick") || "";
-
-      if (isKV(key)) {
-        const [k, ...rest] = key.split(":");
-        item.value =
-          rest.join(":").trim() || $(el).html().replace(`${item.key}:`, "");
-      }
-
-      $(el)
-        .find("ul li")
-        .map(function () {
-          const html = $(this).html();
-          if (isKV(html)) {
-            const [key, ...values] = html.split(":");
-            let value = values.join("").trim();
-            if (value == "true") value = true;
-            if (value == "false") value = false;
-
-            // if special key "href" & link tag present, parse & return href only
-            if (key == "href" && value.startsWith("<a"))
-              value = $(value)
-                .prop("href")
-                .replace(window.location.origin + "/", "");
-
-            item[key] = value;
-            $(this).attr("is-kv", true);
-            // item._tokens.push(item[key]);
-          } else {
-            item._tokens.push(html);
-          }
-        });
-
-      return item;
-    };
+    const subTag = root[0].tagName == "SELECT" ? "option" : "li";
 
     for (const el of root.find(`> ${subTag}`)) {
-      array.push(parseItem(el));
+      // @ts-ignore
+      array.push(this[`parse${subTag.toUpperCase()}`](el));
     }
 
     array.getValue = (key: string) =>
@@ -385,6 +391,37 @@ export default class Plugin extends BasePlugin {
     const { $, $props, $utils, $ee, SlimSelect } = window;
     const self = this;
 
+    // input text
+    $("input[data-bind]").each(function () {
+      try {
+        const el = $(this);
+        const debounce = parseInt(el.attr("data-debounce") || 10);
+        const bindVariable = el.attr("data-bind");
+        const { fn, props } = $props.deSugar(bindVariable);
+
+        el.on(
+          "input",
+          $.debounce(debounce, () => {
+            $props.set(props[0], el.val());
+          })
+        );
+
+        props.map((prop) => {
+          $ee.on(`props:${prop}`, ({ value, old }) => {
+            if (value == old) return;
+            el.val(value);
+          });
+        });
+
+        // @ts-ignore
+        const value = fn();
+        el.val(value);
+      } catch (e) {
+        console.log("errrr", e);
+      }
+    });
+
+    // select & multi select specific
     $("select[data-select]").each(function () {
       const select = $(this);
       const cache = self.cache[select.attr("id")] || false;
@@ -396,9 +433,9 @@ export default class Plugin extends BasePlugin {
 
       const placeholder = select.attr("placeholder") || " ";
       const multi =
-        typeof select.attr("data-multi") == "string" ||
-        typeof select.attr("data-multiple") == "string" ||
-        typeof select.attr("multiple") == "string";
+        select.hasAttr("data-multi") ||
+        select.hasAttr("data-multiple") ||
+        select.hasAttr("multiple");
 
       if (multi) {
         select.attr("multiple", true);
@@ -409,15 +446,18 @@ export default class Plugin extends BasePlugin {
         data.reduce((acc, item) => {
           item.value = item.value || item.key;
           item.text = item.text || item.key;
+          item.selected = item.selected;
           if (initialValues.includes(item.value)) item.selected = true;
           acc.push(item);
           return acc;
         }, []);
+        
 
       const slimSelect = new SlimSelect({
         select: this,
         data: [
           { placeholder: true, text: placeholder },
+          // @ts-ignore
           ...toSelect(cache.data),
         ],
         events: {
@@ -440,6 +480,9 @@ export default class Plugin extends BasePlugin {
         },
       });
 
+
+      self.assignRef(select.attr("data-ref"), slimSelect);
+
       // update component on external change
       binding.props.map((prop: string) => {
         // @ts-ignore
@@ -450,6 +493,10 @@ export default class Plugin extends BasePlugin {
         });
       });
     });
+  };
+
+  assignRef = (varname = "", instance: any) => {
+    varname && this.utils.o.put(window, varname, instance);
   };
 
   style = async () => {
@@ -478,6 +525,29 @@ export default class Plugin extends BasePlugin {
         box-shadow: none;
         --border-color: var(--form-element-active-border-color);
       }
+
+      &.md, &.lg {
+        .ss-placeholder {
+          font-size: 1.4rem;
+        }
+        .ss-value {
+          padding-inline: 0.3rem;
+        }
+      }
+
+      &.md {
+        height: calc(var(--input-height) * 2);
+        .ss-values {
+          padding: var(--spacing);
+        }
+      }
+      &.lg {
+        height: calc(var(--input-height) * 3);
+        .ss-values {
+          padding: calc(var(--spacing) * 2 );
+        }
+      }
+
   
       .ss-arrow {
         margin-right: 15px;
@@ -593,7 +663,7 @@ export default class Plugin extends BasePlugin {
 
       &::before {
         content: '';
-        animation:slide 5s ease-in-out infinite alternate;
+        animation:heroslide 5s ease-in-out infinite alternate;
         background-image: linear-gradient(36deg, var(--contrast) 50%, var(--primary) 50%);
         position: absolute;
         top: 0px;
@@ -634,7 +704,7 @@ export default class Plugin extends BasePlugin {
       }
     }
 
-    @keyframes slide {
+    @keyframes heroslide {
       0% {
         transform:translateX(-50%);
       }

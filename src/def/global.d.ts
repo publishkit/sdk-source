@@ -13,3 +13,7 @@ interface ObjectAny {
 //   on: EEOn;
 //   emit: EEEmit;
 // }
+
+interface jQuery {
+  hasAttr: Function;
+}
