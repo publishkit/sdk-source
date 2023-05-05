@@ -7,7 +7,6 @@ export default class Plugin extends BasePlugin {
 
   init = async () => {
     if (this.app.cfg("navbar") === false) return false;
-    // TODO add json parse inside getdata fn
     const data = (await this.utils.w.getData(`navbar.json`, {
       json: true,
       nocache: true,
@@ -219,15 +218,14 @@ export default class Plugin extends BasePlugin {
           display: grid;
           grid-column-gap: 10px;
           grid-row-gap: 3rem;
-          grid-template-columns: 1fr 1fr 1fr;
+          grid-template-columns: 1fr 1fr;
           justify-content: left;
           align-items: start;
           font-size: 1rem;
           background: var(--bg);
-          border-bottom: 2px solid var(--muted-border-color);
-          border-top: 2px solid var(--muted-border-color);
-          padding: calc(var(--spacing) * 1);
-          height: 100%;
+          border-bottom: 10000px solid var(--muted-border-color);
+          border-top: 4px solid var(--muted-border-color);
+          padding: calc(var(--spacing) * 2);
     
           details {
             margin-bottom: 0;
@@ -242,7 +240,7 @@ export default class Plugin extends BasePlugin {
       [id="navbar.nav"] {
         &.open {
           padding: var(--spacing);
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
         }
 
         i {

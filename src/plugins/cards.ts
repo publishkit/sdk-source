@@ -146,7 +146,7 @@ export default class Plugin extends BasePlugin {
     }
     @media (max-width: 1199px){
         ul.cards:not(.fixed) {
-            grid-template-columns: max-content;
+            grid-template-columns: auto;
             grid-auto-flow: unset;
             justify-content: center;
         }

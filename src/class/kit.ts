@@ -27,6 +27,31 @@ export default class Kit {
     this.help = `visit @ https://publishkit.dev\n\n`;
   }
 
+  ls = (key: string, value?: string) => {
+    if (localStorage == null) return console.log("Local storage not supported!");
+    else {
+      try {
+        let result: string | void | null = "";
+        if (typeof value != "undefined") {
+          localStorage.setItem(key, value);
+          result = value;
+        } else {
+          result =
+            value === null
+              ? localStorage.removeItem(key)
+              : localStorage.getItem(key);
+        }
+        return result ? result.replace(/(\r\n|\n|\r)/gm, "") : result;
+      } catch (err) {
+        const private_browsing_error =
+          "Unable to store local data. Are you using Private Browsing?";
+        console.log(
+          /QUOTA_EXCEEDED_ERR/.test(err) ? private_browsing_error : err
+        );
+      }
+    }
+  };
+
   log = (key: string, ...args: any[]) => {
     if (!this.debug) return;
     const cond =
@@ -101,6 +126,7 @@ export default class Kit {
   };
 
   uncrypt = async () => {
+    const { ls } = this
     return new Promise((solve) => {
       window.addEventListener("DOMContentLoaded", async (event) => {
         const tpl = document.querySelector("template#content");
@@ -109,8 +135,9 @@ export default class Kit {
         const encrypted = value.slice(9);
         const tryPassword = async () => {
           try {
-            const pwd = (await prompt("password")) || "";
+            const pwd = ls("user.pwd") || (await prompt("password")) || "";
             const decrypted = await decrypt(encrypted, pwd);
+            ls("user.pwd", pwd)
             // @ts-ignore
             tpl.innerHTML = decrypted;
             return solve(true);

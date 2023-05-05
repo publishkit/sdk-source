@@ -36,7 +36,9 @@ export default class Plugin extends BasePlugin {
 
     headings.each(function () {
       if ($(this).attr("class")?.includes("noprocess")) return;
-      this.id = "heading-" + $utils.s.slugify($(this).text());
+      this.id = $(this).text().trim()
+      $(this).addClass("heading")
+      // this.id = "heading-" + $utils.s.slugify($(this).text());
     });
   };
 
@@ -46,7 +48,7 @@ export default class Plugin extends BasePlugin {
 
     const toc = ui.get("nav").el;
     const icon = ui.get("icon").el;
-    const headings = $('[id^="heading-"]');
+    const headings = $('.heading');
     const lastHeading = headings.last();
 
     icon.on("click", function (e) {
