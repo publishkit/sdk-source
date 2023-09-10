@@ -471,6 +471,15 @@ details[role=list] summary::after, li[role=list]>a::after {
     padding-top: calc(var(--header-height));
   }
 
+
+  .ui-left:has(> .open) {
+    width: 100%;
+    background: var(--card-background-color);
+    height: 100%;
+    max-height: calc(100vh - var(--header-height));
+    overflow: scroll;
+  }
+
   .ui-center {
     border-radius: 0;
   }

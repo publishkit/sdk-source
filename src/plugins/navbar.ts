@@ -148,16 +148,14 @@ export default class Plugin extends BasePlugin {
         }
         summary {
           color: var(--h1-color);
-          font-weight: 300;
+          font-weight: bold;
           text-transform: uppercase;
-
+          padding-block: 0.5rem;
+          
           &:after {
             display: none;
           }
         }
-      }
-      details[open] summary {
-        padding-bottom: 0.5rem;
       }
       
       li, summary {
@@ -194,7 +192,9 @@ export default class Plugin extends BasePlugin {
 
     .ui-header-right {
       [id="navbar.nav"] ul {
-        display: flex;
+        display: grid;
+        grid-row-gap: 1rem;
+        grid-auto-flow: column;
       }
     }
 
@@ -211,10 +211,6 @@ export default class Plugin extends BasePlugin {
           grid-template-columns: auto auto;
           justify-content: space-around;
           user-select: none;
-          width: 100%;
-          position: fixed;
-          top: var(--header-height);
-          left: 0;
           display: grid;
           grid-column-gap: 10px;
           grid-row-gap: 3rem;
@@ -223,7 +219,7 @@ export default class Plugin extends BasePlugin {
           align-items: start;
           font-size: 1rem;
           background: var(--bg);
-          border-bottom: 10000px solid var(--muted-border-color);
+          border-bottom: 4px solid var(--muted-border-color);
           border-top: 4px solid var(--muted-border-color);
           padding: calc(var(--spacing) * 2);
     
@@ -231,6 +227,18 @@ export default class Plugin extends BasePlugin {
             margin-bottom: 0;
             padding-bottom: 0;
           }
+        }
+      }
+
+  
+      .ui-header-right > [id="navbar.nav"] {
+        position: fixed;
+        left: 0;
+        top: var(--header-height);
+        width: 100%;
+  
+        ul {
+          grid-auto-flow: row;
         }
       }
     }

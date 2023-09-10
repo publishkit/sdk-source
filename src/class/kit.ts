@@ -28,7 +28,8 @@ export default class Kit {
   }
 
   ls = (key: string, value?: string) => {
-    if (localStorage == null) return console.log("Local storage not supported!");
+    if (localStorage == null)
+      return console.log("Local storage not supported!");
     else {
       try {
         let result: string | void | null = "";
@@ -126,7 +127,7 @@ export default class Kit {
   };
 
   uncrypt = async () => {
-    const { ls } = this
+    const { ls } = this;
     return new Promise((solve) => {
       window.addEventListener("DOMContentLoaded", async (event) => {
         const tpl = document.querySelector("template#content");
@@ -137,7 +138,7 @@ export default class Kit {
           try {
             const pwd = ls("user.pwd") || (await prompt("password")) || "";
             const decrypted = await decrypt(encrypted, pwd);
-            ls("user.pwd", pwd)
+            ls("user.pwd", pwd);
             // @ts-ignore
             tpl.innerHTML = decrypted;
             return solve(true);
@@ -152,27 +153,30 @@ export default class Kit {
   };
 
   liscence = async () => {
-    try {
-      if (this.localhost) return (this.ready = true);
+    // 3 august 2023 - going open source
+    this.ready = true;
+    return true;
+    // try {
+    //   if (this.localhost) return (this.ready = true);
 
-      const kitID = this.kitrc.site?.id;
-      if (!kitID)
-        throw new Error(
-          `💥 setting "site.id" missing. more at https://publishkit.dev`
-        );
-      const kit = await (await fetch(`${this.api}/site?id=${kitID}`)).json();
-      kit.hostname = new URL(kit.url).hostname
-      const hostname = window.location.hostname;
-      if (hostname != kit.hostname)
-        throw new Error(
-          `💥 "${hostname}" is unregistered. more at https://publishkit.dev`
-        );
-      this.ready = true;
-    } catch (e) {
-      console.log(e);
-      this.error = e.message;
-      this.ready = true;
-    }
+    //   const kitID = this.kitrc.site?.id;
+    //   if (!kitID)
+    //     throw new Error(
+    //       `💥 setting "site.id" missing. more at https://publishkit.dev`
+    //     );
+    //   const kit = await (await fetch(`${this.api}/site?id=${kitID}`)).json();
+    //   kit.hostname = new URL(kit.url).hostname;
+    //   const hostname = window.location.hostname;
+    //   if (hostname != kit.hostname)
+    //     throw new Error(
+    //       `💥 "${hostname}" is unregistered. more at https://publishkit.dev`
+    //     );
+    //   this.ready = true;
+    // } catch (e) {
+    //   console.log(e);
+    //   this.error = e.message;
+    //   this.ready = true;
+    // }
   };
 
   unregistered = () => {

@@ -2,8 +2,6 @@ import * as dotenv from "dotenv-flow";
 dotenv.config();
 import typescript from "@rollup/plugin-typescript";
 
-import css from "rollup-plugin-import-css";
-import obfuscator from "rollup-plugin-obfuscator";
 import cleanup from "rollup-plugin-cleanup";
 import replace from "rollup-plugin-replace";
 import less from "./plugins/rollup-less.mjs";
@@ -24,11 +22,9 @@ if (NODE_ENV == "prod") {
       typescript(),
       less({ output: `${dist}/kit.css`, sourcemap: false, minify: true }),
       replace({
-        "process.env.KIT_API": JSON.stringify(process.env.KIT_API),
         "process.env.KIT_URL": JSON.stringify(process.env.KIT_URL),
       }),
       cleanup(),
-      obfuscator.default(),
     ],
   });
 
@@ -39,11 +35,9 @@ if (NODE_ENV == "prod") {
     plugins: [
       typescript(),
       replace({
-        "process.env.KIT_API": JSON.stringify(process.env.KIT_API),
         "process.env.KIT_URL": JSON.stringify(process.env.KIT_URL),
       }),
       cleanup(),
-      obfuscator.default(),
     ],
   });
 }
@@ -57,7 +51,6 @@ if (NODE_ENV == "dev") {
       typescript(),
       less({ output: "dev/kit.css", sourcemap: true, minify: false }),
       replace({
-        "process.env.KIT_API": JSON.stringify(process.env.KIT_API),
         "process.env.KIT_URL": JSON.stringify(process.env.KIT_URL),
       }),
       cleanup(),
@@ -78,7 +71,6 @@ if (NODE_ENV == "dev") {
         ],
       }),
       replace({
-        "process.env.KIT_API": JSON.stringify(process.env.KIT_API),
         "process.env.KIT_URL": JSON.stringify(process.env.KIT_URL),
       }),
       cleanup(),
